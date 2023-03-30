@@ -9,7 +9,9 @@
     "what": "ECHO Package system: npm",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:generate": "dotenv -e .env.local -- npx prisma generate",
+    "prisma:push:local": "dotenv -e .env.local -- npx prisma db push"
   },
   "dependencies": {
     "next": "^13.1.6",
@@ -25,6 +27,7 @@
     "@types/styled-components": "^5.1.26",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
+    "dotenv-cli": "^7.1.0",
     "eslint": "^8.23.1",
     "eslint-config-next": "^13.1.6",
     "eslint-plugin-jest": "^27.0.4",

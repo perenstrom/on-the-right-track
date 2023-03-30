@@ -6,3 +6,85 @@ datasource db {
   provider = "postgresql"
   url      = env("DB_CONNECTION_STRING")
 }
+
+model Competition {
+  id           String  @id
+  name         String
+  hosts        String
+  currentStage Int?    @map("current_stage")
+  currentLevel Int?    @map("current_level")
+  winnerTeamId String? @unique @map("winner_team_id")
+
+  winnerTeam Team?     @relation("winner_team", fields: [winnerTeamId], references: [id])
+  teams      Team[]    @relation("playing_teams")
+  segments   Segment[]
+
+  @@map("competitions")
+}
+
+model Team {
+  id            String @id
+  name          String
+  members       String
+  competitionId String @map("competition_id")
+
+  competition       Competition        @relation("playing_teams", fields: [competitionId], references: [id])
+  competitionWin    Competition?       @relation("winner_team")
+  segmentTeamStates SegmentTeamState[]
+
+  @@map("teams")
+}
+
+model Segment {
+  id              String      @id
+  competitionId   String      @map("competition_id")
+  order           Int
+  type            SegmentType @default(QUESTION)
+  numberOfOptions Int?        @map("number_of_options")
+  scorePublished  Boolean     @default(false) @map("score_published")
+
+  competition       Competition        @relation(fields: [competitionId], references: [id])
+  segmentTeamStates SegmentTeamState[]
+
+  @@map("segments")
+}
+
+enum SegmentType {
+  TRIP
+  QUESTION
+  MUSIC
+  SPECIAL
+}
+
+model SegmentTeamState {
+  id        String    @id
+  segmentId String    @map("segment_id")
+  teamId    String    @map("team_id")
+  state     TeamState @default(IDLE)
+  stopLevel Int?      @map("stop_level")
+  score     Int?
+
+  segment Segment  @relation(fields: [segmentId], references: [id])
+  team    Team     @relation(fields: [teamId], references: [id])
+  answers  Answer[]
+
+  @@map("segment_team_states")
+}
+
+enum TeamState {
+  IDLE
+  STOPPED
+  STOPPED_ANSWERED
+  ANSWERED
+}
+
+model Answer {
+  id             String @id
+  stateId        String @map("state_id")
+  questionNumber Int    @map("question_number")
+  answer         String
+
+  state SegmentTeamState @relation(fields: [stateId], references: [id])
+
+  @@map("answers")
+}
