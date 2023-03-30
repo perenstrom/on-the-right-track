@@ -8,12 +8,13 @@ datasource db {
 }
 
 model Competition {
-  id           String  @id
+  id           String   @id
   name         String
   hosts        String
-  currentStage Int?    @map("current_stage")
-  currentLevel Int?    @map("current_level")
-  winnerTeamId String? @unique @map("winner_team_id")
+  date         DateTime
+  currentStage Int?     @map("current_stage")
+  currentLevel Int?     @map("current_level")
+  winnerTeamId String?  @unique @map("winner_team_id")
 
   winnerTeam Team?     @relation("winner_team", fields: [winnerTeamId], references: [id])
   teams      Team[]    @relation("playing_teams")
@@ -66,7 +67,7 @@ model SegmentTeamState {
 
   segment Segment  @relation(fields: [segmentId], references: [id])
   team    Team     @relation(fields: [teamId], references: [id])
-  answers  Answer[]
+  answers Answer[]
 
   @@map("segment_team_states")
 }
