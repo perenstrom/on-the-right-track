@@ -1,94 +1,72 @@
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
-  max-width: 700px;
+  max-width: 800px;
   margin: 0 auto;
-  margin-top: 6rem;
   padding: 0 1rem;
-
+  padding-top: 6rem;
 
   @media (max-width: 768px) {
     margin-top: 3rem;
   }
 `;
 
-const IndexPage: NextPage<{}> = ({}) => {
+const Quote = styled.blockquote`
+  text-align: right;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: hsl(0 0% 50%);
+`;
+
+const Add = styled.p`
+  margin-top: 1rem;
+`;
+
+interface Props {
+  competitions: string[];
+}
+
+const IndexPage: NextPage<Props> = ({ competitions }) => {
   return (
     <Wrapper>
       <h1>Den Riktiga Finalen</h1>
       <p>
-        Competition is a fundamental aspect of human society that drives
-        innovation, progress, and growth. It refers to a situation where two or
-        more individuals or groups are vying for the same resources or goals,
-        creating a dynamic where each participant must strive to outperform the
-        others. In many cases, competition can be healthy and beneficial, as it
-        motivates people to work harder, be more creative, and think outside the
-        box. However, it can also be destructive, leading to unethical behavior,
-        sabotage, and cutthroat tactics that harm both the individuals involved
-        and the larger community.
+        <b>Den Riktiga Finalen</b> är en av de mest prestigefyllda och
+        eftertraktade tävlingarna i sitt slag. Deltagarna kämpar i flera
+        omgångar, där varje moment och fråga är avgörande. Att vinna{' '}
+        <b>Den Riktiga Finalen</b> innebär inte bara en känsla av personlig
+        stolthet, utan också äran att bära titeln som mästare under ett helt år.
+        Det är en hedersbetygelse som de flesta deltagare strävar efter och som
+        bevisar att de är bland de mest kunniga och skickliga i världen.
       </p>
-      <h2>Den Riktiga Finalen</h2>
-      <p>
-        Competition is a fundamental aspect of human society that drives
-        innovation, progress, and growth. It refers to a situation where two or
-        more individuals or groups are vying for the same resources or goals,
-        creating a dynamic where each participant must strive to outperform the
-        others. In many cases, competition can be healthy and beneficial, as it
-        motivates people to work harder, be more creative, and think outside the
-        box. However, it can also be destructive, leading to unethical behavior,
-        sabotage, and cutthroat tactics that harm both the individuals involved
-        and the larger community.
-      </p>
-      <h3>Den Riktiga Finalen</h3>
-      <p>
-        Competition is a fundamental aspect of human society that drives
-        innovation, progress, and growth. It refers to a situation where two or
-        more individuals or groups are vying for the same resources or goals,
-        creating a dynamic where each participant must strive to outperform the
-        others. In many cases, competition can be healthy and beneficial, as it
-        motivates people to work harder, be more creative, and think outside the
-        box. However, it can also be destructive, leading to unethical behavior,
-        sabotage, and cutthroat tactics that harm both the individuals involved
-        and the larger community.
-      </p>
-      <h4>Den Riktiga Finalen</h4>
-      <p>
-        Competition is a fundamental aspect of human society that drives
-        innovation, progress, and growth. It refers to a situation where two or
-        more individuals or groups are vying for the same resources or goals,
-        creating a dynamic where each participant must strive to outperform the
-        others. In many cases, competition can be healthy and beneficial, as it
-        motivates people to work harder, be more creative, and think outside the
-        box. However, it can also be destructive, leading to unethical behavior,
-        sabotage, and cutthroat tactics that harm both the individuals involved
-        and the larger community.
-      </p>
-      <h5>Den Riktiga Finalen</h5>
-      <p>
-        Competition is a fundamental aspect of human society that drives
-        innovation, progress, and growth. It refers to a situation where two or
-        more individuals or groups are vying for the same resources or goals,
-        creating a dynamic where each participant must strive to outperform the
-        others. In many cases, competition can be healthy and beneficial, as it
-        motivates people to work harder, be more creative, and think outside the
-        box. However, it can also be destructive, leading to unethical behavior,
-        sabotage, and cutthroat tactics that harm both the individuals involved
-        and the larger community.
-      </p>
-      <p>
-        In the business world, competition is a ubiquitous force that drives
-        companies to improve their products, services, and strategies.
-        Businesses compete for customers, market share, and profits, creating a
-        highly dynamic and ever-evolving landscape that rewards innovation and
-        adaptability. While competition can be intense and stressful, it can
-        also be highly rewarding for those who excel, providing opportunities
-        for growth, recognition, and success. Ultimately, competition plays a
-        crucial role in shaping our society and driving progress in all areas of
-        life.
-      </p>
+      <Quote>– ChatGPT, 2023</Quote>
+
+      <h2>Tävlingar</h2>
+      {competitions.length > 0 ? (
+        <ul>
+          {competitions.map((competition) => (
+            <li key={competition}>{competition}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>
+          <i>Det finns inga tävlingar just nu.</i>
+        </p>
+      )}
+      <Add>
+        <a href="#">Skapa tävling</a>
+      </Add>
     </Wrapper>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  return {
+    props: {
+      competitions: ['asdf', 'qwer']
+    }
+  };
 };
 
 export default IndexPage;

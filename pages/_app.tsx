@@ -54,7 +54,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   h1, h2, h3, h4, h5, h6 {
-    margin: 3rem 0 1.38rem;
+    margin: 3rem 0 1.38rem -0.4rem;
     font-family: 'Cinzel', serif;
     font-weight: 700;
     line-height: 1.3;
@@ -77,6 +77,17 @@ const GlobalStyle = createGlobalStyle`
 
   p {
     margin-bottom: 1rem;
+    b {
+      font-weight: 500;
+    }
+  }
+
+  a {
+    color: hsl(0 0% 15%);
+  }
+
+  a:hover {
+    color: hsl(320 70% 35%);
   }
 
   @media (max-width: 768px) {
