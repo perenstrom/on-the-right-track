@@ -24,7 +24,7 @@ model Competition {
 }
 
 model Team {
-  id            String @id
+  id            String @id @default(uuid())
   name          String
   members       String
   competitionId String @map("competition_id")
@@ -37,9 +37,10 @@ model Team {
 }
 
 model Segment {
-  id              String      @id
+  id              String      @id @default(uuid())
   competitionId   String      @map("competition_id")
   order           Int
+  orderOfType     Int         @map("order_of_type")
   type            SegmentType @default(QUESTION)
   numberOfOptions Int?        @map("number_of_options")
   scorePublished  Boolean     @default(false) @map("score_published")
@@ -58,7 +59,7 @@ enum SegmentType {
 }
 
 model SegmentTeamState {
-  id        String    @id
+  id        String    @id @default(uuid())
   segmentId String    @map("segment_id")
   teamId    String    @map("team_id")
   state     TeamState @default(IDLE)
@@ -80,7 +81,7 @@ enum TeamState {
 }
 
 model Answer {
-  id             String @id
+  id             String @id @default(uuid())
   stateId        String @map("state_id")
   questionNumber Int    @map("question_number")
   answer         String
