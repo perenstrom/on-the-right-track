@@ -1,19 +1,9 @@
-import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
-import { getCompetitions } from 'services/prisma';
 import styled from 'styled-components';
+import { Wrapper } from 'components/Wrapper';
+import { prismaContext } from 'lib/prisma';
+import { getCompetitions } from 'services/prisma';
 import { Competition } from 'types/types';
-
-const Wrapper = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  padding-top: 6rem;
-
-  @media (max-width: 768px) {
-    margin-top: 3rem;
-  }
-`;
 
 const Quote = styled.blockquote`
   text-align: right;
@@ -60,7 +50,7 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
         </p>
       )}
       <Add>
-        <a href="#">Skapa tävling</a>
+        <a href="/create">Skapa tävling</a>
       </Add>
     </Wrapper>
   );
