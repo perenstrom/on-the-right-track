@@ -1,6 +1,8 @@
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Segment as SegmentType } from '@prisma/client';
+import { SegmentIcon } from 'components/SegmentIcon';
+import { getSegmentTypeName } from 'helpers/copy';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -65,7 +67,8 @@ export const Segment: React.FC<{
   return (
     <Wrapper>
       <span>
-        {segment.type} {segment.orderOfType}
+        <SegmentIcon type={segment.type} />
+        {getSegmentTypeName(segment.type)} {segment.orderOfType}
       </span>
       <OrderWrapper>
         <button type="button" disabled={segment.order === 1}>
