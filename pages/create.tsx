@@ -55,6 +55,49 @@ const CreatePage: NextPage<{}> = () => {
     ]);
   };
 
+  const moveSegment = (direction: 'up' | 'down', currentPosition: number) => {
+    if (
+      (direction === 'up' && currentPosition === 1) ||
+      (direction === 'down' && currentPosition === segments.length)
+    ) {
+      return;
+    }
+
+    const segmentToMove = segments[currentPosition - 1];
+    const segmentToSwitchWith =
+      segments[currentPosition + (direction === 'up' ? -1 : 1) - 1];
+    const sameType = segmentToMove.type === segmentToSwitchWith.type;
+
+    const newSegments = segments
+      .map((segment) => {
+        if (segment.order === currentPosition) {
+          return {
+            ...segment,
+            order:
+              direction === 'up' ? currentPosition - 1 : currentPosition + 1,
+            orderOfType: sameType
+              ? segmentToMove.orderOfType + (direction === 'up' ? -1 : 1)
+              : segmentToMove.orderOfType
+          };
+        }
+
+        if (segment.order === currentPosition + (direction === 'up' ? -1 : 1)) {
+          return {
+            ...segment,
+            order: currentPosition,
+            orderOfType: sameType
+              ? segmentToSwitchWith.orderOfType + (direction === 'up' ? 1 : -1)
+              : segmentToSwitchWith.orderOfType
+          };
+        }
+
+        return segment;
+      })
+      .sort((a, b) => a.order - b.order);
+
+    setSegments(newSegments);
+  };
+
   return (
     <Wrapper>
       <h1>Skapa tävling</h1>
@@ -91,6 +134,8 @@ const CreatePage: NextPage<{}> = () => {
                 key={`${segment.type}-${segment.orderOfType}`}
                 segment={segment}
                 totalSegments={segments.length}
+                moveUp={() => moveSegment('up', segment.order)}
+                moveDown={() => moveSegment('down', segment.order)}
               />
             ))}
           </SegmentWrapper>

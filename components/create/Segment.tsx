@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Segment as SegmentType } from '@prisma/client';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getSegmentTypeName } from 'helpers/copy';
+import { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -63,7 +64,9 @@ const OrderWrapper = styled.div`
 export const Segment: React.FC<{
   segment: Omit<SegmentType, 'id' | 'competitionId'>;
   totalSegments: number;
-}> = ({ segment, totalSegments }) => {
+  moveUp: MouseEventHandler;
+  moveDown: MouseEventHandler;
+}> = ({ segment, totalSegments, moveUp, moveDown }) => {
   return (
     <Wrapper>
       <span>
@@ -71,10 +74,14 @@ export const Segment: React.FC<{
         {getSegmentTypeName(segment.type)} {segment.orderOfType}
       </span>
       <OrderWrapper>
-        <button type="button" disabled={segment.order === 1}>
+        <button type="button" disabled={segment.order === 1} onClick={moveUp}>
           <FontAwesomeIcon icon={faArrowUp} />
         </button>
-        <button type="button" disabled={segment.order === totalSegments}>
+        <button
+          type="button"
+          disabled={segment.order === totalSegments}
+          onClick={moveDown}
+        >
           <FontAwesomeIcon icon={faArrowDown} />
         </button>
       </OrderWrapper>
