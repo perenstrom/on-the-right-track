@@ -1,5 +1,5 @@
 import {
-  faCircleQuestion,
+  faClipboardList,
   faFeatherPointed,
   faMusic,
   faTrain
@@ -18,7 +18,7 @@ export const SegmentIcon: React.FC<{
     case 'TRIP':
       return <FontAwesomeIcon icon={faTrain} style={style} />;
     case 'QUESTION':
-      return <FontAwesomeIcon icon={faCircleQuestion} style={style} />;
+      return <FontAwesomeIcon icon={faClipboardList} style={style} />;
     case 'MUSIC':
       return <FontAwesomeIcon icon={faMusic} style={style} />;
     case 'SPECIAL':

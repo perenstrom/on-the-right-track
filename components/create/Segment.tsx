@@ -1,4 +1,8 @@
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowDown,
+  faArrowUp,
+  faTrashCan
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Segment as SegmentType } from '@prisma/client';
 import { SegmentIcon } from 'components/SegmentIcon';
@@ -15,12 +19,13 @@ const Wrapper = styled.div`
   font-weight: 500;
 
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 
   span {
     padding: 0.5rem;
     display: block;
+    flex-grow: 1;
   }
 `;
 
@@ -37,15 +42,12 @@ const OrderWrapper = styled.div`
     border: 0;
     background-color: transparent;
     flex-grow: 1;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
   }
 
   button:first-child {
     border-bottom: 1px solid black;
-    border-top-right-radius: 3px;
-  }
-
-  button:last-child {
-    border-bottom-right-radius: 3px;
   }
 
   button:hover {
@@ -61,12 +63,29 @@ const OrderWrapper = styled.div`
   }
 `;
 
+const DeleteButton = styled.button`
+  border: 0;
+  background-color: transparent;
+  height: 100%;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+
+  border-left: 1px solid black;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+
+  &:hover {
+    background-color: #bfbfbf;
+  }
+`;
+
 export const Segment: React.FC<{
   segment: Omit<SegmentType, 'id' | 'competitionId'>;
   totalSegments: number;
   moveUp: MouseEventHandler;
   moveDown: MouseEventHandler;
-}> = ({ segment, totalSegments, moveUp, moveDown }) => {
+  deleteSegment: MouseEventHandler;
+}> = ({ segment, totalSegments, moveUp, moveDown, deleteSegment }) => {
   return (
     <Wrapper>
       <span>
@@ -85,6 +104,9 @@ export const Segment: React.FC<{
           <FontAwesomeIcon icon={faArrowDown} />
         </button>
       </OrderWrapper>
+      <DeleteButton type="button" onClick={deleteSegment}>
+        <FontAwesomeIcon icon={faTrashCan} />
+      </DeleteButton>
     </Wrapper>
   );
 };

@@ -98,6 +98,38 @@ const CreatePage: NextPage<{}> = () => {
     setSegments(newSegments);
   };
 
+  const deleteSegment = (position: number) => {
+    const segmentToDelete = segments[position - 1];
+
+    const newSegments = segments
+      .filter((segment) => segment.order !== position)
+      .map((segment) => {
+        const newOrder =
+          segment.order > segmentToDelete.order
+            ? segment.order - 1
+            : segment.order;
+
+        if (segment.type === segmentToDelete.type) {
+          return {
+            ...segment,
+            order: newOrder,
+            orderOfType:
+              segment.orderOfType > segmentToDelete.orderOfType
+                ? segment.orderOfType - 1
+                : segment.orderOfType
+          };
+        }
+
+        return {
+          ...segment,
+          order: newOrder
+        };
+      })
+      .sort((a, b) => a.order - b.order);
+
+    setSegments(newSegments);
+  };
+
   return (
     <Wrapper>
       <h1>Skapa tävling</h1>
@@ -136,6 +168,7 @@ const CreatePage: NextPage<{}> = () => {
                 totalSegments={segments.length}
                 moveUp={() => moveSegment('up', segment.order)}
                 moveDown={() => moveSegment('down', segment.order)}
+                deleteSegment={() => deleteSegment(segment.order)}
               />
             ))}
           </SegmentWrapper>
