@@ -1,5 +1,8 @@
+import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
+import { getCompetitions } from 'services/prisma';
 import styled from 'styled-components';
+import { Competition } from 'types/types';
 
 const Wrapper = styled.div`
   max-width: 800px;
@@ -24,7 +27,7 @@ const Add = styled.p`
 `;
 
 interface Props {
-  competitions: string[];
+  competitions: Competition[];
 }
 
 const IndexPage: NextPage<Props> = ({ competitions }) => {
@@ -46,7 +49,9 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
       {competitions.length > 0 ? (
         <ul>
           {competitions.map((competition) => (
-            <li key={competition}>{competition}</li>
+            <li key={competition.id}>
+              {competition.name} - {competition.hosts}
+            </li>
           ))}
         </ul>
       ) : (
@@ -62,9 +67,11 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const competitions = await getCompetitions(prismaContext);
+
   return {
     props: {
-      competitions: ['asdf', 'qwer']
+      competitions
     }
   };
 };

@@ -15,3 +15,7 @@ export const prisma =
 export const prismaContext = { prisma };
 
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
+
+export type Context = {
+  prisma: PrismaClient;
+};
