@@ -3,8 +3,9 @@ import { Wrapper } from 'components/Wrapper';
 import styled from 'styled-components';
 import { Button } from 'components/Button';
 import { useState } from 'react';
-import { Segment as PrismaSegment, SegmentType } from '@prisma/client';
+import { SegmentType } from '@prisma/client';
 import { Segment } from 'components/create/Segment';
+import { UncreatedSegment } from 'types/types';
 
 const Label = styled.label`
   display: block;
@@ -30,29 +31,63 @@ const ButtonWrapper = styled.div`
   margin-bottom: 4rem;
 `;
 
+const calculateSegmentNumbers = (
+  segments: UncreatedSegment[]
+): UncreatedSegment[] => {
+  const orderOfType: Record<SegmentType, number> = {
+    TRIP: 0,
+    QUESTION: 0,
+    MUSIC: 0,
+    SPECIAL: 0
+  };
+  let nearestTrip = 0;
+
+  return segments.map((segment) => {
+    if (segment.type === 'TRIP') {
+      nearestTrip += 1;
+      orderOfType.TRIP += 1;
+      orderOfType.QUESTION = 0;
+    }
+
+    if (segment.type === 'QUESTION') {
+      orderOfType.QUESTION += 1;
+    }
+
+    if (segment.type === 'MUSIC') {
+      orderOfType.MUSIC += 1;
+    }
+
+    if (segment.type === 'SPECIAL') {
+      orderOfType.SPECIAL += 1;
+    }
+
+    return {
+      ...segment,
+      orderOfType: orderOfType[segment.type],
+      nearestTrip
+    };
+  });
+};
+
 const CreatePage: NextPage<{}> = () => {
   const [name, setName] = useState('');
   const [hosts, setHosts] = useState('');
   const [date, setDate] = useState('');
-  const [segments, setSegments] = useState<
-    Omit<PrismaSegment, 'id' | 'competitionId'>[]
-  >([]);
+  const [segments, setSegments] = useState<UncreatedSegment[]>([]);
 
   const addSegment = (type: SegmentType) => {
-    const orderOfType = segments.filter(
-      (segment) => segment.type === type
-    ).length;
+    const newSegment = {
+      type,
+      order: segments.length + 1,
+      scorePublished: false,
+      numberOfOptions: null,
+      orderOfType: 0,
+      nearestTrip: 0
+    };
 
-    setSegments([
-      ...segments,
-      {
-        type,
-        order: segments.length + 1,
-        scorePublished: false,
-        numberOfOptions: null,
-        orderOfType: orderOfType + 1
-      }
-    ]);
+    const newSegments = calculateSegmentNumbers([...segments, newSegment]);
+
+    setSegments(newSegments);
   };
 
   const moveSegment = (direction: 'up' | 'down', currentPosition: number) => {
@@ -63,31 +98,20 @@ const CreatePage: NextPage<{}> = () => {
       return;
     }
 
-    const segmentToMove = segments[currentPosition - 1];
-    const segmentToSwitchWith =
-      segments[currentPosition + (direction === 'up' ? -1 : 1) - 1];
-    const sameType = segmentToMove.type === segmentToSwitchWith.type;
-
     const newSegments = segments
       .map((segment) => {
         if (segment.order === currentPosition) {
           return {
             ...segment,
             order:
-              direction === 'up' ? currentPosition - 1 : currentPosition + 1,
-            orderOfType: sameType
-              ? segmentToMove.orderOfType + (direction === 'up' ? -1 : 1)
-              : segmentToMove.orderOfType
+              direction === 'up' ? currentPosition - 1 : currentPosition + 1
           };
         }
 
         if (segment.order === currentPosition + (direction === 'up' ? -1 : 1)) {
           return {
             ...segment,
-            order: currentPosition,
-            orderOfType: sameType
-              ? segmentToSwitchWith.orderOfType + (direction === 'up' ? 1 : -1)
-              : segmentToSwitchWith.orderOfType
+            order: currentPosition
           };
         }
 
@@ -95,7 +119,7 @@ const CreatePage: NextPage<{}> = () => {
       })
       .sort((a, b) => a.order - b.order);
 
-    setSegments(newSegments);
+    setSegments(calculateSegmentNumbers(newSegments));
   };
 
   const deleteSegment = (position: number) => {
@@ -109,17 +133,6 @@ const CreatePage: NextPage<{}> = () => {
             ? segment.order - 1
             : segment.order;
 
-        if (segment.type === segmentToDelete.type) {
-          return {
-            ...segment,
-            order: newOrder,
-            orderOfType:
-              segment.orderOfType > segmentToDelete.orderOfType
-                ? segment.orderOfType - 1
-                : segment.orderOfType
-          };
-        }
-
         return {
           ...segment,
           order: newOrder
@@ -127,7 +140,7 @@ const CreatePage: NextPage<{}> = () => {
       })
       .sort((a, b) => a.order - b.order);
 
-    setSegments(newSegments);
+    setSegments(calculateSegmentNumbers(newSegments));
   };
 
   return (
@@ -163,7 +176,11 @@ const CreatePage: NextPage<{}> = () => {
           <SegmentWrapper>
             {segments.map((segment) => (
               <Segment
-                key={`${segment.type}-${segment.orderOfType}`}
+                key={
+                  segment.type === 'QUESTION'
+                    ? `${segment.type}-${segment.nearestTrip}:${segment.orderOfType}`
+                    : `${segment.type}-${segment.orderOfType}`
+                }
                 segment={segment}
                 totalSegments={segments.length}
                 moveUp={() => moveSegment('up', segment.order)}

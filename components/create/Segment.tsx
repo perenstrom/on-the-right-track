@@ -4,11 +4,11 @@ import {
   faTrashCan
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Segment as SegmentType } from '@prisma/client';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getSegmentTypeName } from 'helpers/copy';
 import { MouseEventHandler } from 'react';
 import styled from 'styled-components';
+import { UncreatedSegment } from 'types/types';
 
 const Wrapper = styled.div`
   width: 22rem;
@@ -80,17 +80,24 @@ const DeleteButton = styled.button`
 `;
 
 export const Segment: React.FC<{
-  segment: Omit<SegmentType, 'id' | 'competitionId'>;
+  segment: UncreatedSegment;
   totalSegments: number;
   moveUp: MouseEventHandler;
   moveDown: MouseEventHandler;
   deleteSegment: MouseEventHandler;
 }> = ({ segment, totalSegments, moveUp, moveDown, deleteSegment }) => {
+  const segmentName =
+    segment.type === 'QUESTION'
+      ? `${getSegmentTypeName(segment.type)} ${segment.nearestTrip}:${
+          segment.orderOfType
+        }`
+      : `${getSegmentTypeName(segment.type)} ${segment.orderOfType}`;
+
   return (
     <Wrapper>
       <span>
         <SegmentIcon type={segment.type} />
-        {getSegmentTypeName(segment.type)} {segment.orderOfType}
+        {segmentName}
       </span>
       <OrderWrapper>
         <button type="button" disabled={segment.order === 1} onClick={moveUp}>

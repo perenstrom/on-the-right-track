@@ -40,6 +40,7 @@ model Segment {
   id              String      @id @default(uuid())
   competitionId   String      @map("competition_id")
   order           Int
+  nearestTrip     Int?        @map("nearest_trip")
   orderOfType     Int         @map("order_of_type")
   type            SegmentType @default(QUESTION)
   numberOfOptions Int?        @map("number_of_options")
