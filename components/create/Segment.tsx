@@ -5,7 +5,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegmentIcon } from 'components/SegmentIcon';
-import { getSegmentTypeName } from 'helpers/copy';
+import { getFullSegmentName } from 'helpers/copy';
 import { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import { UncreatedSegment } from 'types/types';
@@ -85,35 +85,26 @@ export const Segment: React.FC<{
   moveUp: MouseEventHandler;
   moveDown: MouseEventHandler;
   deleteSegment: MouseEventHandler;
-}> = ({ segment, totalSegments, moveUp, moveDown, deleteSegment }) => {
-  const segmentName =
-    segment.type === 'QUESTION'
-      ? `${getSegmentTypeName(segment.type)} ${segment.nearestTrip}:${
-          segment.orderOfType
-        }`
-      : `${getSegmentTypeName(segment.type)} ${segment.orderOfType}`;
-
-  return (
-    <Wrapper>
-      <span>
-        <SegmentIcon type={segment.type} />
-        {segmentName}
-      </span>
-      <OrderWrapper>
-        <button type="button" disabled={segment.order === 1} onClick={moveUp}>
-          <FontAwesomeIcon icon={faArrowUp} />
-        </button>
-        <button
-          type="button"
-          disabled={segment.order === totalSegments}
-          onClick={moveDown}
-        >
-          <FontAwesomeIcon icon={faArrowDown} />
-        </button>
-      </OrderWrapper>
-      <DeleteButton type="button" onClick={deleteSegment}>
-        <FontAwesomeIcon icon={faTrashCan} />
-      </DeleteButton>
-    </Wrapper>
-  );
-};
+}> = ({ segment, totalSegments, moveUp, moveDown, deleteSegment }) => (
+  <Wrapper>
+    <span>
+      <SegmentIcon type={segment.type} />
+      {getFullSegmentName(segment)}
+    </span>
+    <OrderWrapper>
+      <button type="button" disabled={segment.order === 1} onClick={moveUp}>
+        <FontAwesomeIcon icon={faArrowUp} />
+      </button>
+      <button
+        type="button"
+        disabled={segment.order === totalSegments}
+        onClick={moveDown}
+      >
+        <FontAwesomeIcon icon={faArrowDown} />
+      </button>
+    </OrderWrapper>
+    <DeleteButton type="button" onClick={deleteSegment}>
+      <FontAwesomeIcon icon={faTrashCan} />
+    </DeleteButton>
+  </Wrapper>
+);
