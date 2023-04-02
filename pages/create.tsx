@@ -2,10 +2,12 @@ import { NextPage } from 'next';
 import { Wrapper } from 'components/Wrapper';
 import styled from 'styled-components';
 import { Button } from 'components/Button';
-import { useState } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { SegmentType } from '@prisma/client';
 import { Segment } from 'components/create/Segment';
 import { UncreatedSegment } from 'types/types';
+import { createCompetition } from 'services/local';
+import { useRouter } from 'next/router';
 
 const Label = styled.label`
   display: block;
@@ -28,7 +30,23 @@ const SegmentWrapper = styled.div`
 const ButtonWrapper = styled.div`
   display: flex;
   gap: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const SubmitButton = styled(Button)`
   margin-bottom: 4rem;
+  background-color: hsl(116, 46%, 55%);
+  border: 1px solid hsl(116, 46%, 30%);
+
+  &:hover {
+    background-color: hsl(116, 46%, 50%);
+  }
+`;
+
+const Divider = styled.hr`
+  margin-bottom: 1rem;
+  border: none;
+  border-bottom: 1px solid #999999;
 `;
 
 const calculateSegmentNumbers = (
@@ -143,10 +161,33 @@ const CreatePage: NextPage<{}> = () => {
     setSegments(calculateSegmentNumbers(newSegments));
   };
 
+  const router = useRouter();
+  const submit: FormEventHandler = async (event) => {
+    event.preventDefault();
+
+    try {
+      await createCompetition({
+        competition: {
+          name,
+          hosts,
+          date,
+          currentLevel: null,
+          currentStage: null,
+          winnerTeamId: null
+        },
+        segments
+      });
+
+      router.push('/');
+    } catch (error) {
+      console.log('Soemthing went wrong');
+    }
+  };
+
   return (
     <Wrapper>
       <h1>Skapa tävling</h1>
-      <form>
+      <form onSubmit={submit}>
         <Label htmlFor="name">Namn</Label>
         <Input
           type="text"
@@ -208,6 +249,10 @@ const CreatePage: NextPage<{}> = () => {
             + Specialfråga
           </Button>
         </ButtonWrapper>
+
+        <Divider />
+
+        <SubmitButton>Spara</SubmitButton>
       </form>
     </Wrapper>
   );

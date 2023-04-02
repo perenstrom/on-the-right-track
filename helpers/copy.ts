@@ -30,25 +30,25 @@ export const getShortSegmentTypeName = (type: SegmentType) => {
 export const getFullSegmentName = (segment: UncreatedSegment | Segment) => {
   switch (segment.type) {
     case 'QUESTION':
-      return `${getSegmentTypeName(segment.type)}-${segment.nearestTrip}:${
+      return `${getSegmentTypeName(segment.type)} ${segment.nearestTrip}:${
         segment.orderOfType
       }`;
     case 'TRIP':
     case 'MUSIC':
     case 'SPECIAL':
-      return `${getSegmentTypeName(segment.type)}-${segment.orderOfType}`;
+      return `${getSegmentTypeName(segment.type)} ${segment.orderOfType}`;
   }
 };
 
 export const getShortSegmentName = (segment: UncreatedSegment | Segment) => {
   switch (segment.type) {
     case 'QUESTION':
-      return `${getShortSegmentTypeName(segment.type)}-${segment.nearestTrip}:${
+      return `${getShortSegmentTypeName(segment.type)} ${segment.nearestTrip}:${
         segment.orderOfType
       }`;
     case 'TRIP':
     case 'MUSIC':
     case 'SPECIAL':
-      return `${getShortSegmentTypeName(segment.type)}-${segment.orderOfType}`;
+      return `${getShortSegmentTypeName(segment.type)} ${segment.orderOfType}`;
   }
 };
