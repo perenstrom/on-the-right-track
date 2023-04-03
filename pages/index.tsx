@@ -4,6 +4,7 @@ import { Wrapper } from 'components/Wrapper';
 import { prismaContext } from 'lib/prisma';
 import { getCompetitions } from 'services/prisma';
 import { Competition } from 'types/types';
+import Link from 'next/link';
 
 const Quote = styled.blockquote`
   text-align: right;
@@ -40,7 +41,9 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
         <ul>
           {competitions.map((competition) => (
             <li key={competition.id}>
-              {competition.name} - {competition.hosts}
+              <a href={`/competitions/${competition.id}/admin`}>
+                {competition.name} - {competition.hosts}
+              </a>
             </li>
           ))}
         </ul>
@@ -50,7 +53,7 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
         </p>
       )}
       <Add>
-        <a href="/create">Skapa tävling</a>
+        <Link href="/create">Skapa tävling</Link>
       </Add>
     </Wrapper>
   );

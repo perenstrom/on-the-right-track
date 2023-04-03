@@ -21,6 +21,29 @@ export const getCompetitions = async (ctx: Context): Promise<Competition[]> => {
   }));
 };
 
+export const getCompetition = async (
+  ctx: Context,
+  id: string
+): Promise<Competition> => {
+  const result = await ctx.prisma.competition.findUnique({
+    where: {
+      id
+    },
+    include: {
+      segments: true
+    }
+  });
+
+  if (!result) {
+    throw new Error('Competition not found');
+  }
+
+  return {
+    ...result,
+    date: result.date.toISOString()
+  };
+};
+
 export const createCompetition = async (
   ctx: Context,
   competition: UncreatedCompetition,
