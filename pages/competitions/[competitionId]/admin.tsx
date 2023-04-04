@@ -1,10 +1,40 @@
+import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import { FormEventHandler, useState } from 'react';
+import { createTeam } from 'services/local';
 import { getCompetition } from 'services/prisma';
 import styled from 'styled-components';
-import { Competition } from 'types/types';
+import { FullCompetition, UncreatedTeam } from 'types/types';
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(0, 0%, 90%, 70%);
+  z-index: 100;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > div {
+    background-color: white;
+    padding: 2rem 3rem;
+    border-radius: 10px;
+    width: 30rem;
+    height: 25rem;
+
+    h2 {
+      margin-top: 0;
+    }
+  }
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -47,33 +77,77 @@ const ControlBar = styled.div`
 `;
 
 interface Props {
-  competition: Competition;
+  competition: FullCompetition;
 }
 
 const AdminPage: NextPage<Props> = ({ competition }) => {
+  const router = useRouter();
+
+  const [addingTeam, setAddingTeam] = useState(false);
+  const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
+  const [members, setMembers] = useState('');
+
+  const handleAddTeam: FormEventHandler = async (event) => {
+    event.preventDefault();
+    const newTeam: UncreatedTeam = {
+      name,
+      members,
+      competitionId: competition.id
+    };
+
+    await createTeam(newTeam);
+    setAddingTeam(false);
+    router.replace(router.asPath);
+  };
+
   return (
-    <Wrapper>
-      <BreadCrumb>breadcrumb</BreadCrumb>
-      <Bottom>
-        <ControlBar>
-          <div>Publicera</div>
-          <div>resepoäng</div>
-          <div>moment</div>
-        </ControlBar>
-        <Main>
-          <div>team</div>
-          <div>team</div>
-          <div>team</div>
-          <div>team</div>
-          <div>team</div>
-          <div>team</div>
-          <div>team</div>
-          <div>team</div>
-          <AddTeam triggerAdd={() => console.log('Add')} />
-        </Main>
-      </Bottom>
-      {false && <pre>{JSON.stringify(competition, null, 2)}</pre>}
-    </Wrapper>
+    <>
+      {addingTeam && (
+        <ModalOverlay>
+          <div>
+            <h2>Lägg till lag</h2>
+            <form onSubmit={handleAddTeam}>
+              <Label htmlFor="name">Namn</Label>
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+              <Label htmlFor="members">Medlemmar (ej obligatoriskt)</Label>
+              <Input
+                type="text"
+                id="members"
+                name="members"
+                value={members}
+                onChange={(event) => setMembers(event.target.value)}
+              />
+              <SubmitButton type="submit">Spara</SubmitButton>
+            </form>
+          </div>
+        </ModalOverlay>
+      )}
+      <Wrapper>
+        <BreadCrumb>breadcrumb</BreadCrumb>
+        <Bottom>
+          <ControlBar>
+            <div>Publicera</div>
+            <div>resepoäng</div>
+            <div>moment</div>
+          </ControlBar>
+          <Main>
+            {competition.teams.map((team) => (
+              <div key={team.id}>
+                {team.name} - {team.members}
+              </div>
+            ))}
+            <AddTeam triggerAdd={() => setAddingTeam(true)} />
+          </Main>
+        </Bottom>
+        {false && <pre>{JSON.stringify(competition, null, 2)}</pre>}
+      </Wrapper>
+    </>
   );
 };
 

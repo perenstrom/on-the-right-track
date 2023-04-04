@@ -8,17 +8,7 @@ import { Segment } from 'components/create/Segment';
 import { UncreatedSegment } from 'types/types';
 import { createCompetition } from 'services/local';
 import { useRouter } from 'next/router';
-
-const Label = styled.label`
-  display: block;
-  font-weight: 500;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  max-width: 25rem;
-  margin-bottom: 1rem;
-`;
+import { Label, Input } from 'components/FormControls';
 
 const SegmentWrapper = styled.div`
   display: flex;
