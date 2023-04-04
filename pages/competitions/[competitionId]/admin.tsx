@@ -1,5 +1,6 @@
 import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
+import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -60,10 +61,6 @@ const Main = styled.div`
   grid-template-rows: repeat(3, 1fr);
   gap: 1rem;
   padding: 1rem;
-
-  div {
-    border: 1px solid black;
-  }
 `;
 
 const ControlBar = styled.div`
@@ -138,9 +135,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           </ControlBar>
           <Main>
             {competition.teams.map((team) => (
-              <div key={team.id}>
-                {team.name} - {team.members}
-              </div>
+              <AdminTeam key={team.id} team={team} />
             ))}
             <AddTeam triggerAdd={() => setAddingTeam(true)} />
           </Main>
