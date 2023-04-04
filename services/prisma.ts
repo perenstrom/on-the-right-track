@@ -2,8 +2,10 @@ import { generateRandomId } from 'helpers/utils';
 import { Context } from 'lib/prisma';
 import {
   Competition,
+  FullCompetition,
   UncreatedCompetition,
-  UncreatedSegment
+  UncreatedSegment,
+  UncreatedTeam
 } from 'types/types';
 
 export const getCompetitions = async (ctx: Context): Promise<Competition[]> => {
@@ -24,13 +26,14 @@ export const getCompetitions = async (ctx: Context): Promise<Competition[]> => {
 export const getCompetition = async (
   ctx: Context,
   id: string
-): Promise<Competition> => {
+): Promise<FullCompetition> => {
   const result = await ctx.prisma.competition.findUnique({
     where: {
       id
     },
     include: {
-      segments: true
+      segments: true,
+      teams: true
     }
   });
 
@@ -60,6 +63,14 @@ export const createCompetition = async (
         create: segments
       }
     }
+  });
+
+  return result;
+};
+
+export const createTeam = async (ctx: Context, team: UncreatedTeam) => {
+  const result = await ctx.prisma.team.create({
+    data: team
   });
 
   return result;

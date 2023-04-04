@@ -19,3 +19,9 @@ export const CreateCompetitionSchema = z.object({
   }),
   segments: z.array(CreateSegmentSchema)
 });
+
+export const CreateTeamSchema = z.object({
+  name: z.string(),
+  competitionId: z.string(),
+  members: z.string()
+});
