@@ -33,7 +33,11 @@ export const getCompetition = async (
     },
     include: {
       segments: true,
-      teams: true
+      teams: {
+        include: {
+          segmentTeamStates: true
+        }
+      }
     }
   });
 

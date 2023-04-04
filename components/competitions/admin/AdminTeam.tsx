@@ -39,12 +39,13 @@ const Score = styled.div`
 
 export const AdminTeam: React.FC<{
   team: Team;
-}> = ({ team }) => {
+  score: number;
+}> = ({ team, score }) => {
   return (
     <Wrapper>
       <h2>{team.name}</h2>
       <span>{team.members}</span>
-      <Score>5</Score>
+      <Score>{score}</Score>
     </Wrapper>
   );
 };

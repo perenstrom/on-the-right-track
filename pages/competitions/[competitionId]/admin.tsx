@@ -1,3 +1,4 @@
+import { Segment } from '@prisma/client';
 import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
@@ -77,6 +78,11 @@ interface Props {
   competition: FullCompetition;
 }
 
+const areScorePublished = (segments: Segment[], segmentId: Segment['id']) => {
+  const segment = segments.find((segment) => segment.id === segmentId);
+  return segment ? segment.scorePublished : false;
+};
+
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
 
@@ -135,7 +141,18 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           </ControlBar>
           <Main>
             {competition.teams.map((team) => (
-              <AdminTeam key={team.id} team={team} />
+              <AdminTeam
+                key={team.id}
+                team={team}
+                score={team.segmentTeamStates.reduce(
+                  (acc, state) =>
+                    acc +
+                    (areScorePublished(competition.segments, state.segmentId)
+                      ? state.score || 0
+                      : 0),
+                  0
+                )}
+              />
             ))}
             <AddTeam triggerAdd={() => setAddingTeam(true)} />
           </Main>
