@@ -21,11 +21,53 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+`;
 
-  span {
-    padding: 0.5rem;
-    display: block;
-    flex-grow: 1;
+const QuestionName = styled.span`
+  padding: 0.5rem;
+  display: block;
+  flex-grow: 1;
+`;
+
+const OptionsWrapper = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.5rem;
+  border-left: 1px solid black;
+`;
+
+const OptionsHeading = styled.div`
+  line-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex: 0 0 50%;
+`;
+
+const OptionsControls = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 0;
+
+  flex: 0 0 50%;
+
+  button {
+    height: 100%;
+    border: 0;
+    background-color: transparent;
+
+    flex: 1;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    flex: 1;
   }
 `;
 
@@ -85,26 +127,64 @@ export const Segment: React.FC<{
   moveUp: MouseEventHandler;
   moveDown: MouseEventHandler;
   deleteSegment: MouseEventHandler;
-}> = ({ segment, totalSegments, moveUp, moveDown, deleteSegment }) => (
-  <Wrapper>
-    <span>
-      <SegmentIcon type={segment.type} />
-      {getFullSegmentName(segment)}
-    </span>
-    <OrderWrapper>
-      <button type="button" disabled={segment.order === 1} onClick={moveUp}>
-        <FontAwesomeIcon icon={faArrowUp} />
-      </button>
-      <button
-        type="button"
-        disabled={segment.order === totalSegments}
-        onClick={moveDown}
-      >
-        <FontAwesomeIcon icon={faArrowDown} />
-      </button>
-    </OrderWrapper>
-    <DeleteButton type="button" onClick={deleteSegment}>
-      <FontAwesomeIcon icon={faTrashCan} />
-    </DeleteButton>
-  </Wrapper>
-);
+  changeOptionsCount: (position: number, count: number) => void;
+}> = ({
+  segment,
+  totalSegments,
+  moveUp,
+  moveDown,
+  deleteSegment,
+  changeOptionsCount
+}) => {
+  const handleOptionsChange = (number: number) => {
+    changeOptionsCount(segment.order, number < 1 ? 1 : number);
+  };
+
+  return (
+    <Wrapper>
+      <QuestionName>
+        <SegmentIcon type={segment.type} />
+        {getFullSegmentName(segment)}
+      </QuestionName>
+      {segment.type === 'QUESTION' && (
+        <OptionsWrapper>
+          <OptionsHeading>Alternativ</OptionsHeading>
+          <OptionsControls>
+            <button
+              type="button"
+              onClick={() =>
+                handleOptionsChange((segment.numberOfOptions ?? 0) - 1)
+              }
+            >
+              -
+            </button>
+            <div>{segment.numberOfOptions}</div>
+            <button
+              type="button"
+              onClick={() =>
+                handleOptionsChange((segment.numberOfOptions ?? 0) + 1)
+              }
+            >
+              +
+            </button>
+          </OptionsControls>
+        </OptionsWrapper>
+      )}
+      <OrderWrapper>
+        <button type="button" disabled={segment.order === 1} onClick={moveUp}>
+          <FontAwesomeIcon icon={faArrowUp} />
+        </button>
+        <button
+          type="button"
+          disabled={segment.order === totalSegments}
+          onClick={moveDown}
+        >
+          <FontAwesomeIcon icon={faArrowDown} />
+        </button>
+      </OrderWrapper>
+      <DeleteButton type="button" onClick={deleteSegment}>
+        <FontAwesomeIcon icon={faTrashCan} />
+      </DeleteButton>
+    </Wrapper>
+  );
+};

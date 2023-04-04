@@ -98,12 +98,27 @@ const CreatePage: NextPage<{}> = () => {
       type,
       order: segments.length + 1,
       scorePublished: false,
-      numberOfOptions: null,
+      numberOfOptions: type === 'QUESTION' ? 2 : null,
       orderOfType: 0,
       nearestTrip: 0
     };
 
     const newSegments = calculateSegmentNumbers([...segments, newSegment]);
+
+    setSegments(newSegments);
+  };
+
+  const changeOptionsCount = (position: number, count: number) => {
+    const newSegments = segments.map((segment) => {
+      if (segment.order === position) {
+        return {
+          ...segment,
+          numberOfOptions: count
+        };
+      }
+
+      return { ...segment };
+    });
 
     setSegments(newSegments);
   };
@@ -227,6 +242,7 @@ const CreatePage: NextPage<{}> = () => {
                 moveUp={() => moveSegment('up', segment.order)}
                 moveDown={() => moveSegment('down', segment.order)}
                 deleteSegment={() => deleteSegment(segment.order)}
+                changeOptionsCount={changeOptionsCount}
               />
             ))}
           </SegmentWrapper>
