@@ -1,3 +1,4 @@
+import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
@@ -22,13 +23,27 @@ const Bottom = styled.div`
 `;
 
 const Main = styled.div`
-  background-color: peachpuff;
   flex: 1;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+
+  div {
+    border: 1px solid black;
+  }
 `;
 
 const ControlBar = styled.div`
   background-color: #85ee85;
   flex: 0 0 12rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 interface Props {
@@ -40,11 +55,24 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     <Wrapper>
       <BreadCrumb>breadcrumb</BreadCrumb>
       <Bottom>
-        <ControlBar>controlBar</ControlBar>
+        <ControlBar>
+          <div>Publicera</div>
+          <div>resepoäng</div>
+          <div>moment</div>
+        </ControlBar>
         <Main>
-          <pre>{JSON.stringify(competition, null, 2)}</pre>
+          <div>team</div>
+          <div>team</div>
+          <div>team</div>
+          <div>team</div>
+          <div>team</div>
+          <div>team</div>
+          <div>team</div>
+          <div>team</div>
+          <AddTeam triggerAdd={() => console.log('Add')} />
         </Main>
       </Bottom>
+      {false && <pre>{JSON.stringify(competition, null, 2)}</pre>}
     </Wrapper>
   );
 };
