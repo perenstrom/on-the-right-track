@@ -10,7 +10,7 @@ import { FormEventHandler, useState } from 'react';
 import { createTeam } from 'services/local';
 import { getCompetition } from 'services/prisma';
 import styled from 'styled-components';
-import { FullCompetition, UncreatedTeam } from 'types/types';
+import { FullCompetition, FullTeam, UncreatedTeam } from 'types/types';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -78,10 +78,18 @@ interface Props {
   competition: FullCompetition;
 }
 
-const areScorePublished = (segments: Segment[], segmentId: Segment['id']) => {
+const areScoresPublished = (segments: Segment[], segmentId: Segment['id']) => {
   const segment = segments.find((segment) => segment.id === segmentId);
   return segment ? segment.scorePublished : false;
 };
+
+const calculateScore = (team: FullTeam, segments: Segment[]) =>
+  team.segmentTeamStates.reduce(
+    (acc, state) =>
+      acc +
+      (areScoresPublished(segments, state.segmentId) ? state.score || 0 : 0),
+    0
+  );
 
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
@@ -144,14 +152,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               <AdminTeam
                 key={team.id}
                 team={team}
-                score={team.segmentTeamStates.reduce(
-                  (acc, state) =>
-                    acc +
-                    (areScorePublished(competition.segments, state.segmentId)
-                      ? state.score || 0
-                      : 0),
-                  0
-                )}
+                score={calculateScore(team, competition.segments)}
               />
             ))}
             <AddTeam triggerAdd={() => setAddingTeam(true)} />
