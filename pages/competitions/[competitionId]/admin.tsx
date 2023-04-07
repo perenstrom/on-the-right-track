@@ -7,7 +7,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
-import { createTeam } from 'services/local';
+import { createTeam, setCurrentStage } from 'services/local';
 import { getCompetition } from 'services/prisma';
 import styled from 'styled-components';
 import { FullCompetition, FullTeam, UncreatedTeam } from 'types/types';
@@ -111,6 +111,27 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  const handleChangeState = async (direction: 'next' | 'prev') => {
+    let nextIndex: number | null =
+      direction === 'next'
+        ? (competition.currentStage || 0) + 1
+        : (competition.currentStage || 0) - 1;
+
+        console.log(competition.currentStage);
+          console.log(nextIndex);
+
+    if (nextIndex >= competition.segments.length) {
+      return;
+    }
+
+    if (nextIndex < 1) {
+      nextIndex = null;
+    }
+
+    await setCurrentStage(competition.id, nextIndex);
+    router.replace(router.asPath);
+  };
+
   return (
     <>
       {addingTeam && (
@@ -145,7 +166,11 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           <ControlBar>
             <div>Publicera</div>
             <div>resepoäng</div>
-            <div>moment</div>
+            <div>
+              <button onClick={() => handleChangeState('prev')}>prev</button>
+              <div>{competition.currentStage}</div>
+              <button onClick={() => handleChangeState('next')}>next</button>
+            </div>
           </ControlBar>
           <Main>
             {competition.teams.map((team) => (
