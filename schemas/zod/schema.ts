@@ -25,3 +25,11 @@ export const CreateTeamSchema = z.object({
   competitionId: z.string(),
   members: z.string()
 });
+
+export const SetStageQuerySchema = z.object({
+  competitionId: z.string()
+});
+
+export const SetStageSchema = z.object({
+  stage: z.number().nullable()
+});

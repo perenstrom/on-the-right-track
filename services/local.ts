@@ -40,3 +40,19 @@ export const createTeam = async (team: UncreatedTeam) => {
 
   return result;
 };
+
+export const setCurrentStage = async (
+  competitionId: string,
+  stage: number | null
+) => {
+  const url = `/api/competitions/${competitionId}/actions/set-stage`;
+  const options: RequestInit = {
+    method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify({ stage })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};

@@ -51,6 +51,23 @@ export const getCompetition = async (
   };
 };
 
+export const setCurrentStage = async (
+  ctx: Context,
+  competitionId: string,
+  stage: number | null
+) => {
+  const result = await ctx.prisma.competition.update({
+    where: {
+      id: competitionId
+    },
+    data: {
+      currentStage: stage
+    }
+  });
+
+  return result;
+};
+
 export const createCompetition = async (
   ctx: Context,
   competition: UncreatedCompetition,
