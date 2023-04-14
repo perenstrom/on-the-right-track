@@ -4,7 +4,7 @@ const Wrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid hsl(0, 0%, 0%);
+  border-top: 2px solid hsl(0, 0%, 0%);
   align-items: center;
 
   h3 {
@@ -53,10 +53,11 @@ export const StageController: React.FC<{
   currentStage: string;
   previousStage?: string;
   nextStage?: string;
-}> = ({ next, previous, currentStage, previousStage, nextStage }) => {
+  heading: string;
+}> = ({ next, previous, currentStage, previousStage, nextStage, heading }) => {
   return (
     <Wrapper>
-      <h3>Moment</h3>
+      <h3>{heading}</h3>
       <span>{currentStage}</span>
       <ButtonWrapper>
         <button
