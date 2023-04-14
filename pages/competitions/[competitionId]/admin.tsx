@@ -2,6 +2,7 @@ import { Segment } from '@prisma/client';
 import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
+import { StageController } from 'components/competitions/admin/StageController';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -65,7 +66,7 @@ const Main = styled.div`
 `;
 
 const ControlBar = styled.div`
-  background-color: #85ee85;
+  background-color: hsl(0, 0%, 85%);
   flex: 0 0 12rem;
 
   display: flex;
@@ -117,9 +118,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         ? (competition.currentStage || 0) + 1
         : (competition.currentStage || 0) - 1;
 
-        console.log(competition.currentStage);
-          console.log(nextIndex);
-
     if (nextIndex >= competition.segments.length) {
       return;
     }
@@ -166,11 +164,13 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           <ControlBar>
             <div>Publicera</div>
             <div>resepoäng</div>
-            <div>
-              <button onClick={() => handleChangeState('prev')}>prev</button>
-              <div>{competition.currentStage}</div>
-              <button onClick={() => handleChangeState('next')}>next</button>
-            </div>
+            <StageController
+              previous={() => handleChangeState('prev')}
+              next={() => handleChangeState('next')}
+              currentStage="2"
+              previousStage="1"
+              nextStage="3"
+            />
           </ControlBar>
           <Main>
             {competition.teams.map((team) => (
