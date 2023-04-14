@@ -132,7 +132,9 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
   };
 
   const previousStage =
-    competition.currentStage && competition.currentStage > 1
+    competition.currentStage === 1
+      ? '0'
+      : competition.currentStage && competition.currentStage > 1
       ? getShortSegmentName(competition.segments[competition.currentStage - 2])
       : undefined;
 

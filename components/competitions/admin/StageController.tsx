@@ -29,12 +29,21 @@ const ButtonWrapper = styled.div`
   button {
     font-size: 1.5rem;
     flex: 1;
-    border: 1px solid hsl(0, 0%, 0%);
+    border: none;
+    border-top: 1px solid hsl(0, 0%, 0%);
     background: transparent;
+  }
+
+  button:last-child {
+    border-left: 1px solid hsl(0, 0%, 0%);
   }
 
   button:hover {
     background-color: #bfbfbf;
+  }
+
+  button:disabled:hover {
+    background-color: transparent;
   }
 `;
 
@@ -50,10 +59,14 @@ export const StageController: React.FC<{
       <h3>Moment</h3>
       <span>{currentStage}</span>
       <ButtonWrapper>
-        <button type="button" onClick={() => previous()}>
+        <button
+          type="button"
+          onClick={() => previous()}
+          disabled={!previousStage}
+        >
           &lt; {previousStage}
         </button>
-        <button type="button" onClick={() => next()}>
+        <button type="button" onClick={() => next()} disabled={!nextStage}>
           {nextStage} &gt;
         </button>
       </ButtonWrapper>
