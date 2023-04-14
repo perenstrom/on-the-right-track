@@ -9,7 +9,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
-import { createTeam, setCurrentStage } from 'services/local';
+import { createTeam, setCurrentLevel, setCurrentStage } from 'services/local';
 import { getCompetition } from 'services/prisma';
 import styled from 'styled-components';
 import { FullCompetition, FullTeam, UncreatedTeam } from 'types/types';
@@ -100,6 +100,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
   const [members, setMembers] = useState('');
 
+  const currentSegment = competition.currentStage
+    ? competition.segments[competition.currentStage - 1]
+    : null;
+
   const handleAddTeam: FormEventHandler = async (event) => {
     event.preventDefault();
     const newTeam: UncreatedTeam = {
@@ -133,7 +137,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   const previousStage =
     competition.currentStage === 1
-      ? '0'
+      ? 'N/A'
       : competition.currentStage && competition.currentStage > 1
       ? getShortSegmentName(competition.segments[competition.currentStage - 2])
       : undefined;
@@ -143,6 +147,38 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     : competition.currentStage < competition.segments.length - 1
     ? getShortSegmentName(competition.segments[competition.currentStage])
     : undefined;
+
+  const handleChangeLevel = async (direction: 'next' | 'prev') => {
+    let nextLevel: number | null =
+      direction === 'next'
+        ? (competition.currentLevel || 12) - 2
+        : (competition.currentLevel || 12) + 2;
+
+    if (nextLevel < 2) {
+      return;
+    }
+
+    if (nextLevel > 10) {
+      nextLevel = null;
+    }
+
+    await setCurrentLevel(competition.id, nextLevel);
+    router.replace(router.asPath);
+  };
+
+  const previousLevel =
+    competition.currentLevel === 10
+      ? 'N/A'
+      : !competition.currentLevel
+      ? undefined
+      : (competition.currentLevel + 2).toString();
+
+  const nextLevel =
+    competition.currentLevel === 2
+      ? undefined
+      : !competition.currentLevel
+      ? '10'
+      : (competition.currentLevel - 2).toString();
 
   return (
     <>
@@ -177,8 +213,18 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         <Bottom>
           <ControlBar>
             <div>Publicera</div>
-            <div>resepoäng</div>
+            {currentSegment?.type === 'TRIP' && (
+              <StageController
+                heading="Nivå"
+                previous={() => handleChangeLevel('prev')}
+                next={() => handleChangeLevel('next')}
+                currentStage={competition.currentLevel?.toString() || 'N/A'}
+                previousStage={previousLevel}
+                nextStage={nextLevel}
+              />
+            )}
             <StageController
+              heading="Moment"
               previous={() => handleChangeState('prev')}
               next={() => handleChangeState('next')}
               currentStage={

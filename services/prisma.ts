@@ -61,7 +61,25 @@ export const setCurrentStage = async (
       id: competitionId
     },
     data: {
-      currentStage: stage
+      currentStage: stage,
+      currentLevel: null
+    }
+  });
+
+  return result;
+};
+
+export const setCurrentLevel = async (
+  ctx: Context,
+  competitionId: string,
+  level: number | null
+) => {
+  const result = await ctx.prisma.competition.update({
+    where: {
+      id: competitionId
+    },
+    data: {
+      currentLevel: level
     }
   });
 

@@ -33,3 +33,11 @@ export const SetStageQuerySchema = z.object({
 export const SetStageSchema = z.object({
   stage: z.number().nullable()
 });
+
+export const SetLevelQuerySchema = z.object({
+  competitionId: z.string()
+});
+
+export const SetLevelSchema = z.object({
+  level: z.number().nullable()
+});

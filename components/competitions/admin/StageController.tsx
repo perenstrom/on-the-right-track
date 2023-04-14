@@ -1,3 +1,5 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPause } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -55,6 +57,15 @@ export const StageController: React.FC<{
   nextStage?: string;
   heading: string;
 }> = ({ next, previous, currentStage, previousStage, nextStage, heading }) => {
+  const prevContent =
+    previousStage === 'N/A' ? (
+      <FontAwesomeIcon icon={faPause} />
+    ) : !previousStage ? (
+      '< '
+    ) : (
+      `< ${previousStage}`
+    );
+
   return (
     <Wrapper>
       <h3>{heading}</h3>
@@ -65,7 +76,7 @@ export const StageController: React.FC<{
           onClick={() => previous()}
           disabled={!previousStage}
         >
-          &lt; {previousStage}
+          {prevContent}
         </button>
         <button type="button" onClick={() => next()} disabled={!nextStage}>
           {nextStage} &gt;

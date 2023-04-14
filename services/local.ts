@@ -56,3 +56,19 @@ export const setCurrentStage = async (
 
   return result;
 };
+
+export const setCurrentLevel = async (
+  competitionId: string,
+  level: number | null
+) => {
+  const url = `/api/competitions/${competitionId}/actions/set-level`;
+  const options: RequestInit = {
+    method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify({ level })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
