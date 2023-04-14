@@ -42,8 +42,8 @@ export const StageController: React.FC<{
   next: () => void;
   previous: () => void;
   currentStage: string;
-  previousStage: string;
-  nextStage: string;
+  previousStage?: string;
+  nextStage?: string;
 }> = ({ next, previous, currentStage, previousStage, nextStage }) => {
   return (
     <Wrapper>

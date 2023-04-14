@@ -3,6 +3,7 @@ import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { StageController } from 'components/competitions/admin/StageController';
+import { getShortSegmentName } from 'helpers/copy';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -130,6 +131,17 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  const previousStage =
+    competition.currentStage && competition.currentStage > 1
+      ? getShortSegmentName(competition.segments[competition.currentStage - 2])
+      : undefined;
+
+  const nextStage = !competition.currentStage
+    ? getShortSegmentName(competition.segments[0])
+    : competition.currentStage < competition.segments.length - 1
+    ? getShortSegmentName(competition.segments[competition.currentStage])
+    : undefined;
+
   return (
     <>
       {addingTeam && (
@@ -167,9 +179,15 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             <StageController
               previous={() => handleChangeState('prev')}
               next={() => handleChangeState('next')}
-              currentStage="2"
-              previousStage="1"
-              nextStage="3"
+              currentStage={
+                competition.currentStage
+                  ? getShortSegmentName(
+                      competition.segments[competition.currentStage - 1]
+                    )
+                  : 'N/A'
+              }
+              previousStage={previousStage}
+              nextStage={nextStage}
             />
           </ControlBar>
           <Main>

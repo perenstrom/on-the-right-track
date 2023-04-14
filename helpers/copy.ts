@@ -43,12 +43,12 @@ export const getFullSegmentName = (segment: UncreatedSegment | Segment) => {
 export const getShortSegmentName = (segment: UncreatedSegment | Segment) => {
   switch (segment.type) {
     case 'QUESTION':
-      return `${getShortSegmentTypeName(segment.type)} ${segment.nearestTrip}:${
+      return `${getShortSegmentTypeName(segment.type)}${segment.nearestTrip}:${
         segment.orderOfType
       }`;
     case 'TRIP':
     case 'MUSIC':
     case 'SPECIAL':
-      return `${getShortSegmentTypeName(segment.type)} ${segment.orderOfType}`;
+      return `${getShortSegmentTypeName(segment.type)}${segment.orderOfType}`;
   }
 };
