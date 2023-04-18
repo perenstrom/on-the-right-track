@@ -107,6 +107,20 @@ export const createCompetition = async (
   return result;
 };
 
+export const getTeam = async (ctx: Context, id: string) => {
+  const result = await ctx.prisma.team.findUnique({
+    where: {
+      id
+    }
+  });
+
+  if (!result) {
+    throw new Error('Team not found');
+  }
+
+  return result;
+};
+
 export const createTeam = async (ctx: Context, team: UncreatedTeam) => {
   const result = await ctx.prisma.team.create({
     data: team
