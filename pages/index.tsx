@@ -41,9 +41,9 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
         <ul>
           {competitions.map((competition) => (
             <li key={competition.id}>
-              <a href={`/competitions/${competition.id}/admin`}>
+              <Link href={`/competitions/${competition.id}/admin`}>
                 {competition.name} - {competition.hosts}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

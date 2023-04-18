@@ -58,6 +58,10 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Cinzel', serif;
     font-weight: 700;
     line-height: 1.3;
+
+    @media (max-width: 768px) {
+      margin: 1rem 0 1.38rem -0.4rem;
+    }
   }
   
   h1 {
