@@ -1,3 +1,4 @@
+import { Team } from '@prisma/client';
 import {
   UncreatedCompetition,
   UncreatedSegment,
@@ -32,6 +33,19 @@ export const createTeam = async (team: UncreatedTeam) => {
   const url = '/api/teams';
   const options: RequestInit = {
     method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify(team)
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
+export const updateTeam = async (teamId: string, team: Partial<Team>) => {
+  const url = `/api/teams/${teamId}`;
+  const options: RequestInit = {
+    method: 'PATCH',
     headers: defaultHeaders,
     body: JSON.stringify(team)
   };

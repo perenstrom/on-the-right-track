@@ -1,3 +1,4 @@
+import { Team } from '@prisma/client';
 import { generateRandomId } from 'helpers/utils';
 import { Context } from 'lib/prisma';
 import {
@@ -117,6 +118,21 @@ export const getTeam = async (ctx: Context, id: string) => {
   if (!result) {
     throw new Error('Team not found');
   }
+
+  return result;
+};
+
+export const updateTeam = async (
+  ctx: Context,
+  teamId: string,
+  team: Partial<Team>
+) => {
+  const result = await ctx.prisma.team.update({
+    where: {
+      id: teamId
+    },
+    data: team
+  });
 
   return result;
 };

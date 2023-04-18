@@ -10,7 +10,7 @@ const teams = async (req: NextApiRequest, res: NextApiResponse) => {
 
       if (!parsedTeam.success) {
         console.log(JSON.stringify(parsedTeam.error, null, 2));
-        res.status(400).end('Game data malformed');
+        res.status(400).end('Team data malformed');
         resolve('');
       } else {
         createTeam(prismaContext, parsedTeam.data)

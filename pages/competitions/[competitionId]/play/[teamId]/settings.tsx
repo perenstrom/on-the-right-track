@@ -3,10 +3,13 @@ import { Button } from 'components/Button';
 import { Input, Label } from 'components/FormControls';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { useState } from 'react';
+import { updateTeam } from 'services/local';
 import { getTeam } from 'services/prisma';
 import styled from 'styled-components';
+import { z } from 'zod';
 
 const Wrapper = styled.form`
   padding: 1rem;
@@ -25,15 +28,32 @@ interface Props {
   team: Team;
 }
 
-const CompetitionPlayChooseTeamPage: NextPage<Props> = ({ team }) => {
+const Params = z.object({
+  competitionId: z.string(),
+  teamId: z.string()
+});
+
+const CompetitionPlaySetTeamSettingsPage: NextPage<Props> = ({ team }) => {
+  const router = useRouter();
+  const parsedParams = Params.safeParse(router.query);
+
   const [name, setName] = useState(team.name);
   const [members, setMembers] = useState(team.members);
 
   const [loading, setLoading] = useState(false);
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    console.log('submit');
+
+    if (!parsedParams.success) {
+      return;
+    }
+
+    await updateTeam(team.id, { name, members });
+
+    const { competitionId } = parsedParams.data;
+    router.push(`/competitions/${competitionId}/play/${team.id}`);
+
     setLoading(false);
   };
 
@@ -82,4 +102,4 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
   };
 };
 
-export default CompetitionPlayChooseTeamPage;
+export default CompetitionPlaySetTeamSettingsPage;

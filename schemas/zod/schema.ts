@@ -26,6 +26,15 @@ export const CreateTeamSchema = z.object({
   members: z.string()
 });
 
+export const PatchTeamSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().optional(),
+  members: z.string().optional()
+});
+export const PatchTeamQuerySchema = z.object({
+  teamId: z.string()
+});
+
 export const SetStageQuerySchema = z.object({
   competitionId: z.string()
 });
