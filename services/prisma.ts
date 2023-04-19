@@ -1,4 +1,4 @@
-import { Team } from '@prisma/client';
+import { SegmentTeamState, Team } from '@prisma/client';
 import { generateRandomId } from 'helpers/utils';
 import { Context } from 'lib/prisma';
 import {
@@ -39,6 +39,26 @@ export const getCompetition = async (
           segmentTeamStates: true
         }
       }
+    }
+  });
+
+  if (!result) {
+    throw new Error('Competition not found');
+  }
+
+  return {
+    ...result,
+    date: result.date.toISOString()
+  };
+};
+
+export const getBaseCompetition = async (
+  ctx: Context,
+  id: string
+): Promise<Competition> => {
+  const result = await ctx.prisma.competition.findUnique({
+    where: {
+      id
     }
   });
 
@@ -140,6 +160,50 @@ export const updateTeam = async (
 export const createTeam = async (ctx: Context, team: UncreatedTeam) => {
   const result = await ctx.prisma.team.create({
     data: team
+  });
+
+  return result;
+};
+
+export const getSegment = async (
+  ctx: Context,
+  competitionId: string,
+  stage: number
+) => {
+  const result = await ctx.prisma.segment.findUnique({
+    where: {
+      competitionId_order: {
+        competitionId,
+        order: stage
+      }
+    }
+  });
+
+  if (!result) {
+    throw new Error('Segment not found');
+  }
+
+  return result;
+};
+
+export const upsertSegmentTeamState = async (
+  ctx: Context,
+  { segmentId, teamId }: { segmentId: string; teamId: string },
+  data: Partial<SegmentTeamState>
+) => {
+  const result = await ctx.prisma.segmentTeamState.upsert({
+    where: {
+      segmentId_teamId: {
+        segmentId,
+        teamId
+      }
+    },
+    update: data,
+    create: {
+      segmentId,
+      teamId,
+      ...data
+    }
   });
 
   return result;

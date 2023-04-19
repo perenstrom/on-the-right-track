@@ -49,6 +49,7 @@ model Segment {
   competition       Competition        @relation(fields: [competitionId], references: [id])
   segmentTeamStates SegmentTeamState[]
 
+  @@unique([competitionId, order])
   @@map("segments")
 }
 
@@ -71,6 +72,7 @@ model SegmentTeamState {
   team    Team     @relation(fields: [teamId], references: [id])
   answers Answer[]
 
+  @@unique([segmentId, teamId])
   @@map("segment_team_states")
 }
 
