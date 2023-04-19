@@ -12,6 +12,12 @@ export const Input = styled.input`
   margin-bottom: 1rem;
 `;
 
+export const TextArea = styled.textarea`
+  width: 100%;
+  max-width: 25rem;
+  margin-bottom: 1rem;
+`;
+
 export const SubmitButton = styled(Button)`
   background-color: hsl(116, 46%, 55%);
   border: 1px solid hsl(116, 46%, 30%);
