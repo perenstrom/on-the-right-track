@@ -1,4 +1,4 @@
-import { Team } from '@prisma/client';
+import { SegmentTeamState, Team } from '@prisma/client';
 import {
   UncreatedCompetition,
   UncreatedSegment,
@@ -80,6 +80,22 @@ export const setCurrentLevel = async (
     method: 'POST',
     headers: defaultHeaders,
     body: JSON.stringify({ level })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
+export const patchTeamSegmentState = async (
+  segmentTeamStateId: string,
+  segmentTeamState: Partial<SegmentTeamState>
+) => {
+  const url = `/api/segment_team_states/${segmentTeamStateId}`;
+  const options: RequestInit = {
+    method: 'PATCH',
+    headers: defaultHeaders,
+    body: JSON.stringify(segmentTeamState)
   };
 
   const result = await fetch(url, options).then((r) => r.json());

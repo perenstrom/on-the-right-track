@@ -1,10 +1,13 @@
 import { Segment, SegmentTeamState, Team } from '@prisma/client';
 import { Button } from 'components/Button';
-import { Input, Label, TextArea } from 'components/FormControls';
+import { Label, TextArea } from 'components/FormControls';
 import { getFullSegmentName } from 'helpers/copy';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import { FormEvent } from 'react';
+import { patchTeamSegmentState } from 'services/local';
 import {
   getBaseCompetition,
   getSegment,
@@ -31,6 +34,15 @@ const SegmentHeading = styled.div`
   font-weight: bold;
   height: 4rem;
   background-color: hsl(0, 0%, 90%);
+`;
+
+const BreakButton = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
 `;
 
 const BreakImage = styled.img`
@@ -99,10 +111,25 @@ interface Props {
 
 const CompetitionPlayPage: NextPage<Props> = ({
   competition,
-  team,
+  //team,
   segment,
   teamState
 }) => {
+  const router = useRouter();
+  const pullTheBreak = async () => {
+    if (teamState) {
+      await patchTeamSegmentState(teamState?.id, {
+        state: 'STOPPED',
+        stopLevel: competition.currentLevel
+      });
+      router.replace(router.asPath);
+    }
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  };
+
   return (
     <Wrapper>
       <SegmentHeading>
@@ -111,19 +138,21 @@ const CompetitionPlayPage: NextPage<Props> = ({
       {!segment && <WaitingForSegment>Invänta nästa moment</WaitingForSegment>}
       {segment?.type === 'TRIP' && teamState?.state === 'IDLE' && (
         <>
-          <BreakImage src="/break.svg" alt="Break" width="80%" />
+          <BreakButton type="button" onClick={() => pullTheBreak()}>
+            <BreakImage src="/break.svg" alt="Break" width="80%" />
+          </BreakButton>
           <TripLevel>{competition.currentLevel}</TripLevel>
         </>
       )}
       {segment?.type === 'TRIP' && teamState?.state === 'STOPPED' && (
-        <>
-          <TripHeading>{competition.currentLevel}</TripHeading>
+        <form onSubmit={handleSubmit}>
+          <TripHeading>{teamState.stopLevel}</TripHeading>
           <AnswerWrapper>
             <AnswerLabel htmlFor="answer">Svar:</AnswerLabel>
             <AnswerInput id="answer" rows={7} />
-            <SubmitButton type="button">Svara</SubmitButton>
+            <SubmitButton type="submit">Svara</SubmitButton>
           </AnswerWrapper>
-        </>
+        </form>
       )}
       {/*       <pre>{JSON.stringify(competition, null, 2)}</pre>
       <pre>{JSON.stringify(team, null, 2)}</pre>
@@ -154,14 +183,13 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
     : null;
 
   const teamState = segment
-    ? await upsertSegmentTeamState(
-        prismaContext,
-        {
+    ? await upsertSegmentTeamState(prismaContext, {
+        selector: {
           segmentId: segment.id,
           teamId: team.id
         },
-        {}
-      )
+        data: {}
+      })
     : null;
 
   return {

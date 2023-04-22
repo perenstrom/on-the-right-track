@@ -50,3 +50,18 @@ export const SetLevelQuerySchema = z.object({
 export const SetLevelSchema = z.object({
   level: z.number().nullable()
 });
+
+export const PatchTeamSegmentStateSchema = z
+  .object({
+    id: z.string(),
+    segmentId: z.string(),
+    teamId: z.string(),
+    state: z.enum(['IDLE', 'STOPPED', 'STOPPED_ANSWERED', 'ANSWERED']),
+    stopLevel: z.number().nullable(),
+    score: z.number().nullable()
+  })
+  .partial();
+
+export const PatchTeamSegmentQuerySchema = z.object({
+  segmentTeamStateId: z.string()
+});

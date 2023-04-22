@@ -1,4 +1,4 @@
-import { SegmentTeamState, Team } from '@prisma/client';
+import { SegmentTeamState, Team, Prisma } from '@prisma/client';
 import { generateRandomId } from 'helpers/utils';
 import { Context } from 'lib/prisma';
 import {
@@ -8,6 +8,7 @@ import {
   UncreatedSegment,
   UncreatedTeam
 } from 'types/types';
+import { WithRequired } from 'types/utils';
 
 export const getCompetitions = async (ctx: Context): Promise<Competition[]> => {
   const result = await ctx.prisma.competition.findMany({
@@ -186,24 +187,62 @@ export const getSegment = async (
   return result;
 };
 
+type SegmentTeamStateId = { id: string };
+type SegmentTeamStateSegmentPlusTeamId = { segmentId: string; teamId: string };
+interface SegmentTeamStateIdInput {
+  selector: SegmentTeamStateId;
+  data: WithRequired<Partial<SegmentTeamState>, 'segmentId' | 'teamId'>;
+}
+interface SegmentTeamStateSegmentPlusTeamIdInput {
+  selector: SegmentTeamStateSegmentPlusTeamId;
+  data: Partial<SegmentTeamState>;
+}
+type SegmentTeamStateInput =
+  | SegmentTeamStateIdInput
+  | SegmentTeamStateSegmentPlusTeamIdInput;
+
+const isSegmentTeamStateIdInput = (
+  test: SegmentTeamStateInput
+): test is SegmentTeamStateIdInput => 'id' in test.selector;
+
 export const upsertSegmentTeamState = async (
   ctx: Context,
-  { segmentId, teamId }: { segmentId: string; teamId: string },
-  data: Partial<SegmentTeamState>
+  input: SegmentTeamStateInput
 ) => {
+  const where: Prisma.SegmentTeamStateWhereUniqueInput =
+    isSegmentTeamStateIdInput(input)
+      ? { id: input.selector.id }
+      : { segmentId_teamId: input.selector };
+
+  const create: Prisma.SegmentTeamStateUncheckedCreateInput =
+    isSegmentTeamStateIdInput(input)
+      ? {
+          id: input.selector.id,
+          ...input.data
+        }
+      : {
+          segmentId: input.selector.segmentId,
+          teamId: input.selector.teamId,
+          ...input.data
+        };
+
   const result = await ctx.prisma.segmentTeamState.upsert({
-    where: {
-      segmentId_teamId: {
-        segmentId,
-        teamId
-      }
-    },
-    update: data,
-    create: {
-      segmentId,
-      teamId,
-      ...data
-    }
+    where: where,
+    update: input.data,
+    create: create
+  });
+
+  return result;
+};
+
+export const updateSegmentTeamState = async (
+  ctx: Context,
+  id: string,
+  input: Prisma.SegmentTeamStateUncheckedUpdateInput
+) => {
+  const result = await ctx.prisma.segmentTeamState.update({
+    where: { id },
+    data: input
   });
 
   return result;
