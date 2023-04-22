@@ -243,6 +243,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               <AdminTeam
                 key={team.id}
                 team={team}
+                currentSegment={currentSegment}
                 score={calculateScore(team, competition.segments)}
               />
             ))}

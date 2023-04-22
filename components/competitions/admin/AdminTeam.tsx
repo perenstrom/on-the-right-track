@@ -1,10 +1,16 @@
-import { Team } from '@prisma/client';
+import { Segment, TeamState } from '@prisma/client';
+import { getTeamStateColor, getTeamStateTextColor } from 'helpers/styling';
 import styled from 'styled-components';
+import { FullTeam } from 'types/types';
 
-const Wrapper = styled.div`
+interface WrapperProps {
+  readonly state: TeamState;
+}
+const Wrapper = styled.div<WrapperProps>`
   display: flex;
   flex-direction: column;
-  background: hsl(0, 0%, 85%);
+  color: ${({ state }) => getTeamStateTextColor(state)};
+  background: ${({ state }) => getTeamStateColor(state)};
   border: none;
   border-radius: 10px;
   padding: 0.8rem 1rem;
@@ -38,11 +44,20 @@ const Score = styled.div`
 `;
 
 export const AdminTeam: React.FC<{
-  team: Team;
+  team: FullTeam;
   score: number;
-}> = ({ team, score }) => {
+  currentSegment: Segment | null;
+}> = ({ team, score, currentSegment }) => {
+  const currentSegmentTeamState = team.segmentTeamStates.find(
+    (segmentTeamState) => segmentTeamState.segmentId === currentSegment?.id
+  );
+
+  const currentState: TeamState = currentSegmentTeamState
+    ? currentSegmentTeamState.state
+    : 'IDLE';
+
   return (
-    <Wrapper>
+    <Wrapper state={currentState}>
       <h2>{team.name}</h2>
       <span>{team.members}</span>
       <Score>{score}</Score>
