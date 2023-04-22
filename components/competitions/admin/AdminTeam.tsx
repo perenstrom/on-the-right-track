@@ -7,6 +7,8 @@ interface WrapperProps {
   readonly state: TeamState;
 }
 const Wrapper = styled.div<WrapperProps>`
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   color: ${({ state }) => getTeamStateTextColor(state)};
@@ -43,6 +45,34 @@ const Score = styled.div`
   font-weight: 500;
 `;
 
+const StopLevelWrapper = styled.div`
+  position: absolute;
+  bottom: -4.5rem;
+  right: -4.5rem;
+  width: 10rem;
+  height: 10rem;
+  border: 2px solid hsl(0, 0%, 15%);
+  border-radius: 50%;
+  background-color: hsl(0, 0%, 100%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StopLevel = styled.div`
+  position: absolute;
+  bottom: 0rem;
+  right: 0rem;
+  width: 5rem;
+  text-align: center;
+  color: hsl(18, 95%, 40%);
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0.5rem;
+`;
+
 export const AdminTeam: React.FC<{
   team: FullTeam;
   score: number;
@@ -61,6 +91,12 @@ export const AdminTeam: React.FC<{
       <h2>{team.name}</h2>
       <span>{team.members}</span>
       <Score>{score}</Score>
+      {currentState === 'STOPPED' && (
+        <>
+          <StopLevelWrapper></StopLevelWrapper>
+          <StopLevel>10</StopLevel>
+        </>
+      )}
     </Wrapper>
   );
 };
