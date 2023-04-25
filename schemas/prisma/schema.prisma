@@ -91,5 +91,6 @@ model Answer {
 
   state SegmentTeamState @relation(fields: [stateId], references: [id])
 
+  @@unique([stateId, questionNumber])
   @@map("answers")
 }

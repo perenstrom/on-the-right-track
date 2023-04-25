@@ -1,4 +1,4 @@
-import { Segment, SegmentTeamState, Team } from '@prisma/client';
+import { Answer, Segment, SegmentTeamState, Team } from '@prisma/client';
 import { Button } from 'components/Button';
 import { Label, TextArea } from 'components/FormControls';
 import { getFullSegmentName } from 'helpers/copy';
@@ -12,6 +12,7 @@ import {
   getBaseCompetition,
   getSegment,
   getTeam,
+  upsertAnswer,
   upsertSegmentTeamState
 } from 'services/prisma';
 import styled from 'styled-components';
@@ -107,6 +108,7 @@ interface Props {
   team: Team;
   segment: Segment | null;
   teamState: SegmentTeamState | null;
+  answers: Answer[];
 }
 
 const CompetitionPlayPage: NextPage<Props> = ({
@@ -192,12 +194,32 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
       })
     : null;
 
+  const numberOfOptions = segment
+    ? segment.type === 'TRIP'
+      ? 1
+      : segment.numberOfOptions || 0
+    : 0;
+
+  let answers: Answer[] = [];
+  if (segment && teamState) {
+    const numberArray = new Array(numberOfOptions).fill(0);
+    const promises = numberArray.map((_, i) => {
+      return upsertAnswer(
+        prismaContext,
+        { stateId: teamState.id, questionNumber: i + 1 },
+        { answer: '' }
+      );
+    });
+    answers = await Promise.all(promises);
+  }
+
   return {
     props: {
       competition,
       team,
       segment,
-      teamState
+      teamState,
+      answers
     }
   };
 };

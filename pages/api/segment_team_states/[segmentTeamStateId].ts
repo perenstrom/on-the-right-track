@@ -13,9 +13,11 @@ const segmentTeamStates = async (req: NextApiRequest, res: NextApiResponse) => {
     return new Promise((resolve) => {
       const parsedBody = PatchTeamSegmentStateSchema.safeParse(req.body);
       const parsedQuery = PatchTeamSegmentQuerySchema.safeParse(req.query);
+
       if (!parsedBody.success) {
         console.log(parsedBody.error);
       }
+      
       if (!parsedBody.success || !parsedQuery.success) {
         console.log(parsedBody);
         console.log(parsedQuery);

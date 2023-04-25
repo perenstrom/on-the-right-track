@@ -1,4 +1,4 @@
-import { SegmentTeamState, Team, Prisma } from '@prisma/client';
+import { SegmentTeamState, Team, Prisma, Answer } from '@prisma/client';
 import { generateRandomId } from 'helpers/utils';
 import { Context } from 'lib/prisma';
 import {
@@ -241,6 +241,38 @@ export const updateSegmentTeamState = async (
   input: Prisma.SegmentTeamStateUncheckedUpdateInput
 ) => {
   const result = await ctx.prisma.segmentTeamState.update({
+    where: { id },
+    data: input
+  });
+
+  return result;
+};
+
+export const upsertAnswer = async (
+  ctx: Context,
+  selector: {
+    stateId: string;
+    questionNumber: number;
+  },
+  data: Omit<Answer, 'stateId' | 'questionNumber' | 'id'>
+) => {
+  const result = await ctx.prisma.answer.upsert({
+    where: {
+      stateId_questionNumber: selector
+    },
+    update: data,
+    create: { ...data, ...selector }
+  });
+
+  return result;
+};
+
+export const updateAnswer = async (
+  ctx: Context,
+  id: string,
+  input: Prisma.AnswerUncheckedUpdateInput
+) => {
+  const result = await ctx.prisma.answer.update({
     where: { id },
     data: input
   });
