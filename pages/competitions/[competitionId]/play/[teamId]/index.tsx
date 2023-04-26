@@ -6,8 +6,8 @@ import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { FormEvent } from 'react';
-import { patchTeamSegmentState } from 'services/local';
+import { FormEvent, useState } from 'react';
+import { patchAnswer, patchTeamSegmentState } from 'services/local';
 import {
   getBaseCompetition,
   getSegment,
@@ -115,7 +115,8 @@ const CompetitionPlayPage: NextPage<Props> = ({
   competition,
   //team,
   segment,
-  teamState
+  teamState,
+  answers: initialAnswers
 }) => {
   const router = useRouter();
   const pullTheBreak = async () => {
@@ -128,8 +129,44 @@ const CompetitionPlayPage: NextPage<Props> = ({
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const [answers, setAnswers] = useState<Answer[]>(initialAnswers);
+
+  const handleAnswersChange = (
+    e: FormEvent<HTMLTextAreaElement>,
+    index: number
+  ) => {
+    const { value } = e.currentTarget;
+
+    const newAnswer = { ...answers[index], answer: value };
+    const newAnswers = [...answers];
+    newAnswers[index] = newAnswer;
+
+    setAnswers(newAnswers);
+  };
+
+  const handleSubmitAnswers = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const numberOfOptions = segment
+      ? segment.type === 'TRIP'
+        ? 1
+        : segment.numberOfOptions || 0
+      : 0;
+
+    if (segment && teamState) {
+      const numberArray = new Array(numberOfOptions).fill(0);
+      const promises = numberArray.map((_, i) =>
+        patchAnswer(answers[i]?.id, answers[i]?.answer)
+      );
+      await Promise.all(promises);
+
+      await patchTeamSegmentState(teamState?.id, {
+        state: 'STOPPED_ANSWERED',
+        stopLevel: competition.currentLevel
+      });
+
+      router.replace(router.asPath);
+    }
   };
 
   return (
@@ -147,11 +184,16 @@ const CompetitionPlayPage: NextPage<Props> = ({
         </>
       )}
       {segment?.type === 'TRIP' && teamState?.state === 'STOPPED' && (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmitAnswers}>
           <TripHeading>{teamState.stopLevel}</TripHeading>
           <AnswerWrapper>
             <AnswerLabel htmlFor="answer">Svar:</AnswerLabel>
-            <AnswerInput id="answer" rows={7} />
+            <AnswerInput
+              id="answer"
+              rows={7}
+              value={answers[0].answer}
+              onChange={(event) => handleAnswersChange(event, 0)}
+            />
             <SubmitButton type="submit">Svara</SubmitButton>
           </AnswerWrapper>
         </form>
@@ -203,13 +245,12 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
   let answers: Answer[] = [];
   if (segment && teamState) {
     const numberArray = new Array(numberOfOptions).fill(0);
-    const promises = numberArray.map((_, i) => {
-      return upsertAnswer(
-        prismaContext,
-        { stateId: teamState.id, questionNumber: i + 1 },
-        { answer: '' }
-      );
-    });
+    const promises = numberArray.map((_, i) =>
+      upsertAnswer(prismaContext, {
+        stateId: teamState.id,
+        questionNumber: i + 1
+      })
+    );
     answers = await Promise.all(promises);
   }
 

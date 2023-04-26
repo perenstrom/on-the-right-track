@@ -65,3 +65,11 @@ export const PatchTeamSegmentStateSchema = z
 export const PatchTeamSegmentQuerySchema = z.object({
   segmentTeamStateId: z.string()
 });
+
+export const PatchAnswerSchema = z.object({
+  answer: z.string()
+});
+
+export const PatchAnswerQuerySchema = z.object({
+  answerId: z.string()
+});

@@ -1,4 +1,4 @@
-import { SegmentTeamState, Team, Prisma, Answer } from '@prisma/client';
+import { SegmentTeamState, Team, Prisma } from '@prisma/client';
 import { generateRandomId } from 'helpers/utils';
 import { Context } from 'lib/prisma';
 import {
@@ -253,15 +253,14 @@ export const upsertAnswer = async (
   selector: {
     stateId: string;
     questionNumber: number;
-  },
-  data: Omit<Answer, 'stateId' | 'questionNumber' | 'id'>
+  }
 ) => {
   const result = await ctx.prisma.answer.upsert({
     where: {
       stateId_questionNumber: selector
     },
-    update: data,
-    create: { ...data, ...selector }
+    update: {},
+    create: { answer: '', ...selector }
   });
 
   return result;

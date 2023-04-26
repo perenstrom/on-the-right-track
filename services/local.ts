@@ -102,3 +102,16 @@ export const patchTeamSegmentState = async (
 
   return result;
 };
+
+export const patchAnswer = async (answerId: string, answer: string) => {
+  const url = `/api/answers/${answerId}`;
+  const options: RequestInit = {
+    method: 'PATCH',
+    headers: defaultHeaders,
+    body: JSON.stringify({ answer })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
