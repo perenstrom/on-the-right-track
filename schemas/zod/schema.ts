@@ -56,7 +56,7 @@ export const PatchTeamSegmentStateSchema = z
     id: z.string(),
     segmentId: z.string(),
     teamId: z.string(),
-    state: z.enum(['IDLE', 'STOPPED', 'STOPPED_ANSWERED', 'ANSWERED']),
+    state: z.enum(['IDLE', 'STOPPED', 'STOPPED_ANSWERED', 'ANSWERED', 'STOPPED_HANDLED']),
     stopLevel: z.number().nullable(),
     score: z.number().nullable()
   })

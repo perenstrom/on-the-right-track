@@ -2,6 +2,9 @@ import { Segment, TeamState } from '@prisma/client';
 import { getTeamStateColor, getTeamStateTextColor } from 'helpers/styling';
 import styled from 'styled-components';
 import { FullTeam } from 'types/types';
+import { ScoreButton } from './ScoreButton';
+import { patchTeamSegmentState } from 'services/local';
+import { useRouter } from 'next/router';
 
 interface WrapperProps {
   readonly state: TeamState;
@@ -15,11 +18,11 @@ const Wrapper = styled.div<WrapperProps>`
   background: ${({ state }) => getTeamStateColor(state)};
   border: none;
   border-radius: 10px;
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 1rem 1rem;
   min-width: 0;
 
   > h2,
-  span {
+  > span {
     line-height: normal;
     display: block;
     margin: 0;
@@ -43,6 +46,14 @@ const Score = styled.div`
   font-size: 6rem;
   line-height: 0;
   font-weight: 500;
+`;
+
+const RelativeFlex = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
 `;
 
 const StopLevelWrapper = styled.div`
@@ -73,6 +84,36 @@ const StopLevel = styled.div`
   padding: 0.5rem;
 `;
 
+const StoppedAnsweredWrapper = styled.div`
+  background-color: hsla(0, 0%, 100%, 0.8);
+  color: hsl(0, 0%, 15%);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  padding: 0 0.5rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+`;
+
+const AnswerHeading = styled.span`
+  font-size: 0.8rem;
+  font-weight: 700;
+`;
+
+const AnswerParagraph = styled.p`
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+`;
+
+const HandleAnswerButtons = styled.div`
+  width: 100%;
+  display: flex;
+  gap: 0.5rem;
+`;
+
 export const AdminTeam: React.FC<{
   team: FullTeam;
   score: number;
@@ -86,17 +127,48 @@ export const AdminTeam: React.FC<{
     ? currentSegmentTeamState.state
     : 'IDLE';
 
+  const router = useRouter();
+  const handleScoring = async (score: number) => {
+    if (!currentSegmentTeamState) return;
+
+    await patchTeamSegmentState(currentSegmentTeamState?.id, {
+      score,
+      state: 'STOPPED_HANDLED'
+    });
+
+    router.replace(router.asPath);
+  };
+
   return (
     <Wrapper state={currentState}>
       <h2>{team.name}</h2>
-      <span>{team.members}</span>
-      <Score>{score}</Score>
-      {currentState === 'STOPPED' && (
-        <>
-          <StopLevelWrapper></StopLevelWrapper>
-          <StopLevel>10</StopLevel>
-        </>
-      )}
+      <RelativeFlex>
+        <span>{team.members}</span>
+        <Score>{score}</Score>
+        {currentState === 'STOPPED' && (
+          <>
+            <StopLevelWrapper></StopLevelWrapper>
+            <StopLevel>10</StopLevel>
+          </>
+        )}
+        {currentState === 'STOPPED_ANSWERED' && (
+          <StoppedAnsweredWrapper>
+            <AnswerHeading>Svar:</AnswerHeading>
+            <AnswerParagraph>
+              {currentSegmentTeamState?.answers[0].answer || ''}
+            </AnswerParagraph>
+            <HandleAnswerButtons>
+              <ScoreButton
+                variant="correct"
+                onClick={() =>
+                  handleScoring(currentSegmentTeamState?.stopLevel || 0)
+                }
+              >{`Rätt ${currentSegmentTeamState?.stopLevel}p`}</ScoreButton>
+              <ScoreButton variant="wrong">Fel 0p</ScoreButton>
+            </HandleAnswerButtons>
+          </StoppedAnsweredWrapper>
+        )}
+      </RelativeFlex>
     </Wrapper>
   );
 };

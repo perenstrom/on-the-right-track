@@ -12,7 +12,11 @@ export type FullCompetition = Omit<
   Prisma.CompetitionGetPayload<{
     include: {
       teams: {
-        include: { segmentTeamStates: true };
+        include: {
+          segmentTeamStates: {
+            include: { answers: true };
+          };
+        };
       };
       segments: true;
     };
@@ -27,6 +31,10 @@ export type UncreatedCompetition = Omit<Competition, 'id'>;
 export type UncreatedSegment = Omit<Segment, 'id' | 'competitionId'>;
 
 export type FullTeam = Prisma.TeamGetPayload<{
-  include: { segmentTeamStates: true };
+  include: {
+    segmentTeamStates: {
+      include: { answers: true };
+    };
+  };
 }>;
 export type UncreatedTeam = Omit<Team, 'id'>;
