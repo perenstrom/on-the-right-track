@@ -48,6 +48,13 @@ const Score = styled.div`
   font-weight: 500;
 `;
 
+const ScoreChange = styled.span`
+  font-size: 3rem;
+  color: hsl(116, 46%, 40%);
+  font-weight: 500;
+  margin-left: 1rem;
+`;
+
 const RelativeFlex = styled.div`
   position: relative;
   display: flex;
@@ -144,7 +151,13 @@ export const AdminTeam: React.FC<{
       <h2>{team.name}</h2>
       <RelativeFlex>
         <span>{team.members}</span>
-        <Score>{score}</Score>
+        <Score>
+          <>{score}</>
+          {!currentSegment?.scorePublished &&
+            currentState === 'STOPPED_HANDLED' && (
+              <ScoreChange>+{currentSegmentTeamState?.score}</ScoreChange>
+            )}
+        </Score>
         {currentState === 'STOPPED' && (
           <>
             <StopLevelWrapper></StopLevelWrapper>
