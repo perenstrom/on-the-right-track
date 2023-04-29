@@ -87,6 +87,22 @@ export const setCurrentLevel = async (
   return result;
 };
 
+export const setScorePublished = async (
+  segmentId: string,
+  scorePublished: boolean
+) => {
+  const url = `/api/segments/${segmentId}/actions/publish-scores`;
+  const options: RequestInit = {
+    method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify({ scorePublished })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
 export const patchTeamSegmentState = async (
   segmentTeamStateId: string,
   segmentTeamState: Partial<SegmentTeamState>

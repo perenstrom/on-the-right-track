@@ -34,7 +34,11 @@ export const getCompetition = async (
       id
     },
     include: {
-      segments: true,
+      segments: {
+        orderBy: {
+          order: 'asc'
+        }
+      },
       teams: {
         include: {
           segmentTeamStates: {
@@ -127,6 +131,23 @@ export const createCompetition = async (
       segments: {
         create: segments
       }
+    }
+  });
+
+  return result;
+};
+
+export const setScorePublished = async (
+  ctx: Context,
+  segmentId: string,
+  scorePublished: boolean
+) => {
+  const result = await ctx.prisma.segment.update({
+    where: {
+      id: segmentId
+    },
+    data: {
+      scorePublished
     }
   });
 

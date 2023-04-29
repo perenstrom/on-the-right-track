@@ -43,7 +43,7 @@ export const SetStageSchema = z.object({
   stage: z.number().nullable()
 });
 
-export const SetLevelQuerySchema = z.object({
+export const CompetitionIdSchema = z.object({
   competitionId: z.string()
 });
 
@@ -51,12 +51,26 @@ export const SetLevelSchema = z.object({
   level: z.number().nullable()
 });
 
+export const SegmentIdSchema = z.object({
+  segmentId: z.string()
+});
+
+export const PublishScoreSchema = z.object({
+  scorePublished: z.boolean()
+});
+
 export const PatchTeamSegmentStateSchema = z
   .object({
     id: z.string(),
     segmentId: z.string(),
     teamId: z.string(),
-    state: z.enum(['IDLE', 'STOPPED', 'STOPPED_ANSWERED', 'ANSWERED', 'STOPPED_HANDLED']),
+    state: z.enum([
+      'IDLE',
+      'STOPPED',
+      'STOPPED_ANSWERED',
+      'ANSWERED',
+      'STOPPED_HANDLED'
+    ]),
     stopLevel: z.number().nullable(),
     score: z.number().nullable()
   })

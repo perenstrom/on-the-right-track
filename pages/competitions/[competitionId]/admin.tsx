@@ -2,6 +2,7 @@ import { Segment } from '@prisma/client';
 import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
+import { PublishButton } from 'components/competitions/admin/PublishButton';
 import { StageController } from 'components/competitions/admin/StageController';
 import { getShortSegmentName } from 'helpers/copy';
 import { prismaContext } from 'lib/prisma';
@@ -9,7 +10,12 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
-import { createTeam, setCurrentLevel, setCurrentStage } from 'services/local';
+import {
+  createTeam,
+  setCurrentLevel,
+  setCurrentStage,
+  setScorePublished
+} from 'services/local';
 import { getCompetition } from 'services/prisma';
 import styled from 'styled-components';
 import { FullCompetition, FullTeam, UncreatedTeam } from 'types/types';
@@ -74,6 +80,11 @@ const ControlBar = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
+`;
+
+const PublishWrapper = styled.div`
+  width: 100%;
+  padding: 1rem;
 `;
 
 interface Props {
@@ -180,6 +191,25 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       ? '10'
       : (competition.currentLevel - 2).toString();
 
+  const isHandled = (team: FullTeam) => {
+    const segmentTeamState = team.segmentTeamStates.find(
+      (state) => state.segmentId === currentSegment?.id
+    );
+
+    return segmentTeamState?.state === 'STOPPED_HANDLED';
+  };
+  const someOneAnswered = competition.teams.some(isHandled);
+  const allAnswered = competition.teams.every(isHandled);
+
+  const handlePublish = async () => {
+    if (!currentSegment) {
+      return;
+    }
+
+    await setScorePublished(currentSegment.id, !currentSegment.scorePublished);
+    router.replace(router.asPath);
+  };
+
   return (
     <>
       {addingTeam && (
@@ -212,7 +242,16 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         <BreadCrumb>breadcrumb</BreadCrumb>
         <Bottom>
           <ControlBar>
-            <div>Publicera</div>
+            {someOneAnswered && (
+              <PublishWrapper>
+                <PublishButton
+                  variant={allAnswered ? 'active' : 'idle'}
+                  onClick={handlePublish}
+                >
+                  {currentSegment?.scorePublished ? 'Avpublicera' : 'Publicera'}
+                </PublishButton>
+              </PublishWrapper>
+            )}
             {currentSegment?.type === 'TRIP' && (
               <StageController
                 heading="Nivå"

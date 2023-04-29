@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prismaContext } from 'lib/prisma';
-import { setCurrentLevel } from 'services/prisma';
-import { CompetitionIdSchema, SetLevelSchema } from 'schemas/zod/schema';
+import { setScorePublished } from 'services/prisma';
+import { PublishScoreSchema, SegmentIdSchema } from 'schemas/zod/schema';
 
-const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
+const publishScores = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     return new Promise((resolve) => {
-      const parsedBody = SetLevelSchema.safeParse(req.body);
-      const parsedQuery = CompetitionIdSchema.safeParse(req.query);
+      const parsedBody = PublishScoreSchema.safeParse(req.body);
+      const parsedQuery = SegmentIdSchema.safeParse(req.query);
 
       if (!parsedBody.success || !parsedQuery.success) {
         console.log(parsedBody);
@@ -15,10 +15,10 @@ const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).end('Action data malformed');
         resolve('');
       } else {
-        const { level } = parsedBody.data;
-        const { competitionId } = parsedQuery.data;
+        const { scorePublished } = parsedBody.data;
+        const { segmentId } = parsedQuery.data;
 
-        setCurrentLevel(prismaContext, competitionId, level)
+        setScorePublished(prismaContext, segmentId, scorePublished)
           .then((competition) => {
             res.status(200).json(competition);
             resolve('');
@@ -35,4 +35,4 @@ const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default setLevel;
+export default publishScores;
