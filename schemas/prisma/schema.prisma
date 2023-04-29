@@ -82,6 +82,7 @@ enum TeamState {
   STOPPED_ANSWERED
   STOPPED_HANDLED
   ANSWERED
+  ANSWERED_HANDLED
 }
 
 model Answer {

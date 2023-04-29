@@ -10,6 +10,7 @@ export const getTeamStateColor = (state: TeamState) => {
     case 'STOPPED_HANDLED':
       return 'hsl(11, 74%, 77%)';
     case 'ANSWERED':
+    case 'ANSWERED_HANDLED':
       return 'hsl(216, 100%, 74%)';
     default:
       return 'hsl(0, 0%, 85%)';
@@ -20,6 +21,7 @@ export const getTeamStateTextColor = (state: TeamState) => {
   switch (state) {
     case 'IDLE':
     case 'ANSWERED':
+    case 'ANSWERED_HANDLED':
     case 'STOPPED_HANDLED':
       return 'hsl(0, 0%, 15%)';
     case 'STOPPED_ANSWERED':

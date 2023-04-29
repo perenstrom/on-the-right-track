@@ -196,7 +196,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       (state) => state.segmentId === currentSegment?.id
     );
 
-    return segmentTeamState?.state === 'STOPPED_HANDLED';
+    return (
+      segmentTeamState?.state === 'STOPPED_HANDLED' ||
+      segmentTeamState?.state === 'ANSWERED_HANDLED'
+    );
   };
   const someOneAnswered = competition.teams.some(isHandled);
   const allAnswered = competition.teams.every(isHandled);

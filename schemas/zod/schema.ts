@@ -69,6 +69,7 @@ export const PatchTeamSegmentStateSchema = z
       'STOPPED',
       'STOPPED_ANSWERED',
       'ANSWERED',
+      'ANSWERED_HANDLED',
       'STOPPED_HANDLED'
     ]),
     stopLevel: z.number().nullable(),

@@ -46,7 +46,11 @@ export const getCompetition = async (
         include: {
           segmentTeamStates: {
             include: {
-              answers: true
+              answers: {
+                orderBy: {
+                  questionNumber: 'asc'
+                }
+              }
             }
           }
         }

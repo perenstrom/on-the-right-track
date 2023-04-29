@@ -108,11 +108,17 @@ const AnswerHeading = styled.span`
   font-weight: 700;
 `;
 
-const AnswerParagraph = styled.p`
-  font-size: 1.5rem;
+const AnswersList = styled.ol`
+  padding-left: 0;
+  list-style: decimal inside;
+  flex: 1;
+`;
+
+const AnswerItem = styled.li`
+  font-size: 1rem;
   font-weight: 700;
   margin: 0;
-  flex: 1;
+  line-height: 1.1;
 `;
 
 const HandleAnswerButtons = styled.div`
@@ -138,9 +144,11 @@ export const AdminTeam: React.FC<{
   const handleScoring = async (score: number) => {
     if (!currentSegmentTeamState) return;
 
+    const newState: TeamState =
+      currentSegment?.type === 'TRIP' ? 'STOPPED_HANDLED' : 'ANSWERED_HANDLED';
     await patchTeamSegmentState(currentSegmentTeamState?.id, {
       score,
-      state: 'STOPPED_HANDLED'
+      state: newState
     });
 
     router.replace(router.asPath);
@@ -154,7 +162,8 @@ export const AdminTeam: React.FC<{
         <Score>
           <>{score}</>
           {!currentSegment?.scorePublished &&
-            currentState === 'STOPPED_HANDLED' && (
+            (currentState === 'STOPPED_HANDLED' ||
+              currentState === 'ANSWERED_HANDLED') && (
               <ScoreChange>+{currentSegmentTeamState?.score}</ScoreChange>
             )}
         </Score>
@@ -164,22 +173,57 @@ export const AdminTeam: React.FC<{
             <StopLevel>{currentSegmentTeamState?.stopLevel}</StopLevel>
           </>
         )}
-        {currentState === 'STOPPED_ANSWERED' && (
+        {(currentState === 'STOPPED_ANSWERED' ||
+          currentState === 'ANSWERED') && (
           <StoppedAnsweredWrapper>
             <AnswerHeading>Svar:</AnswerHeading>
-            <AnswerParagraph>
-              {currentSegmentTeamState?.answers[0].answer || ''}
-            </AnswerParagraph>
+            <AnswersList>
+              {currentSegmentTeamState?.answers.map((answer) => (
+                <AnswerItem key={answer.id}>{answer.answer || ''}</AnswerItem>
+              ))}
+            </AnswersList>
             <HandleAnswerButtons>
-              <ScoreButton
-                variant="correct"
-                onClick={() =>
-                  handleScoring(currentSegmentTeamState?.stopLevel || 0)
-                }
-              >{`Rätt ${currentSegmentTeamState?.stopLevel}p`}</ScoreButton>
-              <ScoreButton variant="wrong" onClick={() => handleScoring(0)}>
-                Fel 0p
-              </ScoreButton>
+              {currentSegment?.type === 'TRIP' && (
+                <>
+                  <ScoreButton variant="wrong" onClick={() => handleScoring(0)}>
+                    Fel 0p
+                  </ScoreButton>
+                  <ScoreButton
+                    variant="correct"
+                    onClick={() =>
+                      handleScoring(currentSegmentTeamState?.stopLevel || 0)
+                    }
+                  >
+                    {`Rätt ${currentSegmentTeamState?.stopLevel}p`}
+                  </ScoreButton>
+                </>
+              )}
+              {(currentSegment?.type === 'MUSIC' ||
+                currentSegment?.type === 'QUESTION') && (
+                <>
+                  <ScoreButton variant="wrong" onClick={() => handleScoring(0)}>
+                    0p
+                  </ScoreButton>
+                  <ScoreButton
+                    variant="correct"
+                    onClick={() => handleScoring(1)}
+                  >
+                    1p
+                  </ScoreButton>
+                  <ScoreButton
+                    variant="correct"
+                    onClick={() => handleScoring(2)}
+                  >
+                    2p
+                  </ScoreButton>
+                  <ScoreButton
+                    variant="correct"
+                    onClick={() => handleScoring(3)}
+                  >
+                    3p
+                  </ScoreButton>
+                </>
+              )}
             </HandleAnswerButtons>
           </StoppedAnsweredWrapper>
         )}
