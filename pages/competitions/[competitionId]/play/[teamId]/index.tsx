@@ -1,6 +1,12 @@
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Answer, Segment, SegmentTeamState, Team } from '@prisma/client';
+import {
+  Answer,
+  Segment,
+  SegmentTeamState,
+  Team,
+  TeamState
+} from '@prisma/client';
 import { Button } from 'components/Button';
 import { Label, TextArea } from 'components/FormControls';
 import { getFullSegmentName } from 'helpers/copy';
@@ -8,7 +14,7 @@ import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { FormEvent, useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 import { patchAnswer, patchTeamSegmentState } from 'services/local';
 import {
   getBaseCompetition,
@@ -145,6 +151,11 @@ const AnswerText = styled.p`
   flex: 1;
 `;
 
+const AnsweredList = styled.ol`
+  flex: 1;
+  padding-left: 1rem;
+`;
+
 const AnsweredCheck = styled.p`
   color: hsl(203, 54%, 50%);
   font-size: 1.5rem;
@@ -208,8 +219,10 @@ const CompetitionPlayPage: NextPage<Props> = ({
       );
       await Promise.all(promises);
 
+      const newState: TeamState =
+        segment.type === 'TRIP' ? 'STOPPED_ANSWERED' : 'ANSWERED';
       await patchTeamSegmentState(teamState?.id, {
-        state: 'STOPPED_ANSWERED'
+        state: newState
       });
 
       router.replace(router.asPath);
@@ -230,34 +243,57 @@ const CompetitionPlayPage: NextPage<Props> = ({
           <TripLevel>{competition.currentLevel}</TripLevel>
         </>
       )}
-      {segment?.type === 'TRIP' && teamState?.state === 'STOPPED' && (
-        <AnswerForm onSubmit={handleSubmitAnswers}>
-          <TripHeading variant="stopped">{teamState.stopLevel}</TripHeading>
-          <AnswerWrapper>
-            <AnswerLabel htmlFor="answer">Svar:</AnswerLabel>
-            <AnswerInput
-              id="answer"
-              value={answers[0].answer}
-              onChange={(event) => handleAnswersChange(event, 0)}
-            />
-            <SubmitButton type="submit">Svara</SubmitButton>
-          </AnswerWrapper>
-        </AnswerForm>
-      )}
-      {segment?.type === 'TRIP' &&
-        (teamState?.state === 'STOPPED_ANSWERED' ||
-          teamState?.state === 'STOPPED_HANDLED') && (
-          <>
-            <TripHeading variant="answered">{teamState.stopLevel}</TripHeading>
-            <AnsweredWrapper>
-              <AnsweredLabel>Ert svar:</AnsweredLabel>
-              <AnswerText>{`${answers[0].answer}`}</AnswerText>
-              <AnsweredCheck>
-                <FontAwesomeIcon icon={faCheck} /> Svarat
-              </AnsweredCheck>
-            </AnsweredWrapper>
-          </>
+      {((segment?.type === 'TRIP' && teamState?.state === 'STOPPED') ||
+        (segment?.type === 'QUESTION' && teamState?.state === 'IDLE') ||
+        (segment?.type === 'MUSIC' && teamState?.state === 'IDLE')) &&
+        teamState && (
+          <AnswerForm onSubmit={handleSubmitAnswers}>
+            {segment?.type === 'TRIP' && (
+              <TripHeading variant="stopped">{teamState.stopLevel}</TripHeading>
+            )}
+            <AnswerWrapper>
+              {answers.map((answer) => (
+                <React.Fragment key={answer.id}>
+                  <AnswerLabel htmlFor={answer.id}>
+                    {`Svar ${answer.questionNumber}`}
+                  </AnswerLabel>
+                  <AnswerInput
+                    id={answer.id}
+                    value={answer.answer}
+                    onChange={(event) =>
+                      handleAnswersChange(event, answer.questionNumber - 1)
+                    }
+                  />
+                </React.Fragment>
+              ))}
+              <SubmitButton type="submit">Svara</SubmitButton>
+            </AnswerWrapper>
+          </AnswerForm>
         )}
+      {((segment?.type === 'TRIP' &&
+        (teamState?.state === 'STOPPED_ANSWERED' ||
+          teamState?.state === 'STOPPED_HANDLED')) ||
+        (segment?.type === 'QUESTION' && teamState?.state === 'ANSWERED') ||
+        (segment?.type === 'MUSIC' && teamState?.state === 'ANSWERED')) && (
+        <>
+          {segment?.type === 'TRIP' && (
+            <TripHeading variant="answered">{teamState.stopLevel}</TripHeading>
+          )}
+          <AnsweredWrapper>
+            <AnsweredLabel>Ert svar:</AnsweredLabel>
+            <AnsweredList>
+              {answers.map((answer) => (
+                <li key={answer.id}>
+                  <AnswerText>{`${answer.answer}`}</AnswerText>
+                </li>
+              ))}
+            </AnsweredList>
+            <AnsweredCheck>
+              <FontAwesomeIcon icon={faCheck} /> Svarat
+            </AnsweredCheck>
+          </AnsweredWrapper>
+        </>
+      )}
     </Wrapper>
   );
 };
@@ -316,7 +352,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
       team,
       segment,
       teamState,
-      answers
+      answers: answers.sort((a, b) => a.questionNumber - b.questionNumber)
     }
   };
 };
