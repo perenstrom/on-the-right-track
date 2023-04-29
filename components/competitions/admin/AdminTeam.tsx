@@ -161,7 +161,7 @@ export const AdminTeam: React.FC<{
         {currentState === 'STOPPED' && (
           <>
             <StopLevelWrapper></StopLevelWrapper>
-            <StopLevel>10</StopLevel>
+            <StopLevel>{currentSegmentTeamState?.stopLevel}</StopLevel>
           </>
         )}
         {currentState === 'STOPPED_ANSWERED' && (
@@ -177,7 +177,9 @@ export const AdminTeam: React.FC<{
                   handleScoring(currentSegmentTeamState?.stopLevel || 0)
                 }
               >{`Rätt ${currentSegmentTeamState?.stopLevel}p`}</ScoreButton>
-              <ScoreButton variant="wrong">Fel 0p</ScoreButton>
+              <ScoreButton variant="wrong" onClick={() => handleScoring(0)}>
+                Fel 0p
+              </ScoreButton>
             </HandleAnswerButtons>
           </StoppedAnsweredWrapper>
         )}

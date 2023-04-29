@@ -40,6 +40,9 @@ export const getCompetition = async (
         }
       },
       teams: {
+        orderBy: {
+          id: 'asc'
+        },
         include: {
           segmentTeamStates: {
             include: {

@@ -161,8 +161,7 @@ const CompetitionPlayPage: NextPage<Props> = ({
       await Promise.all(promises);
 
       await patchTeamSegmentState(teamState?.id, {
-        state: 'STOPPED_ANSWERED',
-        stopLevel: competition.currentLevel
+        state: 'STOPPED_ANSWERED'
       });
 
       router.replace(router.asPath);
@@ -198,10 +197,6 @@ const CompetitionPlayPage: NextPage<Props> = ({
           </AnswerWrapper>
         </form>
       )}
-      {/*       <pre>{JSON.stringify(competition, null, 2)}</pre>
-      <pre>{JSON.stringify(team, null, 2)}</pre>
-      <pre>{JSON.stringify(segment, null, 2)}</pre>
-      <pre>{JSON.stringify(teamState, null, 2)}</pre> */}
     </Wrapper>
   );
 };

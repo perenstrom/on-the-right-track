@@ -120,8 +120,7 @@ export const patchTeamSegmentState = async (
 };
 
 export const patchAnswer = async (answerId: string, answer: string) => {
-  const url = `/api/answers
-  /${answerId}`;
+  const url = `/api/answers/${answerId}`;
   const options: RequestInit = {
     method: 'PATCH',
     headers: defaultHeaders,
