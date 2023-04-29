@@ -177,6 +177,8 @@ export const AdminTeam: React.FC<{
           currentState === 'ANSWERED') && (
           <StoppedAnsweredWrapper>
             <AnswerHeading>Svar:</AnswerHeading>
+            {currentSegment?.type === 'SPECIAL' &&
+              'Specialfråga. Laget har svarat på annat sätt.'}
             <AnswersList>
               {currentSegmentTeamState?.answers.map((answer) => (
                 <AnswerItem key={answer.id}>{answer.answer || ''}</AnswerItem>
@@ -199,7 +201,8 @@ export const AdminTeam: React.FC<{
                 </>
               )}
               {(currentSegment?.type === 'MUSIC' ||
-                currentSegment?.type === 'QUESTION') && (
+                currentSegment?.type === 'QUESTION' ||
+                currentSegment?.type === 'SPECIAL') && (
                 <>
                   <ScoreButton variant="wrong" onClick={() => handleScoring(0)}>
                     0p
