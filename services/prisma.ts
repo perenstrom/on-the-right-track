@@ -4,6 +4,7 @@ import { Context } from 'lib/prisma';
 import {
   Competition,
   FullCompetition,
+  ScoreCompetition,
   UncreatedCompetition,
   UncreatedSegment,
   UncreatedTeam
@@ -53,6 +54,41 @@ export const getCompetition = async (
               }
             }
           }
+        }
+      }
+    }
+  });
+
+  if (!result) {
+    throw new Error('Competition not found');
+  }
+
+  return {
+    ...result,
+    date: result.date.toISOString()
+  };
+};
+
+export const getScoreCompetition = async (
+  ctx: Context,
+  id: string
+): Promise<ScoreCompetition> => {
+  const result = await ctx.prisma.competition.findUnique({
+    where: {
+      id
+    },
+    include: {
+      segments: {
+        orderBy: {
+          order: 'asc'
+        }
+      },
+      teams: {
+        orderBy: {
+          id: 'asc'
+        },
+        include: {
+          segmentTeamStates: true
         }
       }
     }

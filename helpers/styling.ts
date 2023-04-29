@@ -31,3 +31,35 @@ export const getTeamStateTextColor = (state: TeamState) => {
       return 'hsl(0, 0%, 15%)';
   }
 };
+
+export const getScoreTeamStateColor = (state: TeamState) => {
+  switch (state) {
+    case 'IDLE':
+      return 'hsl(0, 0%, 85%)';
+    case 'STOPPED':
+      return 'hsl(18, 95%, 40%)';
+    case 'STOPPED_ANSWERED':
+    case 'STOPPED_HANDLED':
+      return 'hsl(11, 74%, 77%)';
+    case 'ANSWERED':
+    case 'ANSWERED_HANDLED':
+      return 'hsl(216, 100%, 74%)';
+    default:
+      return 'hsl(0, 0%, 85%)';
+  }
+};
+
+export const getScoreTeamStateTextColor = (state: TeamState) => {
+  switch (state) {
+    case 'IDLE':
+    case 'ANSWERED':
+    case 'ANSWERED_HANDLED':
+    case 'STOPPED_HANDLED':
+    case 'STOPPED_ANSWERED':
+      return 'hsl(0, 0%, 15%)';
+    case 'STOPPED':
+      return 'hsl(0, 0%, 100%)';
+    default:
+      return 'hsl(0, 0%, 15%)';
+  }
+};

@@ -8,6 +8,21 @@ import {
 export type Competition = Omit<PrismaCompetition, 'date'> & {
   date: string;
 };
+export type ScoreCompetition = Omit<
+  Prisma.CompetitionGetPayload<{
+    include: {
+      teams: {
+        include: {
+          segmentTeamStates: true;
+        };
+      };
+      segments: true;
+    };
+  }>,
+  'date'
+> & {
+  date: string;
+};
 export type FullCompetition = Omit<
   Prisma.CompetitionGetPayload<{
     include: {
@@ -35,6 +50,11 @@ export type FullTeam = Prisma.TeamGetPayload<{
     segmentTeamStates: {
       include: { answers: true };
     };
+  };
+}>;
+export type ScoreTeam = Prisma.TeamGetPayload<{
+  include: {
+    segmentTeamStates: true;
   };
 }>;
 export type UncreatedTeam = Omit<Team, 'id'>;
