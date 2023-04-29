@@ -22,7 +22,7 @@ const Wrapper = styled.div<WrapperProps>`
   min-width: 0;
 
   > h2,
-  > span {
+  > div > span {
     line-height: normal;
     display: block;
     margin: 0;
