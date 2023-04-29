@@ -1,3 +1,5 @@
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Answer, Segment, SegmentTeamState, Team } from '@prisma/client';
 import { Button } from 'components/Button';
 import { Label, TextArea } from 'components/FormControls';
@@ -22,6 +24,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
 `;
 
 const SegmentHeading = styled.div`
@@ -50,7 +53,10 @@ const BreakImage = styled.img`
   margin-top: -13rem;
 `;
 
-const TripHeading = styled.div`
+interface TripHeadingProps {
+  variant: 'stopped' | 'answered';
+}
+const TripHeading = styled.div<TripHeadingProps>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +67,8 @@ const TripHeading = styled.div`
   font-weight: bold;
   color: hsl(0, 0%, 100%);
   height: 7rem;
-  background-color: hsl(18, 95%, 40%);
+  background-color: ${({ variant }) =>
+    variant === 'stopped' ? 'hsl(18, 95%, 40%)' : 'hsl(11, 74%, 77%)'};
 `;
 
 const TripLevel = styled.div`
@@ -82,9 +89,19 @@ const WaitingForSegment = styled.div`
   font-size: 1.6rem;
 `;
 
+const AnswerForm = styled.form`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
 const AnswerWrapper = styled.div`
   width: 100%;
+  flex: 1;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
 `;
 
 const AnswerLabel = styled(Label)`
@@ -94,6 +111,7 @@ const AnswerLabel = styled(Label)`
 const AnswerInput = styled(TextArea)`
   font-size: 1.5rem;
   line-height: 1.2;
+  flex: 1;
 `;
 
 const SubmitButton = styled(Button)`
@@ -101,6 +119,36 @@ const SubmitButton = styled(Button)`
   border: 1px solid hsl(116, 46%, 30%);
   width: 100%;
   font-size: 1.5rem;
+`;
+
+const AnsweredWrapper = styled.div`
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+const AnsweredLabel = styled.p`
+  font-size: 2rem;
+  display: block;
+  font-weight: 500;
+`;
+
+const AnswerText = styled.p`
+  font-size: 1.5rem;
+  line-height: 1.2;
+
+  width: 100%;
+  margin-bottom: 1rem;
+
+  flex: 1;
+`;
+
+const AnsweredCheck = styled.p`
+  color: hsl(203, 54%, 50%);
+  font-size: 1.5rem;
+  text-align: center;
 `;
 
 interface Props {
@@ -183,20 +231,33 @@ const CompetitionPlayPage: NextPage<Props> = ({
         </>
       )}
       {segment?.type === 'TRIP' && teamState?.state === 'STOPPED' && (
-        <form onSubmit={handleSubmitAnswers}>
-          <TripHeading>{teamState.stopLevel}</TripHeading>
+        <AnswerForm onSubmit={handleSubmitAnswers}>
+          <TripHeading variant="stopped">{teamState.stopLevel}</TripHeading>
           <AnswerWrapper>
             <AnswerLabel htmlFor="answer">Svar:</AnswerLabel>
             <AnswerInput
               id="answer"
-              rows={7}
               value={answers[0].answer}
               onChange={(event) => handleAnswersChange(event, 0)}
             />
             <SubmitButton type="submit">Svara</SubmitButton>
           </AnswerWrapper>
-        </form>
+        </AnswerForm>
       )}
+      {segment?.type === 'TRIP' &&
+        (teamState?.state === 'STOPPED_ANSWERED' ||
+          teamState?.state === 'STOPPED_HANDLED') && (
+          <>
+            <TripHeading variant="answered">{teamState.stopLevel}</TripHeading>
+            <AnsweredWrapper>
+              <AnsweredLabel>Ert svar:</AnsweredLabel>
+              <AnswerText>{`${answers[0].answer}`}</AnswerText>
+              <AnsweredCheck>
+                <FontAwesomeIcon icon={faCheck} /> Svarat
+              </AnsweredCheck>
+            </AnsweredWrapper>
+          </>
+        )}
     </Wrapper>
   );
 };
