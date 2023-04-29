@@ -162,6 +162,29 @@ const AnsweredCheck = styled.p`
   text-align: center;
 `;
 
+const SpecialWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem;
+`;
+
+const TextWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  line-height: 1.4rem;
+  font-size: 1.2rem;
+`;
+
+const SpecialText = styled.div`
+  max-width: 18rem;
+`;
+
 interface Props {
   competition: Competition;
   team: Team;
@@ -229,6 +252,18 @@ const CompetitionPlayPage: NextPage<Props> = ({
     }
   };
 
+  const handleSubmitSpecial = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (teamState) {
+      await patchTeamSegmentState(teamState?.id, {
+        state: 'ANSWERED'
+      });
+
+      router.replace(router.asPath);
+    }
+  };
+
   return (
     <Wrapper>
       <SegmentHeading>
@@ -270,6 +305,30 @@ const CompetitionPlayPage: NextPage<Props> = ({
             </AnswerWrapper>
           </AnswerForm>
         )}
+      {segment?.type === 'SPECIAL' && (
+        <AnswerForm onSubmit={handleSubmitSpecial}>
+          <SpecialWrapper>
+            <TextWrapper>
+              <SpecialText>
+                Specialfråga. Följ instruktioner från spelledningen.
+              </SpecialText>
+
+              <SpecialText>
+                {teamState?.state === 'IDLE'
+                  ? 'Tryck på Svarat när ni är klara.'
+                  : 'Ni har svarat.'}
+              </SpecialText>
+            </TextWrapper>
+            {teamState?.state === 'IDLE' ? (
+              <SubmitButton type="submit">Svarat</SubmitButton>
+            ) : (
+              <AnsweredCheck>
+                <FontAwesomeIcon icon={faCheck} /> Svarat
+              </AnsweredCheck>
+            )}
+          </SpecialWrapper>
+        </AnswerForm>
+      )}
       {((segment?.type === 'TRIP' &&
         (teamState?.state === 'STOPPED_ANSWERED' ||
           teamState?.state === 'STOPPED_HANDLED')) ||
@@ -335,7 +394,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
     : 0;
 
   let answers: Answer[] = [];
-  if (segment && teamState) {
+  if (segment && teamState && numberOfOptions > 0) {
     const numberArray = new Array(numberOfOptions).fill(0);
     const promises = numberArray.map((_, i) =>
       upsertAnswer(prismaContext, {
