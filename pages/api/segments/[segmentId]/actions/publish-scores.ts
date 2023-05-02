@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prismaContext } from 'lib/prisma';
 import { setScorePublished } from 'services/prisma';
 import { PublishScoreSchema, SegmentIdSchema } from 'schemas/zod/schema';
+import { publishNewScoresPublished } from 'services/ably/client';
 
 const publishScores = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -20,6 +21,7 @@ const publishScores = async (req: NextApiRequest, res: NextApiResponse) => {
 
         setScorePublished(prismaContext, segmentId, scorePublished)
           .then((competition) => {
+            publishNewScoresPublished(competition.id, scorePublished);
             res.status(200).json(competition);
             resolve('');
           })

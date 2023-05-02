@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prismaContext } from 'lib/prisma';
 import { setCurrentStage } from 'services/prisma';
 import { SetStageQuerySchema, SetStageSchema } from 'schemas/zod/schema';
-import { publishNewStage } from 'services/ably';
+import { publishNewStage } from 'services/ably/client';
 
 const setStage = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
