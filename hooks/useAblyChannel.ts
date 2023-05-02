@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 export function useAblyChannel(
   area: 'client' | 'admin',
   competitionId: string,
-  callback: () => void
+  callback: (message: Ably.Types.Message) => void
 ) {
   useEffect(() => {
     const ably = new Ably.Realtime.Promise(
@@ -17,8 +17,8 @@ export function useAblyChannel(
           `${area}-${competitionId}`
         );
 
-        await clientChannel.subscribe(() => {
-          callback();
+        await clientChannel.subscribe((message) => {
+          callback(message);
         });
       } catch (error) {
         console.log(error);

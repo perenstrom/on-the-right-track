@@ -5,7 +5,8 @@ import {
   PatchTeamSegmentQuerySchema,
   PatchTeamSegmentStateSchema
 } from 'schemas/zod/schema';
-import { publishNewSegmentTeamState } from 'services/ably/admin';
+import { publishNewSegmentTeamState as publishNewSegmentTeamStateAdmin } from 'services/ably/admin';
+import { publishNewSegmentTeamState as publishNewSegmentTeamStateClient } from 'services/ably/client';
 
 const segmentTeamStates = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PATCH') {
@@ -30,7 +31,8 @@ const segmentTeamStates = async (req: NextApiRequest, res: NextApiResponse) => {
           segmentTeamStateData
         )
           .then((segmentTeamState) => {
-            publishNewSegmentTeamState(competitionId, segmentTeamState);
+            publishNewSegmentTeamStateAdmin(competitionId, segmentTeamState);
+            publishNewSegmentTeamStateClient(competitionId, segmentTeamState);
             res.status(200).json(segmentTeamState);
             resolve('');
           })

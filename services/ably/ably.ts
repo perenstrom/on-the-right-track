@@ -4,7 +4,7 @@ export const ablyEvents = {
   newLevel: 'newLevel',
   newStage: 'newStage',
   newScoresPublished: 'newScoresPublished',
-  neSegmentTeamState: 'neSegmentTeamState',
+  newSegmentTeamState: 'newSegmentTeamState'
 } as const;
 
 export const makePublishMessage =

@@ -20,6 +20,8 @@ import {
 import styled from 'styled-components';
 import { Competition } from 'types/types';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
+import { ablyEvents } from 'services/ably/ably';
+import { PublishNewSegmentTeamStateSchema } from 'services/ably/client';
 
 const Wrapper = styled.div`
   display: flex;
@@ -195,7 +197,23 @@ const CompetitionPlayPage: NextPage<Props> = ({
 }) => {
   const router = useRouter();
 
-  useAblyClientChannel(competition.id, () => router.replace(router.asPath));
+  useAblyClientChannel(competition.id, (message) => {
+    if (message.name === ablyEvents.newSegmentTeamState) {
+      const parsedMessage = PublishNewSegmentTeamStateSchema.safeParse(
+        message.data
+      );
+
+      if (
+        parsedMessage.success &&
+        parsedMessage.data.teamId !== teamState?.teamId
+      ) {
+        return;
+      }
+    }
+
+    router.replace(router.asPath);
+    return;
+  });
 
   const pullTheBreak = async () => {
     if (teamState) {

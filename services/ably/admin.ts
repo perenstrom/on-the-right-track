@@ -8,7 +8,7 @@ export const publishNewSegmentTeamState = async (
   segmentTeamState: SegmentTeamState
 ) => {
   publishMessage(
-    ablyEvents.neSegmentTeamState,
+    ablyEvents.newSegmentTeamState,
     competitionId,
     segmentTeamState
   );

@@ -59,20 +59,21 @@ export const PublishScoreSchema = z.object({
   scorePublished: z.boolean()
 });
 
+export const teamStateSchema = z.enum([
+  'IDLE',
+  'STOPPED',
+  'STOPPED_ANSWERED',
+  'ANSWERED',
+  'ANSWERED_HANDLED',
+  'STOPPED_HANDLED'
+]);
 export const PatchTeamSegmentStateSchema = z
   .object({
     competitionId: z.string(),
     id: z.string(),
     segmentId: z.string(),
     teamId: z.string(),
-    state: z.enum([
-      'IDLE',
-      'STOPPED',
-      'STOPPED_ANSWERED',
-      'ANSWERED',
-      'ANSWERED_HANDLED',
-      'STOPPED_HANDLED'
-    ]),
+    state: teamStateSchema,
     stopLevel: z.number().nullable(),
     score: z.number().nullable()
   })
