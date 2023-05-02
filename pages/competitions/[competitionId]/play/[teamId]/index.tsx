@@ -1,12 +1,6 @@
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  Answer,
-  Segment,
-  SegmentTeamState,
-  Team,
-  TeamState
-} from '@prisma/client';
+import { Answer, Segment, SegmentTeamState, TeamState } from '@prisma/client';
 import { Button } from 'components/Button';
 import { Label, TextArea } from 'components/FormControls';
 import { getFullSegmentName } from 'helpers/copy';
@@ -25,6 +19,7 @@ import {
 } from 'services/prisma';
 import styled from 'styled-components';
 import { Competition } from 'types/types';
+import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 
 const Wrapper = styled.div`
   display: flex;
@@ -187,7 +182,6 @@ const SpecialText = styled.div`
 
 interface Props {
   competition: Competition;
-  team: Team;
   segment: Segment | null;
   teamState: SegmentTeamState | null;
   answers: Answer[];
@@ -195,12 +189,14 @@ interface Props {
 
 const CompetitionPlayPage: NextPage<Props> = ({
   competition,
-  //team,
   segment,
   teamState,
   answers: initialAnswers
 }) => {
   const router = useRouter();
+
+  useAblyClientChannel(competition.id, () => router.replace(router.asPath));
+
   const pullTheBreak = async () => {
     if (teamState) {
       await patchTeamSegmentState(teamState?.id, {
@@ -408,7 +404,6 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
   return {
     props: {
       competition,
-      team,
       segment,
       teamState,
       answers: answers.sort((a, b) => a.questionNumber - b.questionNumber)
