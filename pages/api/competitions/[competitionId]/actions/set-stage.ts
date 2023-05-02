@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prismaContext } from 'lib/prisma';
 import { setCurrentStage } from 'services/prisma';
 import { SetStageQuerySchema, SetStageSchema } from 'schemas/zod/schema';
+import { publishNewStage } from 'services/ably';
 
 const setStage = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -20,6 +21,7 @@ const setStage = async (req: NextApiRequest, res: NextApiResponse) => {
 
         setCurrentStage(prismaContext, competitionId, stage)
           .then((competition) => {
+            publishNewStage(competitionId, stage);
             res.status(200).json(competition);
             resolve('');
           })
