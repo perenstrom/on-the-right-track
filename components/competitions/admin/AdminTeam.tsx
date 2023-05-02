@@ -142,14 +142,18 @@ export const AdminTeam: React.FC<{
 
   const router = useRouter();
   const handleScoring = async (score: number) => {
-    if (!currentSegmentTeamState) return;
+    if (!currentSegmentTeamState || !currentSegment) return;
 
     const newState: TeamState =
-      currentSegment?.type === 'TRIP' ? 'STOPPED_HANDLED' : 'ANSWERED_HANDLED';
-    await patchTeamSegmentState(currentSegmentTeamState?.id, {
-      score,
-      state: newState
-    });
+      currentSegment.type === 'TRIP' ? 'STOPPED_HANDLED' : 'ANSWERED_HANDLED';
+    await patchTeamSegmentState(
+      currentSegment.competitionId,
+      currentSegmentTeamState.id,
+      {
+        score,
+        state: newState
+      }
+    );
 
     router.replace(router.asPath);
   };

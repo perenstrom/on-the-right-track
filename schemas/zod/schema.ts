@@ -61,6 +61,7 @@ export const PublishScoreSchema = z.object({
 
 export const PatchTeamSegmentStateSchema = z
   .object({
+    competitionId: z.string(),
     id: z.string(),
     segmentId: z.string(),
     teamId: z.string(),
@@ -75,7 +76,8 @@ export const PatchTeamSegmentStateSchema = z
     stopLevel: z.number().nullable(),
     score: z.number().nullable()
   })
-  .partial();
+  .partial()
+  .required({ competitionId: true });
 
 export const PatchTeamSegmentQuerySchema = z.object({
   segmentTeamStateId: z.string()

@@ -199,7 +199,7 @@ const CompetitionPlayPage: NextPage<Props> = ({
 
   const pullTheBreak = async () => {
     if (teamState) {
-      await patchTeamSegmentState(teamState?.id, {
+      await patchTeamSegmentState(competition.id, teamState?.id, {
         state: 'STOPPED',
         stopLevel: competition.currentLevel
       });
@@ -240,7 +240,7 @@ const CompetitionPlayPage: NextPage<Props> = ({
 
       const newState: TeamState =
         segment.type === 'TRIP' ? 'STOPPED_ANSWERED' : 'ANSWERED';
-      await patchTeamSegmentState(teamState?.id, {
+      await patchTeamSegmentState(competition.id, teamState?.id, {
         state: newState
       });
 
@@ -252,7 +252,7 @@ const CompetitionPlayPage: NextPage<Props> = ({
     e.preventDefault();
 
     if (teamState) {
-      await patchTeamSegmentState(teamState?.id, {
+      await patchTeamSegmentState(competition.id, teamState?.id, {
         state: 'ANSWERED'
       });
 

@@ -1,8 +1,8 @@
 import { useAblyChannel } from './useAblyChannel';
 
-export function useAblyClientChannel(
+export function useAblyAdminChannel(
   competitionId: string,
   callback: () => void
 ) {
-  useAblyChannel('client', competitionId, callback);
+  useAblyChannel('admin', competitionId, callback);
 }

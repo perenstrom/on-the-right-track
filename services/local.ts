@@ -104,6 +104,7 @@ export const setScorePublished = async (
 };
 
 export const patchTeamSegmentState = async (
+  competitionId: string,
   segmentTeamStateId: string,
   segmentTeamState: Partial<SegmentTeamState>
 ) => {
@@ -111,7 +112,7 @@ export const patchTeamSegmentState = async (
   const options: RequestInit = {
     method: 'PATCH',
     headers: defaultHeaders,
-    body: JSON.stringify(segmentTeamState)
+    body: JSON.stringify({ competitionId, ...segmentTeamState })
   };
 
   const result = await fetch(url, options).then((r) => r.json());

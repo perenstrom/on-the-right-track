@@ -3,7 +3,8 @@ import Ably from 'ably';
 export const ablyEvents = {
   newLevel: 'newLevel',
   newStage: 'newStage',
-  newScoresPublished: 'newScoresPublished'
+  newScoresPublished: 'newScoresPublished',
+  neSegmentTeamState: 'neSegmentTeamState',
 } as const;
 
 export const makePublishMessage =

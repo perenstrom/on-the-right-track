@@ -5,6 +5,7 @@ import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { PublishButton } from 'components/competitions/admin/PublishButton';
 import { StageController } from 'components/competitions/admin/StageController';
 import { getShortSegmentName } from 'helpers/copy';
+import { useAblyAdminChannel } from 'hooks/useAblyAdminChannel';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -106,6 +107,8 @@ const calculateScore = (team: FullTeam, segments: Segment[]) =>
 
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
+
+  useAblyAdminChannel(competition.id, () => router.replace(router.asPath));
 
   const [addingTeam, setAddingTeam] = useState(false);
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
