@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prismaContext } from 'lib/prisma';
 import { setCurrentLevel } from 'services/prisma';
 import { CompetitionIdSchema, SetLevelSchema } from 'schemas/zod/schema';
+import { publishNewLevel } from 'services/ably';
 
 const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -20,6 +21,7 @@ const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
 
         setCurrentLevel(prismaContext, competitionId, level)
           .then((competition) => {
+            publishNewLevel(competitionId, level);
             res.status(200).json(competition);
             resolve('');
           })
