@@ -5,6 +5,9 @@ import { FullTeam } from 'types/types';
 import { ScoreButton } from './ScoreButton';
 import { patchTeamSegmentState } from 'services/local';
 import { useRouter } from 'next/router';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { MouseEventHandler } from 'react';
 
 interface WrapperProps {
   readonly state: TeamState;
@@ -127,6 +130,21 @@ const HandleAnswerButtons = styled.div`
   gap: 0.5rem;
 `;
 
+const EditButton = styled.button`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 0 -0.5rem -0.5rem 0;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  color: hsla(0, 0%, 0%, 30%);
+
+  &:hover {
+    color: hsla(0, 0%, 0%, 50%);
+  }
+`;
+
 export const AdminTeam: React.FC<{
   team: FullTeam;
   score: number;
@@ -158,6 +176,26 @@ export const AdminTeam: React.FC<{
     router.replace(router.asPath);
   };
 
+  const handleEditButton: MouseEventHandler<HTMLButtonElement> = async (
+    event
+  ) => {
+    event.preventDefault();
+    if (!currentSegmentTeamState || !currentSegment) return;
+
+    const newState: TeamState =
+      currentSegment.type === 'TRIP' ? 'STOPPED_ANSWERED' : 'ANSWERED';
+    await patchTeamSegmentState(
+      currentSegment.competitionId,
+      currentSegmentTeamState.id,
+      {
+        state: newState,
+        score: null
+      }
+    );
+
+    router.replace(router.asPath);
+  };
+
   return (
     <Wrapper state={currentState}>
       <h2>{team.name}</h2>
@@ -170,6 +208,12 @@ export const AdminTeam: React.FC<{
               currentState === 'ANSWERED_HANDLED') && (
               <ScoreChange>+{currentSegmentTeamState?.score}</ScoreChange>
             )}
+          {(currentState === 'STOPPED_HANDLED' ||
+            currentState === 'ANSWERED_HANDLED') && (
+            <EditButton onClick={handleEditButton}>
+              <FontAwesomeIcon icon={faEdit} />
+            </EditButton>
+          )}
         </Score>
         {currentState === 'STOPPED' && (
           <>
