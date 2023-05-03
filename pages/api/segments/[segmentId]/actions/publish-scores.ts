@@ -20,9 +20,9 @@ const publishScores = async (req: NextApiRequest, res: NextApiResponse) => {
         const { segmentId } = parsedQuery.data;
 
         setScorePublished(prismaContext, segmentId, scorePublished)
-          .then((competition) => {
-            publishNewScoresPublished(competition.id, scorePublished);
-            res.status(200).json(competition);
+          .then((segment) => {
+            publishNewScoresPublished(segment.competitionId, scorePublished);
+            res.status(200).json(segment);
             resolve('');
           })
           .catch((error) => {

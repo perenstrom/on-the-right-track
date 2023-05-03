@@ -1,4 +1,4 @@
-import { Segment, TeamState } from '@prisma/client';
+import { Segment, SegmentType, TeamState } from '@prisma/client';
 import {
   getScoreTeamStateColor,
   getScoreTeamStateTextColor
@@ -8,14 +8,26 @@ import { ScoreTeam as ScoreTeamType } from 'types/types';
 
 interface WrapperProps {
   readonly state: TeamState;
+  readonly scoresPublished: boolean;
+  readonly score: number | null;
+  readonly segmentType: SegmentType;
 }
 const Wrapper = styled.div<WrapperProps>`
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  color: ${({ state }) => getScoreTeamStateTextColor(state)};
-  background: ${({ state }) => getScoreTeamStateColor(state)};
+  color: ${({ state, scoresPublished }) =>
+    getScoreTeamStateTextColor({ state, scoresPublished })};
+  background: ${({ state, scoresPublished, score, segmentType }) => {
+    const options = scoresPublished
+      ? { scoresPublished, score, segmentType }
+      : {
+          scoresPublished,
+          state
+        };
+    return getScoreTeamStateColor(options);
+  }};
   border: none;
   border-radius: 10px;
   padding: 0.8rem 1rem 1rem;
@@ -70,7 +82,12 @@ export const ScoreTeam: React.FC<{
     : 'IDLE';
 
   return (
-    <Wrapper state={currentState}>
+    <Wrapper
+      state={currentState}
+      score={currentSegmentTeamState?.score || null}
+      scoresPublished={currentSegment?.scorePublished || false}
+      segmentType={currentSegment?.type || 'QUESTION'}
+    >
       <h2>{team.name}</h2>
       <RelativeFlex>
         <span>{team.members}</span>
