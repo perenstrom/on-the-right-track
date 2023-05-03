@@ -49,9 +49,10 @@ const CompetitionPlaySetTeamSettingsPage: NextPage<Props> = ({ team }) => {
       return;
     }
 
-    await updateTeam(team.id, { name, members });
-
     const { competitionId } = parsedParams.data;
+
+    await updateTeam(team.id, { competitionId, name, members });
+
     router.push(`/competitions/${competitionId}/play/${team.id}`);
 
     setLoading(false);

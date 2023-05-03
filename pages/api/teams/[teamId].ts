@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prismaContext } from 'lib/prisma';
 import { updateTeam } from 'services/prisma';
 import { PatchTeamQuerySchema, PatchTeamSchema } from 'schemas/zod/schema';
+import { publishNewTeam } from 'services/ably/admin';
 
 const teams = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PATCH') {
@@ -17,6 +18,7 @@ const teams = async (req: NextApiRequest, res: NextApiResponse) => {
       } else {
         updateTeam(prismaContext, parsedQuery.data.teamId, parsedBody.data)
           .then((team) => {
+            publishNewTeam(parsedBody.data.competitionId, team);
             res.status(200).json(team);
             resolve('');
           })

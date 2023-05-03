@@ -27,6 +27,7 @@ export const CreateTeamSchema = z.object({
 });
 
 export const PatchTeamSchema = z.object({
+  competitionId: z.string(),
   id: z.string().optional(),
   name: z.string().optional(),
   members: z.string().optional()
