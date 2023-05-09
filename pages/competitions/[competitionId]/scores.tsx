@@ -5,6 +5,7 @@ import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import { useCallback } from 'react';
 import { getScoreCompetition } from 'services/prisma';
 import styled from 'styled-components';
 import { ScoreCompetition, ScoreTeam as ScoreTeamType } from 'types/types';
@@ -50,7 +51,10 @@ const calculateScore = (team: ScoreTeamType, segments: Segment[]) =>
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
 
-  useAblyClientChannel(competition.id, () => router.replace(router.asPath));
+  useAblyClientChannel(
+    competition.id,
+    useCallback(() => router.replace(router.asPath), [router])
+  );
 
   const currentSegment = competition.currentStage
     ? competition.segments[competition.currentStage - 1]

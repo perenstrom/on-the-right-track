@@ -1,15 +1,22 @@
 import Ably from 'ably';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useAblyChannel(
   area: 'client' | 'admin',
   competitionId: string,
   callback: (message: Ably.Types.Message) => void
 ) {
+  const [connectionState, setConnectionState] =
+    useState<Ably.Types.ConnectionState>('initialized');
+
   useEffect(() => {
     const ably = new Ably.Realtime.Promise(
       process.env.NEXT_PUBLIC_ABLY_SUBSCRIBE_API_KEY
     );
+
+    ably.connection.on((stateChange) => {
+      setConnectionState(stateChange.current);
+    });
 
     const asyncEffect = async () => {
       try {
@@ -27,6 +34,11 @@ export function useAblyChannel(
 
     asyncEffect();
 
-    return () => ably.close();
+    return () => {
+      ably.connection.off();
+      ably.close();
+    };
   }, [competitionId, callback, area]);
+
+  return { connectionState };
 }

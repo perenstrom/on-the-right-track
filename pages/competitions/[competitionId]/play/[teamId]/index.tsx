@@ -8,7 +8,7 @@ import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useCallback, useState } from 'react';
 import { patchAnswer, patchTeamSegmentState } from 'services/local';
 import {
   getBaseCompetition,
@@ -22,6 +22,7 @@ import { Competition } from 'types/types';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 import { ablyEvents } from 'services/ably/ably';
 import { PublishNewSegmentTeamStateSchema } from 'services/ably/client';
+import { ConnectionStatus } from 'components/ConnectionStatus';
 
 const Wrapper = styled.div`
   display: flex;
@@ -197,23 +198,45 @@ const CompetitionPlayPage: NextPage<Props> = ({
 }) => {
   const router = useRouter();
 
-  useAblyClientChannel(competition.id, (message) => {
-    if (message.name === ablyEvents.newSegmentTeamState) {
-      const parsedMessage = PublishNewSegmentTeamStateSchema.safeParse(
-        message.data
-      );
+  const { connectionState } = useAblyClientChannel(
+    competition.id,
+    useCallback(
+      (message) => {
+        if (message.name === ablyEvents.newSegmentTeamState) {
+          const parsedMessage = PublishNewSegmentTeamStateSchema.safeParse(
+            message.data
+          );
 
-      if (
-        parsedMessage.success &&
-        parsedMessage.data.teamId !== teamState?.teamId
-      ) {
+          if (
+            parsedMessage.success &&
+            parsedMessage.data.teamId !== teamState?.teamId
+          ) {
+            return;
+          }
+        }
+
+        router.replace(router.asPath);
         return;
-      }
-    }
+      },
+      [router, teamState?.teamId]
+    )
+  );
 
+  const [ablyHasDisconnected, setAblyHasDisconnected] = useState(false);
+  // If Ably connection fails, mark as disconnected
+  if (connectionState === 'suspended' && !ablyHasDisconnected) {
+    setAblyHasDisconnected(true);
+  }
+  // Fetch new data if connection is restored
+  if (connectionState === 'connected' && ablyHasDisconnected) {
     router.replace(router.asPath);
-    return;
-  });
+  }
+
+  const [ablyHasFailed, setAblyHasFailed] = useState(false);
+  // If Ably connection fails, mark as failed
+  if (connectionState === 'failed' && !ablyHasFailed) {
+    setAblyHasFailed(true);
+  }
 
   const pullTheBreak = async () => {
     if (teamState) {
@@ -278,15 +301,27 @@ const CompetitionPlayPage: NextPage<Props> = ({
     }
   };
 
+  const connectionStatus =
+    connectionState !== 'connected'
+      ? ablyHasFailed
+        ? 'disconnected'
+        : 'connecting'
+      : 'connected';
+
   return (
     <Wrapper>
       <SegmentHeading>
         {segment ? getFullSegmentName(segment) : '. . .'}
       </SegmentHeading>
+      <ConnectionStatus state={connectionStatus} />
       {!segment && <WaitingForSegment>Invänta nästa moment</WaitingForSegment>}
       {segment?.type === 'TRIP' && teamState?.state === 'IDLE' && (
         <>
-          <BreakButton type="button" onClick={() => pullTheBreak()}>
+          <BreakButton
+            type="button"
+            onClick={() => pullTheBreak()}
+            disabled={connectionState !== 'connected'}
+          >
             <BreakImage src="/break.svg" alt="Break" width="80%" />
           </BreakButton>
           <TripLevel>{competition.currentLevel}</TripLevel>
@@ -315,7 +350,12 @@ const CompetitionPlayPage: NextPage<Props> = ({
                   />
                 </React.Fragment>
               ))}
-              <SubmitButton type="submit">Svara</SubmitButton>
+              <SubmitButton
+                type="submit"
+                disabled={connectionState !== 'connected'}
+              >
+                Svara
+              </SubmitButton>
             </AnswerWrapper>
           </AnswerForm>
         )}
@@ -334,7 +374,12 @@ const CompetitionPlayPage: NextPage<Props> = ({
               </SpecialText>
             </TextWrapper>
             {teamState?.state === 'IDLE' ? (
-              <SubmitButton type="submit">Svarat</SubmitButton>
+              <SubmitButton
+                type="submit"
+                disabled={connectionState !== 'connected'}
+              >
+                Svarat
+              </SubmitButton>
             ) : (
               <AnsweredCheck>
                 <FontAwesomeIcon icon={faCheck} /> Svarat

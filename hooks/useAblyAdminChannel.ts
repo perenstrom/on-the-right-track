@@ -5,5 +5,5 @@ export function useAblyAdminChannel(
   competitionId: string,
   callback: (message: Ably.Types.Message) => void
 ) {
-  useAblyChannel('admin', competitionId, callback);
+  return useAblyChannel('admin', competitionId, callback);
 }

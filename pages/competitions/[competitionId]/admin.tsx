@@ -10,7 +10,7 @@ import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useCallback, useState } from 'react';
 import {
   createTeam,
   setCurrentLevel,
@@ -108,7 +108,10 @@ const calculateScore = (team: FullTeam, segments: Segment[]) =>
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
 
-  useAblyAdminChannel(competition.id, () => router.replace(router.asPath));
+  useAblyAdminChannel(
+    competition.id,
+    useCallback(() => router.replace(router.asPath), [router])
+  );
 
   const [addingTeam, setAddingTeam] = useState(false);
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
