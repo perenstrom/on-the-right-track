@@ -197,6 +197,14 @@ const CompetitionPlayPage: NextPage<Props> = ({
   answers: initialAnswers
 }) => {
   const router = useRouter();
+  const [answers, setAnswers] = useState<Answer[]>(initialAnswers);
+
+  // Reset answers when segment changes
+  const [prevAnswers, setPrevAnswers] = useState(initialAnswers);
+  if (initialAnswers !== prevAnswers) {
+    setPrevAnswers(initialAnswers);
+    setAnswers(initialAnswers);
+  }
 
   const { connectionState } = useAblyClientChannel(
     competition.id,
@@ -247,8 +255,6 @@ const CompetitionPlayPage: NextPage<Props> = ({
       router.replace(router.asPath);
     }
   };
-
-  const [answers, setAnswers] = useState<Answer[]>(initialAnswers);
 
   const handleAnswersChange = (
     e: FormEvent<HTMLTextAreaElement>,
