@@ -75,6 +75,7 @@ const Main = styled.div`
 
 const ControlBar = styled.div`
   background-color: hsl(0, 0%, 85%);
+  border-right: 1px solid hsl(0, 0%, 0%);
   flex: 0 0 12rem;
 
   display: flex;

@@ -7,6 +7,9 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   border-top: 2px solid hsl(0, 0%, 0%);
+  border-bottom: 2px solid hsl(0, 0%, 0%);
+  background: white;
+  margin-bottom: 1rem;
   align-items: center;
 
   h3 {
