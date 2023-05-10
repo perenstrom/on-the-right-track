@@ -314,6 +314,28 @@ const CompetitionPlayPage: NextPage<Props> = ({
         : 'connecting'
       : 'connected';
 
+  const isTrip = segment?.type === 'TRIP';
+  const isQuestion = segment?.type === 'QUESTION';
+  const isMusic = segment?.type === 'MUSIC';
+  const isSpecial = segment?.type === 'SPECIAL';
+
+  const hasLevel = competition.currentLevel === null;
+
+  const isIdle = teamState?.state === 'IDLE';
+  const isStopped = teamState?.state === 'STOPPED';
+  const isStoppedAnswered = teamState?.state === 'STOPPED_ANSWERED';
+  const isStoppedHandled = teamState?.state === 'STOPPED_HANDLED';
+  const isAnswered = teamState?.state === 'ANSWERED';
+  const isAnsweredHandled = teamState?.state === 'ANSWERED_HANDLED';
+
+  const isWaitingForDeparture = isTrip && isIdle && hasLevel;
+  const isTraveling = isTrip && isIdle && !hasLevel;
+  const isAnswering =
+    (isTrip && isStopped) || ((isQuestion || isMusic) && isIdle && teamState);
+  const hasAnswered =
+    (isTrip && (isStoppedAnswered || isStoppedHandled)) ||
+    ((isQuestion || isMusic) && (isAnswered || isAnsweredHandled));
+
   return (
     <Wrapper>
       <SegmentHeading>
@@ -321,7 +343,10 @@ const CompetitionPlayPage: NextPage<Props> = ({
       </SegmentHeading>
       <ConnectionStatus state={connectionStatus} />
       {!segment && <WaitingForSegment>Invänta nästa moment</WaitingForSegment>}
-      {segment?.type === 'TRIP' && teamState?.state === 'IDLE' && (
+      {isWaitingForDeparture && (
+        <WaitingForSegment>Invänta avgång</WaitingForSegment>
+      )}
+      {isTraveling && (
         <>
           <BreakButton
             type="button"
@@ -333,39 +358,36 @@ const CompetitionPlayPage: NextPage<Props> = ({
           <TripLevel>{competition.currentLevel}</TripLevel>
         </>
       )}
-      {((segment?.type === 'TRIP' && teamState?.state === 'STOPPED') ||
-        (segment?.type === 'QUESTION' && teamState?.state === 'IDLE') ||
-        (segment?.type === 'MUSIC' && teamState?.state === 'IDLE')) &&
-        teamState && (
-          <AnswerForm onSubmit={handleSubmitAnswers}>
-            {segment?.type === 'TRIP' && (
-              <TripHeading variant="stopped">{teamState.stopLevel}</TripHeading>
-            )}
-            <AnswerWrapper>
-              {answers.map((answer) => (
-                <React.Fragment key={answer.id}>
-                  <AnswerLabel htmlFor={answer.id}>
-                    {`Svar ${answer.questionNumber}`}
-                  </AnswerLabel>
-                  <AnswerInput
-                    id={answer.id}
-                    value={answer.answer}
-                    onChange={(event) =>
-                      handleAnswersChange(event, answer.questionNumber - 1)
-                    }
-                  />
-                </React.Fragment>
-              ))}
-              <SubmitButton
-                type="submit"
-                disabled={connectionState !== 'connected'}
-              >
-                Svara
-              </SubmitButton>
-            </AnswerWrapper>
-          </AnswerForm>
-        )}
-      {segment?.type === 'SPECIAL' && (
+      {isAnswering && (
+        <AnswerForm onSubmit={handleSubmitAnswers}>
+          {isTrip && (
+            <TripHeading variant="stopped">{teamState.stopLevel}</TripHeading>
+          )}
+          <AnswerWrapper>
+            {answers.map((answer) => (
+              <React.Fragment key={answer.id}>
+                <AnswerLabel htmlFor={answer.id}>
+                  {`Svar ${answer.questionNumber}`}
+                </AnswerLabel>
+                <AnswerInput
+                  id={answer.id}
+                  value={answer.answer}
+                  onChange={(event) =>
+                    handleAnswersChange(event, answer.questionNumber - 1)
+                  }
+                />
+              </React.Fragment>
+            ))}
+            <SubmitButton
+              type="submit"
+              disabled={connectionState !== 'connected'}
+            >
+              Svara
+            </SubmitButton>
+          </AnswerWrapper>
+        </AnswerForm>
+      )}
+      {isSpecial && (
         <AnswerForm onSubmit={handleSubmitSpecial}>
           <SpecialWrapper>
             <TextWrapper>
@@ -374,12 +396,10 @@ const CompetitionPlayPage: NextPage<Props> = ({
               </SpecialText>
 
               <SpecialText>
-                {teamState?.state === 'IDLE'
-                  ? 'Tryck på Svarat när ni är klara.'
-                  : 'Ni har svarat.'}
+                {isIdle ? 'Tryck på Svarat när ni är klara.' : 'Ni har svarat.'}
               </SpecialText>
             </TextWrapper>
-            {teamState?.state === 'IDLE' ? (
+            {isIdle ? (
               <SubmitButton
                 type="submit"
                 disabled={connectionState !== 'connected'}
@@ -394,13 +414,9 @@ const CompetitionPlayPage: NextPage<Props> = ({
           </SpecialWrapper>
         </AnswerForm>
       )}
-      {((segment?.type === 'TRIP' &&
-        (teamState?.state === 'STOPPED_ANSWERED' ||
-          teamState?.state === 'STOPPED_HANDLED')) ||
-        (segment?.type === 'QUESTION' && teamState?.state === 'ANSWERED') ||
-        (segment?.type === 'MUSIC' && teamState?.state === 'ANSWERED')) && (
+      {hasAnswered && (
         <>
-          {segment?.type === 'TRIP' && (
+          {isTrip && (
             <TripHeading variant="answered">{teamState.stopLevel}</TripHeading>
           )}
           <AnsweredWrapper>
