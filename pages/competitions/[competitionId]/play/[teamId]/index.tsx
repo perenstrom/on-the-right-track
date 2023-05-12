@@ -339,99 +339,119 @@ const CompetitionPlayPage: NextPage<Props> = ({
   return (
     <Wrapper>
       <SegmentHeading>
-        {segment ? getFullSegmentName(segment) : '. . .'}
+        {ablyHasFailed
+          ? 'offline'
+          : segment
+          ? getFullSegmentName(segment)
+          : '. . .'}
       </SegmentHeading>
       <ConnectionStatus state={connectionStatus} />
-      {!segment && <WaitingForSegment>Invänta nästa moment</WaitingForSegment>}
-      {isWaitingForDeparture && (
-        <WaitingForSegment>Invänta avgång</WaitingForSegment>
-      )}
-      {isTraveling && (
+      {ablyHasFailed ? (
+        <WaitingForSegment>
+          Du har tappat kontakten med servern. Ladda om sidan.
+        </WaitingForSegment>
+      ) : (
         <>
-          <BreakButton
-            type="button"
-            onClick={() => pullTheBreak()}
-            disabled={connectionState !== 'connected'}
-          >
-            <BreakImage src="/break.svg" alt="Break" width="80%" />
-          </BreakButton>
-          <TripLevel>{competition.currentLevel}</TripLevel>
-        </>
-      )}
-      {isAnswering && (
-        <AnswerForm onSubmit={handleSubmitAnswers}>
-          {isTrip && (
-            <TripHeading variant="stopped">{teamState.stopLevel}</TripHeading>
+          {!segment && (
+            <WaitingForSegment>Invänta nästa moment</WaitingForSegment>
           )}
-          <AnswerWrapper>
-            {answers.map((answer) => (
-              <React.Fragment key={answer.id}>
-                <AnswerLabel htmlFor={answer.id}>
-                  {`Svar ${answer.questionNumber}`}
-                </AnswerLabel>
-                <AnswerInput
-                  id={answer.id}
-                  value={answer.answer}
-                  onChange={(event) =>
-                    handleAnswersChange(event, answer.questionNumber - 1)
-                  }
-                />
-              </React.Fragment>
-            ))}
-            <SubmitButton
-              type="submit"
-              disabled={connectionState !== 'connected'}
-            >
-              Svara
-            </SubmitButton>
-          </AnswerWrapper>
-        </AnswerForm>
-      )}
-      {isSpecial && (
-        <AnswerForm onSubmit={handleSubmitSpecial}>
-          <SpecialWrapper>
-            <TextWrapper>
-              <SpecialText>
-                Specialfråga. Följ instruktioner från spelledningen.
-              </SpecialText>
-
-              <SpecialText>
-                {isIdle ? 'Tryck på Svarat när ni är klara.' : 'Ni har svarat.'}
-              </SpecialText>
-            </TextWrapper>
-            {isIdle ? (
-              <SubmitButton
-                type="submit"
+          {isWaitingForDeparture && (
+            <WaitingForSegment>Invänta avgång</WaitingForSegment>
+          )}
+          {isTraveling && (
+            <>
+              <BreakButton
+                type="button"
+                onClick={() => pullTheBreak()}
                 disabled={connectionState !== 'connected'}
               >
-                Svarat
-              </SubmitButton>
-            ) : (
-              <AnsweredCheck>
-                <FontAwesomeIcon icon={faCheck} /> Svarat
-              </AnsweredCheck>
-            )}
-          </SpecialWrapper>
-        </AnswerForm>
-      )}
-      {hasAnswered && (
-        <>
-          {isTrip && (
-            <TripHeading variant="answered">{teamState.stopLevel}</TripHeading>
+                <BreakImage src="/break.svg" alt="Break" width="80%" />
+              </BreakButton>
+              <TripLevel>{competition.currentLevel}</TripLevel>
+            </>
           )}
-          <AnsweredWrapper>
-            <AnsweredLabel>Ert svar:</AnsweredLabel>
-            <AnsweredList>
-              {answers.map((answer) => (
-                <li key={answer.id}>
-                  <AnswerText>{`${answer.answer}`}</AnswerText>
-                </li>
-              ))}
-            </AnsweredList>
-            <AnsweredCheck>
-              <FontAwesomeIcon icon={faCheck} /> Svarat
-            </AnsweredCheck>
-          </AnsweredWrapper>
+          {isAnswering && (
+            <AnswerForm onSubmit={handleSubmitAnswers}>
+              {isTrip && (
+                <TripHeading variant="stopped">
+                  {teamState.stopLevel}
+                </TripHeading>
+              )}
+              <AnswerWrapper>
+                {answers.map((answer) => (
+                  <React.Fragment key={answer.id}>
+                    <AnswerLabel htmlFor={answer.id}>
+                      {`Svar ${answer.questionNumber}`}
+                    </AnswerLabel>
+                    <AnswerInput
+                      id={answer.id}
+                      value={answer.answer}
+                      onChange={(event) =>
+                        handleAnswersChange(event, answer.questionNumber - 1)
+                      }
+                    />
+                  </React.Fragment>
+                ))}
+                <SubmitButton
+                  type="submit"
+                  disabled={connectionState !== 'connected'}
+                >
+                  Svara
+                </SubmitButton>
+              </AnswerWrapper>
+            </AnswerForm>
+          )}
+          {isSpecial && (
+            <AnswerForm onSubmit={handleSubmitSpecial}>
+              <SpecialWrapper>
+                <TextWrapper>
+                  <SpecialText>
+                    Specialfråga. Följ instruktioner från spelledningen.
+                  </SpecialText>
+
+                  <SpecialText>
+                    {isIdle
+                      ? 'Tryck på Svarat när ni är klara.'
+                      : 'Ni har svarat.'}
+                  </SpecialText>
+                </TextWrapper>
+                {isIdle ? (
+                  <SubmitButton
+                    type="submit"
+                    disabled={connectionState !== 'connected'}
+                  >
+                    Svarat
+                  </SubmitButton>
+                ) : (
+                  <AnsweredCheck>
+                    <FontAwesomeIcon icon={faCheck} /> Svarat
+                  </AnsweredCheck>
+                )}
+              </SpecialWrapper>
+            </AnswerForm>
+          )}
+          {hasAnswered && (
+            <>
+              {isTrip && (
+                <TripHeading variant="answered">
+                  {teamState.stopLevel}
+                </TripHeading>
+              )}
+              <AnsweredWrapper>
+                <AnsweredLabel>Ert svar:</AnsweredLabel>
+                <AnsweredList>
+                  {answers.map((answer) => (
+                    <li key={answer.id}>
+                      <AnswerText>{`${answer.answer}`}</AnswerText>
+                    </li>
+                  ))}
+                </AnsweredList>
+                <AnsweredCheck>
+                  <FontAwesomeIcon icon={faCheck} /> Svarat
+                </AnsweredCheck>
+              </AnsweredWrapper>
+            </>
+          )}
         </>
       )}
     </Wrapper>
