@@ -9,16 +9,21 @@ const AddButton = styled.button`
   border-radius: 10px;
 
   &:hover {
-  color: hsl(60 0% 78%);
+    color: hsl(60 0% 78%);
   }
 `;
 
 export const AddTeam: React.FC<{
   triggerAdd: () => void;
-}> = ({ triggerAdd }) => {
+  connectionState: 'connected' | 'connecting' | 'disconnected';
+}> = ({ triggerAdd, connectionState }) => {
   return (
-    <AddButton type="button" onClick={() => triggerAdd()}>
-      <FontAwesomeIcon icon={faPlus} size='6x'/>
+    <AddButton
+      type="button"
+      onClick={() => triggerAdd()}
+      disabled={connectionState !== 'connected'}
+    >
+      <FontAwesomeIcon icon={faPlus} size="6x" />
     </AddButton>
   );
 };

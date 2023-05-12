@@ -1,4 +1,5 @@
 import { Segment } from '@prisma/client';
+import { ConnectionStatus } from 'components/ConnectionStatus';
 import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
@@ -105,10 +106,33 @@ const calculateScore = (team: FullTeam, segments: Segment[]) =>
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
 
-  useAblyAdminChannel(
+  const { connectionState } = useAblyAdminChannel(
     competition.id,
     useCallback(() => router.replace(router.asPath), [router])
   );
+
+  const [ablyHasDisconnected, setAblyHasDisconnected] = useState(false);
+  // If Ably connection fails, mark as disconnected
+  if (connectionState === 'suspended' && !ablyHasDisconnected) {
+    setAblyHasDisconnected(true);
+  }
+  // Fetch new data if connection is restored
+  if (connectionState === 'connected' && ablyHasDisconnected) {
+    router.replace(router.asPath);
+  }
+
+  const [ablyHasFailed, setAblyHasFailed] = useState(false);
+  // If Ably connection fails, mark as failed
+  if (connectionState === 'failed' && !ablyHasFailed) {
+    setAblyHasFailed(true);
+  }
+
+  const connectionStatus =
+    connectionState !== 'connected'
+      ? ablyHasFailed
+        ? 'disconnected'
+        : 'connecting'
+      : 'connected';
 
   const [addingTeam, setAddingTeam] = useState(false);
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
@@ -245,6 +269,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         </ModalOverlay>
       )}
       <Wrapper>
+        <ConnectionStatus state={connectionStatus} />
         <BreadCrumb
           segments={competition.segments}
           currentSegment={currentSegment?.id || ''}
@@ -256,6 +281,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 <PublishButton
                   variant={allAnswered ? 'active' : 'idle'}
                   onClick={handlePublish}
+                  disabled={connectionState !== 'connected'}
                 >
                   {currentSegment?.scorePublished ? 'Avpublicera' : 'Publicera'}
                 </PublishButton>
@@ -269,6 +295,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 currentStage={competition.currentLevel?.toString() || 'N/A'}
                 previousStage={previousLevel}
                 nextStage={nextLevel}
+                connectionState={connectionStatus}
               />
             )}
             <StageController
@@ -284,6 +311,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               }
               previousStage={previousStage}
               nextStage={nextStage}
+              connectionState={connectionStatus}
             />
           </ControlBar>
           <Main>
@@ -293,9 +321,13 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 team={team}
                 currentSegment={currentSegment}
                 score={calculateScore(team, competition.segments)}
+                connectionState={connectionStatus}
               />
             ))}
-            <AddTeam triggerAdd={() => setAddingTeam(true)} />
+            <AddTeam
+              triggerAdd={() => setAddingTeam(true)}
+              connectionState={connectionStatus}
+            />
           </Main>
         </Bottom>
         {false && <pre>{JSON.stringify(competition, null, 2)}</pre>}

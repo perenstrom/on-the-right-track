@@ -59,7 +59,16 @@ export const StageController: React.FC<{
   previousStage?: string;
   nextStage?: string;
   heading: string;
-}> = ({ next, previous, currentStage, previousStage, nextStage, heading }) => {
+  connectionState: 'connected' | 'connecting' | 'disconnected';
+}> = ({
+  next,
+  previous,
+  currentStage,
+  previousStage,
+  nextStage,
+  heading,
+  connectionState
+}) => {
   const prevContent =
     previousStage === 'N/A' ? (
       <FontAwesomeIcon icon={faPause} />
@@ -77,11 +86,15 @@ export const StageController: React.FC<{
         <button
           type="button"
           onClick={() => previous()}
-          disabled={!previousStage}
+          disabled={!previousStage || connectionState !== 'connected'}
         >
           {prevContent}
         </button>
-        <button type="button" onClick={() => next()} disabled={!nextStage}>
+        <button
+          type="button"
+          onClick={() => next()}
+          disabled={!nextStage || connectionState !== 'connected'}
+        >
           {nextStage} &gt;
         </button>
       </ButtonWrapper>

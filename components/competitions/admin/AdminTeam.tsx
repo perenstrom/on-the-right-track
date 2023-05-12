@@ -149,7 +149,8 @@ export const AdminTeam: React.FC<{
   team: FullTeam;
   score: number;
   currentSegment: Segment | null;
-}> = ({ team, score, currentSegment }) => {
+  connectionState: 'connected' | 'connecting' | 'disconnected';
+}> = ({ team, score, currentSegment, connectionState }) => {
   const currentSegmentTeamState = team.segmentTeamStates.find(
     (segmentTeamState) => segmentTeamState.segmentId === currentSegment?.id
   );
@@ -210,7 +211,10 @@ export const AdminTeam: React.FC<{
             )}
           {(currentState === 'STOPPED_HANDLED' ||
             currentState === 'ANSWERED_HANDLED') && (
-            <EditButton onClick={handleEditButton}>
+            <EditButton
+              onClick={handleEditButton}
+              disabled={connectionState !== 'connected'}
+            >
               <FontAwesomeIcon icon={faEdit} />
             </EditButton>
           )}
@@ -235,7 +239,11 @@ export const AdminTeam: React.FC<{
             <HandleAnswerButtons>
               {currentSegment?.type === 'TRIP' && (
                 <>
-                  <ScoreButton variant="wrong" onClick={() => handleScoring(0)}>
+                  <ScoreButton
+                    variant="wrong"
+                    onClick={() => handleScoring(0)}
+                    disabled={connectionState !== 'connected'}
+                  >
                     Fel 0p
                   </ScoreButton>
                   <ScoreButton
@@ -243,6 +251,7 @@ export const AdminTeam: React.FC<{
                     onClick={() =>
                       handleScoring(currentSegmentTeamState?.stopLevel || 0)
                     }
+                    disabled={connectionState !== 'connected'}
                   >
                     {`Rätt ${currentSegmentTeamState?.stopLevel}p`}
                   </ScoreButton>
@@ -252,24 +261,31 @@ export const AdminTeam: React.FC<{
                 currentSegment?.type === 'QUESTION' ||
                 currentSegment?.type === 'SPECIAL') && (
                 <>
-                  <ScoreButton variant="wrong" onClick={() => handleScoring(0)}>
+                  <ScoreButton
+                    variant="wrong"
+                    onClick={() => handleScoring(0)}
+                    disabled={connectionState !== 'connected'}
+                  >
                     0p
                   </ScoreButton>
                   <ScoreButton
                     variant="correct"
                     onClick={() => handleScoring(1)}
+                    disabled={connectionState !== 'connected'}
                   >
                     1p
                   </ScoreButton>
                   <ScoreButton
                     variant="correct"
                     onClick={() => handleScoring(2)}
+                    disabled={connectionState !== 'connected'}
                   >
                     2p
                   </ScoreButton>
                   <ScoreButton
                     variant="correct"
                     onClick={() => handleScoring(3)}
+                    disabled={connectionState !== 'connected'}
                   >
                     3p
                   </ScoreButton>

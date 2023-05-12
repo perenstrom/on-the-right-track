@@ -1,11 +1,12 @@
 import { Segment } from '@prisma/client';
+import { ConnectionStatus } from 'components/ConnectionStatus';
 import { ScoreTeam } from 'components/competitions/ScoreTeam';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { getScoreCompetition } from 'services/prisma';
 import styled from 'styled-components';
 import { ScoreCompetition, ScoreTeam as ScoreTeamType } from 'types/types';
@@ -51,10 +52,33 @@ const calculateScore = (team: ScoreTeamType, segments: Segment[]) =>
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
 
-  useAblyClientChannel(
+  const { connectionState } = useAblyClientChannel(
     competition.id,
     useCallback(() => router.replace(router.asPath), [router])
   );
+
+  const [ablyHasDisconnected, setAblyHasDisconnected] = useState(false);
+  // If Ably connection fails, mark as disconnected
+  if (connectionState === 'suspended' && !ablyHasDisconnected) {
+    setAblyHasDisconnected(true);
+  }
+  // Fetch new data if connection is restored
+  if (connectionState === 'connected' && ablyHasDisconnected) {
+    router.replace(router.asPath);
+  }
+
+  const [ablyHasFailed, setAblyHasFailed] = useState(false);
+  // If Ably connection fails, mark as failed
+  if (connectionState === 'failed' && !ablyHasFailed) {
+    setAblyHasFailed(true);
+  }
+
+  const connectionStatus =
+    connectionState !== 'connected'
+      ? ablyHasFailed
+        ? 'disconnected'
+        : 'connecting'
+      : 'connected';
 
   const currentSegment = competition.currentStage
     ? competition.segments[competition.currentStage - 1]
@@ -63,6 +87,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
   return (
     <>
       <Wrapper>
+        <ConnectionStatus state={connectionStatus} />
         <Bottom>
           <Main>
             {competition.teams.map((team) => (
@@ -75,7 +100,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             ))}
           </Main>
         </Bottom>
-        {false && <pre>{JSON.stringify(competition, null, 2)}</pre>}
       </Wrapper>
     </>
   );
