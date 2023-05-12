@@ -2,6 +2,7 @@ import { Segment } from '@prisma/client';
 import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
+import { BreadCrumb } from 'components/competitions/admin/BreadCrumb';
 import { PublishButton } from 'components/competitions/admin/PublishButton';
 import { StageController } from 'components/competitions/admin/StageController';
 import { getShortSegmentName } from 'helpers/copy';
@@ -51,11 +52,6 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-`;
-
-const BreadCrumb = styled.div`
-  background-color: tomato;
-  flex: 0 0 3rem;
 `;
 
 const Bottom = styled.div`
@@ -249,7 +245,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         </ModalOverlay>
       )}
       <Wrapper>
-        <BreadCrumb>breadcrumb</BreadCrumb>
+        <BreadCrumb
+          segments={competition.segments}
+          currentSegment={currentSegment?.id || ''}
+        />
         <Bottom>
           <ControlBar>
             {someOneAnswered && (
