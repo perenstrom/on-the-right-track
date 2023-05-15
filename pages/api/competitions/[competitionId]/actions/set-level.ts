@@ -19,13 +19,9 @@ const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
         const { level } = parsedBody.data;
         const { competitionId } = parsedQuery.data;
 
-        console.log(`Setting level to ${level} for competition ${competitionId}`);
-
         setCurrentLevel(prismaContext, competitionId, level)
           .then(async (competition) => {
-            console.log(`Level set to ${competition.currentLevel} for competition ${competitionId}`);
             await publishNewLevel(competitionId, level);
-            console.log('Published Ably message, returning response');
             res.status(200).json(competition);
             resolve('');
           })

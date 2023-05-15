@@ -15,11 +15,8 @@ export const makePublishMessage =
     competitionId: string,
     data: T
   ) => {
-    console.log(`${area}: Publishing ${eventName} for competition ${competitionId}`);
     const ably = new Ably.Realtime.Promise(process.env.ABLY_PUBLISH_API_KEY);
     const testChannel = await ably.channels.get(`${area}-${competitionId}`);
-    console.log(`${area}: Got channel ${area}-${competitionId}`);
     await testChannel.publish(eventName, data);
-    console.log(`${area}: Published ${eventName} for competition ${competitionId}`);
     ably.close();
   };
