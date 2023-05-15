@@ -30,9 +30,11 @@ const segmentTeamStates = async (req: NextApiRequest, res: NextApiResponse) => {
           parsedQuery.data.segmentTeamStateId,
           segmentTeamStateData
         )
-          .then((segmentTeamState) => {
-            publishNewSegmentTeamStateAdmin(competitionId, segmentTeamState);
-            publishNewSegmentTeamStateClient(competitionId, segmentTeamState);
+          .then(async (segmentTeamState) => {
+            await Promise.all([
+              publishNewSegmentTeamStateAdmin(competitionId, segmentTeamState),
+              publishNewSegmentTeamStateClient(competitionId, segmentTeamState)
+            ]);
             res.status(200).json(segmentTeamState);
             resolve('');
           })

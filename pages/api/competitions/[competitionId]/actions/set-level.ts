@@ -20,8 +20,8 @@ const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
         const { competitionId } = parsedQuery.data;
 
         setCurrentLevel(prismaContext, competitionId, level)
-          .then((competition) => {
-            publishNewLevel(competitionId, level);
+          .then(async (competition) => {
+            await publishNewLevel(competitionId, level);
             res.status(200).json(competition);
             resolve('');
           })

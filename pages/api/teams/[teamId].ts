@@ -17,8 +17,8 @@ const teams = async (req: NextApiRequest, res: NextApiResponse) => {
         resolve('');
       } else {
         updateTeam(prismaContext, parsedQuery.data.teamId, parsedBody.data)
-          .then((team) => {
-            publishNewTeam(parsedBody.data.competitionId, team);
+          .then(async (team) => {
+            await publishNewTeam(parsedBody.data.competitionId, team);
             res.status(200).json(team);
             resolve('');
           })

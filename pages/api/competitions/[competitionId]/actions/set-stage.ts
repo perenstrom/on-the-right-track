@@ -20,8 +20,8 @@ const setStage = async (req: NextApiRequest, res: NextApiResponse) => {
         const { competitionId } = parsedQuery.data;
 
         setCurrentStage(prismaContext, competitionId, stage)
-          .then((competition) => {
-            publishNewStage(competitionId, stage);
+          .then(async (competition) => {
+            await publishNewStage(competitionId, stage);
             res.status(200).json(competition);
             resolve('');
           })

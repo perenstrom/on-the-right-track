@@ -9,21 +9,23 @@ export const publishNewLevel = async (
   competitionId: string,
   level: number | null
 ) => {
-  publishMessage(ablyEvents.newLevel, competitionId, { level });
+  return publishMessage(ablyEvents.newLevel, competitionId, { level });
 };
 
 export const publishNewStage = async (
   competitionId: string,
   stage: number | null
 ) => {
-  publishMessage(ablyEvents.newStage, competitionId, { stage });
+  return publishMessage(ablyEvents.newStage, competitionId, { stage });
 };
 
 export const publishNewScoresPublished = async (
   competitionId: string,
   published: boolean
 ) => {
-  publishMessage(ablyEvents.newScoresPublished, competitionId, { published });
+  return publishMessage(ablyEvents.newScoresPublished, competitionId, {
+    published
+  });
 };
 
 export const PublishNewSegmentTeamStateSchema = z.object({
@@ -38,7 +40,7 @@ export const publishNewSegmentTeamState = async (
   competitionId: string,
   segmentTeamState: SegmentTeamState
 ) => {
-  publishMessage(
+  return publishMessage(
     ablyEvents.newSegmentTeamState,
     competitionId,
     segmentTeamState
