@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "lint": "next lint",
     "prisma:generate": "dotenv -e .env.local -- npx prisma generate --schema=./schemas/prisma/schema.prisma",
-    "prisma:push:local": "dotenv -e .env.local -- npx prisma db push --schema=./schemas/prisma/schema.prisma"
+    "prisma:push:local": "dotenv -e .env.local -- npx prisma db push --schema=./schemas/prisma/schema.prisma",
+    "postinstall": "prisma generate --schema=./schemas/prisma/schema.prisma"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
