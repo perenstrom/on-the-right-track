@@ -9,6 +9,7 @@ export const publishNewLevel = async (
   competitionId: string,
   level: number | null
 ) => {
+  console.log(`Client: Publishing new level ${level} for competition ${competitionId}`);
   return publishMessage(ablyEvents.newLevel, competitionId, { level });
 };
 
