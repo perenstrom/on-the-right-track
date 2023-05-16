@@ -70,12 +70,21 @@ export const StageController: React.FC<{
   connectionState
 }) => {
   const prevContent =
-    previousStage === 'N/A' ? (
+    previousStage === 'start' ? (
       <FontAwesomeIcon icon={faPause} />
     ) : !previousStage ? (
       '< '
     ) : (
       `< ${previousStage}`
+    );
+
+  const nextContent =
+    nextStage === 'end' ? (
+      <FontAwesomeIcon icon={faPause} />
+    ) : !nextStage ? (
+      '> '
+    ) : (
+      `${nextStage} >`
     );
 
   return (
@@ -95,7 +104,7 @@ export const StageController: React.FC<{
           onClick={() => next()}
           disabled={!nextStage || connectionState !== 'connected'}
         >
-          {nextStage} &gt;
+          {nextContent}
         </button>
       </ButtonWrapper>
     </Wrapper>

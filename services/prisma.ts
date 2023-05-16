@@ -3,13 +3,14 @@ import { generateRandomId } from 'helpers/utils';
 import { Context } from 'lib/prisma';
 import {
   Competition,
+  CompetitionWithSegmentCount,
   FullCompetition,
   ScoreCompetition,
   UncreatedCompetition,
   UncreatedSegment,
   UncreatedTeam
 } from 'types/types';
-import { WithRequired } from 'types/utils';
+import { Optional, WithRequired } from 'types/utils';
 
 export const getCompetitions = async (ctx: Context): Promise<Competition[]> => {
   const result = await ctx.prisma.competition.findMany({
@@ -107,10 +108,17 @@ export const getScoreCompetition = async (
 export const getBaseCompetition = async (
   ctx: Context,
   id: string
-): Promise<Competition> => {
+): Promise<CompetitionWithSegmentCount> => {
   const result = await ctx.prisma.competition.findUnique({
     where: {
       id
+    },
+    include: {
+      segments: {
+        orderBy: {
+          order: 'asc'
+        }
+      }
     }
   });
 
@@ -118,8 +126,13 @@ export const getBaseCompetition = async (
     throw new Error('Competition not found');
   }
 
+  const segmentCount = result.segments.length;
+  const modifiedResult: Optional<typeof result, 'segments'> = { ...result };
+  delete modifiedResult.segments;
+
   return {
-    ...result,
+    ...modifiedResult,
+    segmentCount,
     date: result.date.toISOString()
   };
 };

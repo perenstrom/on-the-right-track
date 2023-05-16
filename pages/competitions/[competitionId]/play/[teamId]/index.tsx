@@ -18,7 +18,7 @@ import {
   upsertSegmentTeamState
 } from 'services/prisma';
 import styled from 'styled-components';
-import { Competition } from 'types/types';
+import { CompetitionWithSegmentCount } from 'types/types';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 import { ablyEvents } from 'services/ably/ably';
 import { PublishNewSegmentTeamStateSchema } from 'services/ably/client';
@@ -184,7 +184,7 @@ const SpecialText = styled.div`
 `;
 
 interface Props {
-  competition: Competition;
+  competition: CompetitionWithSegmentCount;
   segment: Segment | null;
   teamState: SegmentTeamState | null;
   answers: Answer[];
@@ -352,9 +352,13 @@ const CompetitionPlayPage: NextPage<Props> = ({
         </WaitingForSegment>
       ) : (
         <>
-          {!segment && (
+          {!segment && competition.currentStage === null && (
             <WaitingForSegment>Invänta nästa moment</WaitingForSegment>
           )}
+          {!segment &&
+            competition.currentStage === competition.segmentCount + 1 && (
+              <WaitingForSegment>Spelet är över</WaitingForSegment>
+            )}
           {isWaitingForDeparture && (
             <WaitingForSegment>Invänta avgång</WaitingForSegment>
           )}
@@ -474,9 +478,15 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
     getTeam(prismaContext, context?.params?.teamId)
   ]);
 
-  const segment = competition.currentStage
-    ? await getSegment(prismaContext, competition.id, competition.currentStage)
-    : null;
+  const segment =
+    competition.currentStage &&
+    competition.currentStage <= competition.segmentCount
+      ? await getSegment(
+          prismaContext,
+          competition.id,
+          competition.currentStage
+        )
+      : null;
 
   const teamState = segment
     ? await upsertSegmentTeamState(prismaContext, {

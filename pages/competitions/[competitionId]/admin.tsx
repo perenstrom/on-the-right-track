@@ -138,9 +138,11 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
   const [members, setMembers] = useState('');
 
-  const currentSegment = competition.currentStage
-    ? competition.segments[competition.currentStage - 1]
-    : null;
+  const currentSegment =
+    competition.currentStage &&
+    competition.currentStage !== competition.segments.length + 1
+      ? competition.segments[competition.currentStage - 1]
+      : null;
 
   const handleAddTeam: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -161,7 +163,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         ? (competition.currentStage || 0) + 1
         : (competition.currentStage || 0) - 1;
 
-    if (nextIndex > competition.segments.length) {
+    if (nextIndex > competition.segments.length + 1) {
       return;
     }
 
@@ -175,7 +177,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   const previousStage =
     competition.currentStage === 1
-      ? 'N/A'
+      ? 'start'
       : competition.currentStage && competition.currentStage > 1
       ? getShortSegmentName(competition.segments[competition.currentStage - 2])
       : undefined;
@@ -184,6 +186,8 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     ? getShortSegmentName(competition.segments[0])
     : competition.currentStage < competition.segments.length
     ? getShortSegmentName(competition.segments[competition.currentStage])
+    : competition.currentStage === competition.segments.length
+    ? 'end'
     : undefined;
 
   const handleChangeLevel = async (direction: 'next' | 'prev') => {
@@ -272,7 +276,13 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         <ConnectionStatus state={connectionStatus} />
         <BreadCrumb
           segments={competition.segments}
-          currentSegment={currentSegment?.id || ''}
+          currentSegment={
+            competition.currentStage
+              ? currentSegment?.id || ''
+              : competition.currentStage === competition.segments.length + 1
+              ? 'end'
+              : 'start'
+          }
         />
         <Bottom>
           <ControlBar>
@@ -303,11 +313,14 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               previous={() => handleChangeState('prev')}
               next={() => handleChangeState('next')}
               currentStage={
-                competition.currentStage
-                  ? getShortSegmentName(
+                competition.currentStage &&
+                competition.currentStage === competition.segments.length + 1
+                  ? 'Slut'
+                  : !competition.currentStage
+                  ? 'Start'
+                  : getShortSegmentName(
                       competition.segments[competition.currentStage - 1]
                     )
-                  : 'N/A'
               }
               previousStage={previousStage}
               nextStage={nextStage}

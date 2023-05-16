@@ -8,6 +8,10 @@ import {
 export type Competition = Omit<PrismaCompetition, 'date'> & {
   date: string;
 };
+export type CompetitionWithSegmentCount = Omit<PrismaCompetition, 'date'> & {
+  date: string;
+  segmentCount: number;
+};
 export type ScoreCompetition = Omit<
   Prisma.CompetitionGetPayload<{
     include: {
