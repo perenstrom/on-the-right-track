@@ -175,6 +175,11 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  const goToSegment = (stage: number) => {
+    setCurrentStage(competition.id, stage);
+    router.replace(router.asPath);
+  };
+
   const previousStage =
     competition.currentStage === 1
       ? 'start'
@@ -277,12 +282,13 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         <BreadCrumb
           segments={competition.segments}
           currentSegment={
-            competition.currentStage
-              ? currentSegment?.id || ''
-              : competition.currentStage === competition.segments.length + 1
+            competition.currentStage === competition.segments.length + 1
               ? 'end'
+              : competition.currentStage
+              ? currentSegment?.id || ''
               : 'start'
           }
+          goToSegment={goToSegment}
         />
         <Bottom>
           <ControlBar>

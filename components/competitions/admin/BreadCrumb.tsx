@@ -1,3 +1,5 @@
+import { faFlagCheckered } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Segment } from '@prisma/client';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getShortSegmentName } from 'helpers/copy';
@@ -16,6 +18,7 @@ const Wrapper = styled.div`
 `;
 
 const SegmentPartWrapper = styled.div`
+  flex-grow: 1;
   position: relative;
   height: 100%;
   --arrow-size: 20px;
@@ -40,6 +43,11 @@ const SegmentPartSeparator = styled.div`
   );
 `;
 
+const LastSegmentPartSeparator = styled(SegmentPartSeparator)`
+  clip-path: polygon(var(--arrow-size) 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  right: 0;
+`;
+
 interface SegmentPartProps {
   readonly current: boolean;
   readonly scoresPublished: boolean;
@@ -49,8 +57,11 @@ const SegmentPart = styled.div<SegmentPartProps>`
   height: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
 
-  padding: 0 2rem 0 2.3rem;
+  cursor: pointer;
+
+  padding: 0 1.5rem 0 2.2rem;
   margin-left: calc((var(--arrow-size) - 3px) * -1);
 
   background: ${({ current, scoresPublished }) =>
@@ -59,7 +70,7 @@ const SegmentPart = styled.div<SegmentPartProps>`
       : scoresPublished
       ? 'hsl(87, 70%, 74%)'
       : 'hsl(0, 0%, 75%)'};
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   clip-path: polygon(
     var(--arrow-size) 50%,
     0% 0%,
@@ -68,35 +79,46 @@ const SegmentPart = styled.div<SegmentPartProps>`
     calc(100% - var(--arrow-size)) 100%,
     0% 100%
   );
+`;
 
-  &:first-child {
-    clip-path: polygon(
-      0% 0%,
-      calc(100% - var(--arrow-size)) 0%,
-      100% 50%,
-      calc(100% - var(--arrow-size)) 100%,
-      0% 100%
-    );
-  }
+const LastSegmentPart = styled(SegmentPart)`
+  padding: 0 1rem 0 1.8rem;
+  clip-path: polygon(var(--arrow-size) 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%);
 `;
 
 export const BreadCrumb: React.FC<{
   segments: Segment[];
   currentSegment: string;
-}> = ({ segments, currentSegment }) => {
+  goToSegment: (stage: number) => void;
+}> = ({ segments, currentSegment, goToSegment }) => {
   return (
     <Wrapper>
-      {segments.map((segment) => (
+      {segments.map((segment, stageIndex) => (
         <SegmentPartWrapper key={segment.id}>
           <SegmentPartSeparator />
           <SegmentPart
             current={currentSegment === segment.id}
             scoresPublished={segment.scorePublished}
+            onClick={() => goToSegment(stageIndex + 1)}
           >
-            <SegmentIcon type={segment.type} />{getShortSegmentName(segment)}
+            <SegmentIcon type={segment.type} />
+            {getShortSegmentName(segment)}
           </SegmentPart>
         </SegmentPartWrapper>
       ))}
+      <SegmentPartWrapper key={'end'}>
+        <LastSegmentPartSeparator />
+        <LastSegmentPart
+          current={currentSegment === 'end'}
+          scoresPublished={false}
+          onClick={() => goToSegment(segments.length + 1)}
+        >
+          <FontAwesomeIcon
+            icon={faFlagCheckered}
+            style={{ minWidth: '1.5rem' }}
+          />
+        </LastSegmentPart>
+      </SegmentPartWrapper>
     </Wrapper>
   );
 };
