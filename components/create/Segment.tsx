@@ -146,9 +146,9 @@ export const Segment: React.FC<{
         <SegmentIcon type={segment.type} />
         {getFullSegmentName(segment)}
       </QuestionName>
-      {segment.type === 'QUESTION' && (
+      {(segment.type === 'QUESTION' || segment.type === 'MUSIC') && (
         <OptionsWrapper>
-          <OptionsHeading>Alternativ</OptionsHeading>
+          <OptionsHeading>Delsvar</OptionsHeading>
           <OptionsControls>
             <button
               type="button"

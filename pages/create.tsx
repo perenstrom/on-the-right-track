@@ -88,7 +88,7 @@ const CreatePage: NextPage<{}> = () => {
       type,
       order: segments.length + 1,
       scorePublished: false,
-      numberOfOptions: type === 'QUESTION' ? 2 : null,
+      numberOfOptions: type === 'QUESTION' || type === 'MUSIC' ? 2 : null,
       orderOfType: 0,
       nearestTrip: 0
     };
