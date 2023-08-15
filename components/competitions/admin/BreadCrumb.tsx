@@ -1,5 +1,6 @@
 import { Segment } from '@prisma/client';
-import { getFullSegmentName } from 'helpers/copy';
+import { SegmentIcon } from 'components/SegmentIcon';
+import { getShortSegmentName } from 'helpers/copy';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -92,7 +93,7 @@ export const BreadCrumb: React.FC<{
             current={currentSegment === segment.id}
             scoresPublished={segment.scorePublished}
           >
-            {getFullSegmentName(segment)}
+            <SegmentIcon type={segment.type} />{getShortSegmentName(segment)}
           </SegmentPart>
         </SegmentPartWrapper>
       ))}
