@@ -175,7 +175,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
-  const goToSegment = (stage: number) => {
+  const goToSegment = (stage: number | null) => {
     setCurrentStage(competition.id, stage);
     router.replace(router.asPath);
   };
