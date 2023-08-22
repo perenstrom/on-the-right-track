@@ -5,6 +5,7 @@ export const ablyEvents = {
   newStage: 'newStage',
   newScoresPublished: 'newScoresPublished',
   newSegmentTeamState: 'newSegmentTeamState',
+  newWinner: 'newWinner',
   newTeam: 'newTeam',
 } as const;
 

@@ -61,6 +61,7 @@ const FirstSegmentPartSeparator = styled(SegmentPartSeparator)`
 interface SegmentPartProps {
   readonly current: boolean;
   readonly scoresPublished: boolean;
+  readonly gameIsOver: boolean;
 }
 const SegmentPart = styled.div<SegmentPartProps>`
   position: relative;
@@ -69,7 +70,7 @@ const SegmentPart = styled.div<SegmentPartProps>`
   align-items: center;
   justify-content: center;
 
-  cursor: pointer;
+  cursor: ${({ gameIsOver }) => (gameIsOver ? 'default' : 'pointer')};
 
   padding: 0 1.5rem 0 2.2rem;
   margin-left: calc((var(--arrow-size) - 3px) * -1);
@@ -110,8 +111,9 @@ const FirstSegmentPart = styled(SegmentPart)`
 export const BreadCrumb: React.FC<{
   segments: Segment[];
   currentSegment: string;
+  gameIsOver: boolean;
   goToSegment: (stage: number | null) => void;
-}> = ({ segments, currentSegment, goToSegment }) => {
+}> = ({ segments, currentSegment, gameIsOver, goToSegment }) => {
   return (
     <Wrapper>
       <SegmentPartWrapper key={'start'}>
@@ -119,7 +121,8 @@ export const BreadCrumb: React.FC<{
         <FirstSegmentPart
           current={currentSegment === 'start'}
           scoresPublished={true}
-          onClick={() => goToSegment(null)}
+          gameIsOver={gameIsOver}
+          onClick={() => !gameIsOver && goToSegment(null)}
         >
           <FontAwesomeIcon icon={faPause} style={{ minWidth: '1.5rem' }} />
         </FirstSegmentPart>
@@ -130,7 +133,8 @@ export const BreadCrumb: React.FC<{
           <SegmentPart
             current={currentSegment === segment.id}
             scoresPublished={segment.scorePublished}
-            onClick={() => goToSegment(stageIndex + 1)}
+            gameIsOver={gameIsOver}
+            onClick={() => !gameIsOver && goToSegment(stageIndex + 1)}
           >
             <SegmentIcon type={segment.type} />
             {getShortSegmentName(segment)}
@@ -142,7 +146,8 @@ export const BreadCrumb: React.FC<{
         <LastSegmentPart
           current={currentSegment === 'end'}
           scoresPublished={false}
-          onClick={() => goToSegment(segments.length + 1)}
+          gameIsOver={gameIsOver}
+          onClick={() => !gameIsOver && goToSegment(segments.length + 1)}
         >
           <FontAwesomeIcon
             icon={faFlagCheckered}

@@ -87,6 +87,22 @@ export const setCurrentLevel = async (
   return result;
 };
 
+export const setCompetitionWinner = async (
+  competitionId: string,
+  winner: string | null
+) => {
+  const url = `/api/competitions/${competitionId}/actions/set-winner`;
+  const options: RequestInit = {
+    method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify({ winner })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
 export const setScorePublished = async (
   segmentId: string,
   scorePublished: boolean

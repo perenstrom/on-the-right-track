@@ -52,6 +52,10 @@ export const SetLevelSchema = z.object({
   level: z.number().nullable()
 });
 
+export const SetWinnerSchema = z.object({
+  winner: z.string().nullable()
+});
+
 export const SegmentIdSchema = z.object({
   segmentId: z.string()
 });

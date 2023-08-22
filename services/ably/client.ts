@@ -28,6 +28,13 @@ export const publishNewScoresPublished = async (
   });
 };
 
+export const publishNewWinner = async (
+  competitionId: string,
+  winner: string | null
+) => {
+  return publishMessage(ablyEvents.newWinner, competitionId, { winner });
+};
+
 export const PublishNewSegmentTeamStateSchema = z.object({
   id: z.string(),
   segmentId: z.string(),

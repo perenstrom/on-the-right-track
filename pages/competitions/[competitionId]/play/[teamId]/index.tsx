@@ -335,6 +335,8 @@ const CompetitionPlayPage: NextPage<Props> = ({
   const hasAnswered =
     (isTrip && (isStoppedAnswered || isStoppedHandled)) ||
     ((isQuestion || isMusic) && (isAnswered || isAnsweredHandled));
+  const isFinished = competition.currentStage === competition.segmentCount + 1;
+  const winnerIsDeclared = !!competition.winnerTeamId;
 
   return (
     <Wrapper>
@@ -355,10 +357,16 @@ const CompetitionPlayPage: NextPage<Props> = ({
           {!segment && competition.currentStage === null && (
             <WaitingForSegment>Invänta nästa moment</WaitingForSegment>
           )}
-          {!segment &&
-            competition.currentStage === competition.segmentCount + 1 && (
-              <WaitingForSegment>Spelet är över</WaitingForSegment>
-            )}
+          {!segment && isFinished && !winnerIsDeclared && (
+            <WaitingForSegment>
+              Spelet är över, invänta resultat
+            </WaitingForSegment>
+          )}
+          {!segment && winnerIsDeclared && (
+            <WaitingForSegment>
+              Spelet är över, grattis till vinnarlaget!
+            </WaitingForSegment>
+          )}
           {isWaitingForDeparture && (
             <WaitingForSegment>Invänta avgång</WaitingForSegment>
           )}

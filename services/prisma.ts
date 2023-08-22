@@ -193,6 +193,23 @@ export const createCompetition = async (
   return result;
 };
 
+export const setCompetitionWinner = async (
+  ctx: Context,
+  competitionId: string,
+  winnerTeamId: string | null
+) => {
+  const result = await ctx.prisma.competition.update({
+    where: {
+      id: competitionId
+    },
+    data: {
+      winnerTeamId: winnerTeamId
+    }
+  });
+
+  return result;
+};
+
 export const setScorePublished = async (
   ctx: Context,
   segmentId: string,

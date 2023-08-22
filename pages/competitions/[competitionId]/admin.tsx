@@ -1,4 +1,5 @@
 import { Segment } from '@prisma/client';
+import { Button } from 'components/Button';
 import { ConnectionStatus } from 'components/ConnectionStatus';
 import { Label, Input, SubmitButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
@@ -15,6 +16,7 @@ import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useCallback, useState } from 'react';
 import {
   createTeam,
+  setCompetitionWinner,
   setCurrentLevel,
   setCurrentStage,
   setScorePublished
@@ -84,6 +86,20 @@ const ControlBar = styled.div`
 const PublishWrapper = styled.div`
   width: 100%;
   padding: 1rem;
+`;
+
+const ModalContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ModalContent = styled.div`
+  flex-grow: 1;
+`;
+
+const ModalButtonWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
 `;
 
 interface Props {
@@ -239,6 +255,12 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
   };
   const someOneAnswered = competition.teams.some(isHandled);
   const allAnswered = competition.teams.every(isHandled);
+  const isLastStage =
+    competition.currentStage === competition.segments.length + 1;
+  const allPublished = competition.segments.every(
+    (segment) => segment.scorePublished
+  );
+  const gameIsOver = competition.winnerTeamId !== null;
 
   const handlePublish = async () => {
     if (!currentSegment) {
@@ -246,6 +268,27 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     }
 
     await setScorePublished(currentSegment.id, !currentSegment.scorePublished);
+    router.replace(router.asPath);
+  };
+
+  const [endGameModalOpen, setEndGameModalOpen] = useState(false);
+  const handleEndGame = async () => {
+    if (!gameIsOver) {
+      const winnerTeamId = competition.teams.reduce(
+        (acc, team) => {
+          const score = calculateScore(team, competition.segments);
+          return score > acc.score ? { id: team.id, score: score } : acc;
+        },
+        { id: '', score: 0 }
+      ).id;
+
+      await setCompetitionWinner(competition.id, winnerTeamId);
+      setEndGameModalOpen(false);
+    } else {
+      await setCompetitionWinner(competition.id, null);
+    }
+
+    setEndGameModalOpen(false);
     router.replace(router.asPath);
   };
 
@@ -277,6 +320,26 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           </div>
         </ModalOverlay>
       )}
+      {endGameModalOpen && (
+        <ModalOverlay>
+          <ModalContentWrapper>
+            <h2>{gameIsOver ? 'Öppna' : 'Avsluta'}</h2>
+            <ModalContent>
+              {gameIsOver
+                ? 'Är du säker på att du vill återöppna spelet och ta bort vinnare?'
+                : 'Är du säker på att du vill avsluta spelet och utse vinnare?'}
+            </ModalContent>
+            <ModalButtonWrapper>
+              <Button onClick={() => setEndGameModalOpen(false)}>
+                Nej, avbryt
+              </Button>
+              <SubmitButton onClick={handleEndGame}>
+                {gameIsOver ? 'Ja, öppna' : 'Ja, avsluta'}
+              </SubmitButton>
+            </ModalButtonWrapper>
+          </ModalContentWrapper>
+        </ModalOverlay>
+      )}
       <Wrapper>
         <ConnectionStatus state={connectionStatus} />
         <BreadCrumb
@@ -288,11 +351,12 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               ? currentSegment?.id || ''
               : 'start'
           }
+          gameIsOver={gameIsOver}
           goToSegment={goToSegment}
         />
         <Bottom>
           <ControlBar>
-            {someOneAnswered && (
+            {someOneAnswered && !gameIsOver && (
               <PublishWrapper>
                 <PublishButton
                   variant={allAnswered ? 'active' : 'idle'}
@@ -303,7 +367,18 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 </PublishButton>
               </PublishWrapper>
             )}
-            {currentSegment?.type === 'TRIP' && (
+            {isLastStage && allPublished && (
+              <PublishWrapper>
+                <PublishButton
+                  variant={'active'}
+                  onClick={() => setEndGameModalOpen(true)}
+                  disabled={connectionState !== 'connected'}
+                >
+                  {gameIsOver ? 'Öppna' : 'Avsluta'}
+                </PublishButton>
+              </PublishWrapper>
+            )}
+            {currentSegment?.type === 'TRIP' && !gameIsOver && (
               <StageController
                 heading="Nivå"
                 previous={() => handleChangeLevel('prev')}
@@ -314,24 +389,26 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 connectionState={connectionStatus}
               />
             )}
-            <StageController
-              heading="Moment"
-              previous={() => handleChangeState('prev')}
-              next={() => handleChangeState('next')}
-              currentStage={
-                competition.currentStage &&
-                competition.currentStage === competition.segments.length + 1
-                  ? 'Slut'
-                  : !competition.currentStage
-                  ? 'Start'
-                  : getShortSegmentName(
-                      competition.segments[competition.currentStage - 1]
-                    )
-              }
-              previousStage={previousStage}
-              nextStage={nextStage}
-              connectionState={connectionStatus}
-            />
+            {!gameIsOver && (
+              <StageController
+                heading="Moment"
+                previous={() => handleChangeState('prev')}
+                next={() => handleChangeState('next')}
+                currentStage={
+                  competition.currentStage &&
+                  competition.currentStage === competition.segments.length + 1
+                    ? 'Slut'
+                    : !competition.currentStage
+                    ? 'Start'
+                    : getShortSegmentName(
+                        competition.segments[competition.currentStage - 1]
+                      )
+                }
+                previousStage={previousStage}
+                nextStage={nextStage}
+                connectionState={connectionStatus}
+              />
+            )}
           </ControlBar>
           <Main>
             {competition.teams.map((team) => (
@@ -343,13 +420,14 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 connectionState={connectionStatus}
               />
             ))}
-            <AddTeam
-              triggerAdd={() => setAddingTeam(true)}
-              connectionState={connectionStatus}
-            />
+            {!gameIsOver && (
+              <AddTeam
+                triggerAdd={() => setAddingTeam(true)}
+                connectionState={connectionStatus}
+              />
+            )}
           </Main>
         </Bottom>
-        {false && <pre>{JSON.stringify(competition, null, 2)}</pre>}
       </Wrapper>
     </>
   );
