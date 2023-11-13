@@ -150,7 +150,8 @@ export const AdminTeam: React.FC<{
   score: number;
   currentSegment: Segment | null;
   connectionState: 'connected' | 'connecting' | 'disconnected';
-}> = ({ team, score, currentSegment, connectionState }) => {
+  displayAnswers: boolean;
+}> = ({ team, score, currentSegment, connectionState, displayAnswers }) => {
   const currentSegmentTeamState = team.segmentTeamStates.find(
     (segmentTeamState) => segmentTeamState.segmentId === currentSegment?.id
   );
@@ -206,27 +207,30 @@ export const AdminTeam: React.FC<{
           <>{score}</>
           {!currentSegment?.scorePublished &&
             (currentState === 'STOPPED_HANDLED' ||
-              currentState === 'ANSWERED_HANDLED') && (
+              currentState === 'ANSWERED_HANDLED') &&
+            !displayAnswers && (
               <ScoreChange>+{currentSegmentTeamState?.score}</ScoreChange>
             )}
           {(currentState === 'STOPPED_HANDLED' ||
-            currentState === 'ANSWERED_HANDLED') && (
-            <EditButton
-              onClick={handleEditButton}
-              disabled={connectionState !== 'connected'}
-            >
-              <FontAwesomeIcon icon={faEdit} />
-            </EditButton>
-          )}
+            currentState === 'ANSWERED_HANDLED') &&
+            !displayAnswers && (
+              <EditButton
+                onClick={handleEditButton}
+                disabled={connectionState !== 'connected'}
+              >
+                <FontAwesomeIcon icon={faEdit} />
+              </EditButton>
+            )}
         </Score>
-        {currentState === 'STOPPED' && (
+        {currentState === 'STOPPED' && !displayAnswers && (
           <>
             <StopLevelWrapper></StopLevelWrapper>
             <StopLevel>{currentSegmentTeamState?.stopLevel}</StopLevel>
           </>
         )}
         {(currentState === 'STOPPED_ANSWERED' ||
-          currentState === 'ANSWERED') && (
+          currentState === 'ANSWERED' ||
+          displayAnswers) && (
           <StoppedAnsweredWrapper>
             <AnswerHeading>Svar:</AnswerHeading>
             {currentSegment?.type === 'SPECIAL' &&
@@ -236,62 +240,64 @@ export const AdminTeam: React.FC<{
                 <AnswerItem key={answer.id}>{answer.answer || ''}</AnswerItem>
               ))}
             </AnswersList>
-            <HandleAnswerButtons>
-              {currentSegment?.type === 'TRIP' && (
-                <>
-                  <ScoreButton
-                    variant="wrong"
-                    onClick={() => handleScoring(0)}
-                    disabled={connectionState !== 'connected'}
-                  >
-                    Fel 0p
-                  </ScoreButton>
-                  <ScoreButton
-                    variant="correct"
-                    onClick={() =>
-                      handleScoring(currentSegmentTeamState?.stopLevel || 0)
-                    }
-                    disabled={connectionState !== 'connected'}
-                  >
-                    {`Rätt ${currentSegmentTeamState?.stopLevel}p`}
-                  </ScoreButton>
-                </>
-              )}
-              {(currentSegment?.type === 'MUSIC' ||
-                currentSegment?.type === 'QUESTION' ||
-                currentSegment?.type === 'SPECIAL') && (
-                <>
-                  <ScoreButton
-                    variant="wrong"
-                    onClick={() => handleScoring(0)}
-                    disabled={connectionState !== 'connected'}
-                  >
-                    0p
-                  </ScoreButton>
-                  <ScoreButton
-                    variant="correct"
-                    onClick={() => handleScoring(1)}
-                    disabled={connectionState !== 'connected'}
-                  >
-                    1p
-                  </ScoreButton>
-                  <ScoreButton
-                    variant="correct"
-                    onClick={() => handleScoring(2)}
-                    disabled={connectionState !== 'connected'}
-                  >
-                    2p
-                  </ScoreButton>
-                  <ScoreButton
-                    variant="correct"
-                    onClick={() => handleScoring(3)}
-                    disabled={connectionState !== 'connected'}
-                  >
-                    3p
-                  </ScoreButton>
-                </>
-              )}
-            </HandleAnswerButtons>
+            {!displayAnswers && (
+              <HandleAnswerButtons>
+                {currentSegment?.type === 'TRIP' && (
+                  <>
+                    <ScoreButton
+                      variant="wrong"
+                      onClick={() => handleScoring(0)}
+                      disabled={connectionState !== 'connected'}
+                    >
+                      Fel 0p
+                    </ScoreButton>
+                    <ScoreButton
+                      variant="correct"
+                      onClick={() =>
+                        handleScoring(currentSegmentTeamState?.stopLevel || 0)
+                      }
+                      disabled={connectionState !== 'connected'}
+                    >
+                      {`Rätt ${currentSegmentTeamState?.stopLevel}p`}
+                    </ScoreButton>
+                  </>
+                )}
+                {(currentSegment?.type === 'MUSIC' ||
+                  currentSegment?.type === 'QUESTION' ||
+                  currentSegment?.type === 'SPECIAL') && (
+                  <>
+                    <ScoreButton
+                      variant="wrong"
+                      onClick={() => handleScoring(0)}
+                      disabled={connectionState !== 'connected'}
+                    >
+                      0p
+                    </ScoreButton>
+                    <ScoreButton
+                      variant="correct"
+                      onClick={() => handleScoring(1)}
+                      disabled={connectionState !== 'connected'}
+                    >
+                      1p
+                    </ScoreButton>
+                    <ScoreButton
+                      variant="correct"
+                      onClick={() => handleScoring(2)}
+                      disabled={connectionState !== 'connected'}
+                    >
+                      2p
+                    </ScoreButton>
+                    <ScoreButton
+                      variant="correct"
+                      onClick={() => handleScoring(3)}
+                      disabled={connectionState !== 'connected'}
+                    >
+                      3p
+                    </ScoreButton>
+                  </>
+                )}
+              </HandleAnswerButtons>
+            )}
           </StoppedAnsweredWrapper>
         )}
       </RelativeFlex>

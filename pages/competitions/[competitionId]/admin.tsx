@@ -160,6 +160,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
   const [addingTeam, setAddingTeam] = useState(false);
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
   const [members, setMembers] = useState('');
+  const [displayAnswers, setDisplayAnswers] = useState(false);
 
   const currentSegment =
     competition.currentStage &&
@@ -363,6 +364,17 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         />
         <Bottom>
           <ControlBar>
+            {currentSegment?.scorePublished && (
+              <PublishWrapper>
+                <PublishButton
+                  variant={'active'}
+                  onClick={() => setDisplayAnswers(!displayAnswers)}
+                  disabled={connectionState !== 'connected'}
+                >
+                  {displayAnswers ? 'Dölj svar' : 'Visa svar'}
+                </PublishButton>
+              </PublishWrapper>
+            )}
             {someOneAnswered && !gameIsOver && (
               <PublishWrapper>
                 <PublishButton
@@ -425,6 +437,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 currentSegment={currentSegment}
                 score={calculateScore(team, competition.segments)}
                 connectionState={connectionStatus}
+                displayAnswers={displayAnswers}
               />
             ))}
             {!gameIsOver && (
