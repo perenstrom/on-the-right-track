@@ -21,7 +21,10 @@ import styled from 'styled-components';
 import { CompetitionWithSegmentCount } from 'types/types';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 import { ablyEvents } from 'services/ably/ably';
-import { PublishNewSegmentTeamStateSchema } from 'services/ably/client';
+import {
+  PublishNewSegmentTeamStateSchema,
+  PublishNewStageSchema
+} from 'services/ably/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
 
 const Wrapper = styled.div`
@@ -210,6 +213,7 @@ const CompetitionPlayPage: NextPage<Props> = ({
     competition.id,
     useCallback(
       (message) => {
+        // Ignore team state events for other teams
         if (message.name === ablyEvents.newSegmentTeamState) {
           const parsedMessage = PublishNewSegmentTeamStateSchema.safeParse(
             message.data
@@ -223,10 +227,22 @@ const CompetitionPlayPage: NextPage<Props> = ({
           }
         }
 
+        // Ignore stage events for same stage
+        if (message.name === ablyEvents.newStage) {
+          const parsedMessage = PublishNewStageSchema.safeParse(message.data);
+
+          if (
+            parsedMessage.success &&
+            parsedMessage.data.stage === competition.currentStage
+          ) {
+            return;
+          }
+        }
+
         router.replace(router.asPath);
         return;
       },
-      [router, teamState?.teamId]
+      [competition.currentStage, router, teamState?.teamId]
     )
   );
 

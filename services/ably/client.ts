@@ -12,6 +12,9 @@ export const publishNewLevel = async (
   return publishMessage(ablyEvents.newLevel, competitionId, { level });
 };
 
+export const PublishNewStageSchema = z.object({
+  stage: z.number().nullable()
+});
 export const publishNewStage = async (
   competitionId: string,
   stage: number | null
