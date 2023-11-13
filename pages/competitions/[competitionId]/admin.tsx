@@ -124,7 +124,14 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   const { connectionState } = useAblyAdminChannel(
     competition.id,
-    useCallback(() => router.replace(router.asPath), [router])
+    useCallback(
+      (msg) => {
+        console.log('message received');
+        console.log(JSON.stringify(msg, null, 2));
+        return router.replace(router.asPath);
+      },
+      [router]
+    )
   );
 
   const [ablyHasDisconnected, setAblyHasDisconnected] = useState(false);

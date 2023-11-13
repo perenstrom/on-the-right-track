@@ -17,3 +17,17 @@ export const publishNewSegmentTeamState = async (
 export const publishNewTeam = async (competitionId: string, team: Team) => {
   return publishMessage(ablyEvents.newSegmentTeamState, competitionId, team);
 };
+
+export const publishNewStage = async (
+  competitionId: string,
+  stage: number | null
+) => {
+  return publishMessage(ablyEvents.newStage, competitionId, { stage });
+};
+
+export const publishNewLevel = async (
+  competitionId: string,
+  level: number | null
+) => {
+  return publishMessage(ablyEvents.newLevel, competitionId, { level });
+};
