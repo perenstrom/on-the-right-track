@@ -6,7 +6,7 @@ export const ablyEvents = {
   newScoresPublished: 'newScoresPublished',
   newSegmentTeamState: 'newSegmentTeamState',
   newWinner: 'newWinner',
-  newTeam: 'newTeam',
+  newTeam: 'newTeam'
 } as const;
 
 export const makePublishMessage =
@@ -16,7 +16,7 @@ export const makePublishMessage =
     competitionId: string,
     data: T
   ) => {
-    const ably = new Ably.Realtime.Promise(process.env.ABLY_PUBLISH_API_KEY);
+    const ably = new Ably.Realtime(process.env.ABLY_PUBLISH_API_KEY);
     const testChannel = await ably.channels.get(`${area}-${competitionId}`);
     await testChannel.publish(eventName, data);
     ably.close();
