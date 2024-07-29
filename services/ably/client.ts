@@ -1,4 +1,4 @@
-import { SegmentTeamState } from '@prisma/client';
+import { SegmentTeamState, Team } from '@prisma/client';
 import { ablyEvents, makePublishMessage } from './ably';
 import { z } from 'zod';
 import { teamStateSchema } from 'schemas/zod/schema';
@@ -10,6 +10,10 @@ export const publishNewLevel = async (
   level: number | null
 ) => {
   return publishMessage(ablyEvents.newLevel, competitionId, { level });
+};
+
+export const publishNewTeam = async (competitionId: string, team: Team) => {
+  return publishMessage(ablyEvents.newSegmentTeamState, competitionId, team);
 };
 
 export const PublishNewStageSchema = z.object({
