@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 export function useAblyChannel(
   area: 'client' | 'admin',
   competitionId: string,
-  callback: (message: Ably.Types.Message) => void
+  callback: (message: Ably.Message) => void
 ) {
   const [connectionState, setConnectionState] =
-    useState<Ably.Types.ConnectionState>('initialized');
+    useState<Ably.ConnectionState>('initialized');
 
   useEffect(() => {
-    const ably = new Ably.Realtime.Promise(
+    const ably = new Ably.Realtime(
       process.env.NEXT_PUBLIC_ABLY_SUBSCRIBE_API_KEY
     );
 

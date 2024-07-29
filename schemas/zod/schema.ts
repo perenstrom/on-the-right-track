@@ -48,6 +48,10 @@ export const CompetitionIdSchema = z.object({
   competitionId: z.string()
 });
 
+export const SegmentTeamStateIdSchema = z.object({
+  segmentTeamStateId: z.string()
+});
+
 export const SetLevelSchema = z.object({
   level: z.number().nullable()
 });
