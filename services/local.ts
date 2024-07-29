@@ -119,6 +119,22 @@ export const setScorePublished = async (
   return result;
 };
 
+export const pullTheBreak = async (
+  competitionId: string,
+  segmentTeamStateId: string
+) => {
+  const url = `/api/segment_team_states/${segmentTeamStateId}/actions/pull-the-break`;
+  const options: RequestInit = {
+    method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify({ competitionId })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
 export const patchTeamSegmentState = async (
   competitionId: string,
   segmentTeamStateId: string,

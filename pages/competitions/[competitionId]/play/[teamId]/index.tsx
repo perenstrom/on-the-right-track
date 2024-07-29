@@ -26,6 +26,7 @@ import {
   PublishNewStageSchema
 } from 'services/ably/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
+import { pullTheBreak as pullTheBreakService } from 'services/local';
 
 const Wrapper = styled.div`
   display: flex;
@@ -264,10 +265,7 @@ const CompetitionPlayPage: NextPage<Props> = ({
 
   const pullTheBreak = async () => {
     if (teamState) {
-      await patchTeamSegmentState(competition.id, teamState?.id, {
-        state: 'STOPPED',
-        stopLevel: competition.currentLevel
-      });
+      await pullTheBreakService(competition.id, teamState.id);
       router.replace(router.asPath);
     }
   };
