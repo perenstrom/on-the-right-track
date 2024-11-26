@@ -195,6 +195,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       nextIndex = null;
     }
 
+    setDisplayAnswers(false);
     await setCurrentStage(competition.id, nextIndex);
     router.replace(router.asPath);
   };
