@@ -5,40 +5,36 @@ import { SetStageQuerySchema, SetStageSchema } from 'schemas/zod/schema';
 import { publishNewStage as publishNewStageClient } from 'services/ably/client';
 import { publishNewStage as publishNewStageAdmin } from 'services/ably/admin';
 
-const setStage = async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method === 'POST') {
-    return new Promise((resolve) => {
-      const parsedBody = SetStageSchema.safeParse(req.body);
-      const parsedQuery = SetStageQuerySchema.safeParse(req.query);
+    const parsedBody = SetStageSchema.safeParse(req.body);
+    const parsedQuery = SetStageQuerySchema.safeParse(req.query);
 
-      if (!parsedBody.success || !parsedQuery.success) {
-        console.log(parsedBody);
-        console.log(parsedQuery);
-        res.status(400).end('Action data malformed');
-        resolve('');
-      } else {
-        const { stage } = parsedBody.data;
-        const { competitionId } = parsedQuery.data;
+    if (!parsedBody.success || !parsedQuery.success) {
+      console.log(parsedBody);
+      console.log(parsedQuery);
+      res.status(400).end('Action data malformed');
+    } else {
+      const { stage } = parsedBody.data;
+      const { competitionId } = parsedQuery.data;
 
-        setCurrentStage(prismaContext, competitionId, stage)
-          .then(async (competition) => {
-            await Promise.all([
-              publishNewStageClient(competitionId, stage),
-              publishNewStageAdmin(competitionId, stage)
-            ]);
-            res.status(200).json(competition);
-            resolve('');
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).end('Unexpected internal server error');
-            resolve('');
-          });
-      }
-    });
+      setCurrentStage(prismaContext, competitionId, stage)
+        .then(async (competition) => {
+          await Promise.all([
+            publishNewStageClient(competitionId, stage),
+            publishNewStageAdmin(competitionId, stage)
+          ]);
+          res.status(200).json(competition);
+        })
+        .catch((error) => {
+          console.log(error);
+          res.status(500).end('Unexpected internal server error');
+        });
+    }
   } else {
     res.status(404).end();
   }
-};
-
-export default setStage;
+}
