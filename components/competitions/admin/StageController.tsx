@@ -60,6 +60,7 @@ export const StageController: React.FC<{
   nextStage?: string;
   heading: string;
   connectionState: 'connected' | 'connecting' | 'disconnected';
+  isLoading?: boolean;
 }> = ({
   next,
   previous,
@@ -67,7 +68,8 @@ export const StageController: React.FC<{
   previousStage,
   nextStage,
   heading,
-  connectionState
+  connectionState,
+  isLoading = false
 }) => {
   const prevContent =
     previousStage === 'start' ? (
@@ -95,14 +97,16 @@ export const StageController: React.FC<{
         <button
           type="button"
           onClick={() => previous()}
-          disabled={!previousStage || connectionState !== 'connected'}
+          disabled={
+            !previousStage || connectionState !== 'connected' || isLoading
+          }
         >
           {prevContent}
         </button>
         <button
           type="button"
           onClick={() => next()}
-          disabled={!nextStage || connectionState !== 'connected'}
+          disabled={!nextStage || connectionState !== 'connected' || isLoading}
         >
           {nextContent}
         </button>

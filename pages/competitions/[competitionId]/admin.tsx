@@ -181,6 +181,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  const [segmentIsLoading, setSegmentIsLoading] = useState(false);
   const handleChangeState = async (direction: 'next' | 'prev') => {
     let nextIndex: number | null =
       direction === 'next'
@@ -196,7 +197,9 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     }
 
     setDisplayAnswers(false);
+    setSegmentIsLoading(true);
     await setCurrentStage(competition.id, nextIndex);
+    setSegmentIsLoading(false);
     router.replace(router.asPath);
   };
 
@@ -427,6 +430,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 previousStage={previousStage}
                 nextStage={nextStage}
                 connectionState={connectionStatus}
+                isLoading={segmentIsLoading}
               />
             )}
           </ControlBar>
