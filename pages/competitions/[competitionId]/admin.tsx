@@ -223,6 +223,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     ? 'end'
     : undefined;
 
+  const [levelIsLoading, setLevelIsLoading] = useState(false);
   const handleChangeLevel = async (direction: 'next' | 'prev') => {
     let nextLevel: number | null =
       direction === 'next'
@@ -236,8 +237,9 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     if (nextLevel > 10) {
       nextLevel = null;
     }
-
+    setLevelIsLoading(true);
     await setCurrentLevel(competition.id, nextLevel);
+    setLevelIsLoading(false);
     router.replace(router.asPath);
   };
 
@@ -410,6 +412,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 previousStage={previousLevel}
                 nextStage={nextLevel}
                 connectionState={connectionStatus}
+                isLoading={levelIsLoading}
               />
             )}
             {!gameIsOver && (
