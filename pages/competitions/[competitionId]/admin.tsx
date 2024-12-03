@@ -181,6 +181,12 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  const resetAddTeam = () => {
+    setName(`Lag ${competition.teams.length + 1}`);
+    setMembers('');
+    setAddingTeam(false);
+  };
+
   const [segmentIsLoading, setSegmentIsLoading] = useState(false);
   const handleChangeState = async (direction: 'next' | 'prev') => {
     let nextIndex: number | null =
@@ -329,7 +335,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 value={members}
                 onChange={(event) => setMembers(event.target.value)}
               />
-              <SubmitButton type="submit">Spara</SubmitButton>
+              <ModalButtonWrapper>
+                <SubmitButton type="submit">Spara</SubmitButton>
+                <Button onClick={() => resetAddTeam()}>Avbryt</Button>
+              </ModalButtonWrapper>
             </form>
           </div>
         </ModalOverlay>
