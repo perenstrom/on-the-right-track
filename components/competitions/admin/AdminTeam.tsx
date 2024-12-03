@@ -151,7 +151,15 @@ export const AdminTeam: React.FC<{
   currentSegment: Segment | null;
   connectionState: 'connected' | 'connecting' | 'disconnected';
   displayAnswers: boolean;
-}> = ({ team, score, currentSegment, connectionState, displayAnswers }) => {
+  handleEditTeam: (teamId: string) => void;
+}> = ({
+  team,
+  score,
+  currentSegment,
+  connectionState,
+  displayAnswers,
+  handleEditTeam
+}) => {
   const currentSegmentTeamState = team.segmentTeamStates.find(
     (segmentTeamState) => segmentTeamState.segmentId === currentSegment?.id
   );
@@ -221,6 +229,14 @@ export const AdminTeam: React.FC<{
                 <FontAwesomeIcon icon={faEdit} />
               </EditButton>
             )}
+          {!currentSegment && team.segmentTeamStates.length === 0 && (
+            <EditButton
+              onClick={() => handleEditTeam(team.id)}
+              disabled={connectionState !== 'connected'}
+            >
+              <FontAwesomeIcon icon={faEdit} />
+            </EditButton>
+          )}
         </Score>
         {currentState === 'STOPPED' && !displayAnswers && (
           <>

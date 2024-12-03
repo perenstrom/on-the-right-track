@@ -1,7 +1,12 @@
 import { Segment } from '@prisma/client';
 import { Button } from 'components/Button';
 import { ConnectionStatus } from 'components/ConnectionStatus';
-import { Label, Input, SubmitButton } from 'components/FormControls';
+import {
+  Label,
+  Input,
+  SubmitButton,
+  CancelButton
+} from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { BreadCrumb } from 'components/competitions/admin/BreadCrumb';
@@ -91,6 +96,7 @@ const PublishWrapper = styled.div`
 const ModalContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 `;
 
 const ModalContent = styled.div`
@@ -158,6 +164,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       : 'connected';
 
   const [addingTeam, setAddingTeam] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<string | null>(null);
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
   const [members, setMembers] = useState('');
   const [displayAnswers, setDisplayAnswers] = useState(false);
@@ -185,6 +192,17 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     setName(`Lag ${competition.teams.length + 1}`);
     setMembers('');
     setAddingTeam(false);
+  };
+
+  const handleDeleteTeam: FormEventHandler = async (event) => {
+    event.preventDefault();
+    if (!editingTeam) {
+      return;
+    }
+
+    // await deleteTeam(editingTeam);
+    setEditingTeam(null);
+    router.replace(router.asPath);
   };
 
   const [segmentIsLoading, setSegmentIsLoading] = useState(false);
@@ -312,6 +330,9 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  const getTeamName = (teamId: string) =>
+    competition.teams.find((team) => team.id === teamId)?.name || '';
+
   return (
     <>
       {addingTeam && (
@@ -341,6 +362,22 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               </ModalButtonWrapper>
             </form>
           </div>
+        </ModalOverlay>
+      )}
+      {editingTeam && (
+        <ModalOverlay>
+          <ModalContentWrapper>
+            <div>
+              <h2>Ta bort lag</h2>
+              <p>{`Vill du ta bort "${getTeamName(editingTeam)}"?`}</p>
+            </div>
+            <form onSubmit={handleDeleteTeam}>
+              <ModalButtonWrapper>
+                <CancelButton type="submit">Ta bort</CancelButton>
+                <Button onClick={() => setEditingTeam(null)}>Avbryt</Button>
+              </ModalButtonWrapper>
+            </form>
+          </ModalContentWrapper>
         </ModalOverlay>
       )}
       {endGameModalOpen && (
@@ -455,6 +492,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 score={calculateScore(team, competition.segments)}
                 connectionState={connectionStatus}
                 displayAnswers={displayAnswers}
+                handleEditTeam={setEditingTeam}
               />
             ))}
             {!gameIsOver && (
