@@ -55,6 +55,18 @@ export const updateTeam = async (teamId: string, team: Partial<Team>) => {
   return result;
 };
 
+export const deleteTeam = async (teamId: string) => {
+  const url = `/api/teams/${teamId}`;
+  const options: RequestInit = {
+    method: 'DELETE',
+    headers: defaultHeaders
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
 export const setCurrentStage = async (
   competitionId: string,
   stage: number | null

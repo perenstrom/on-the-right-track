@@ -6,7 +6,8 @@ export const ablyEvents = {
   newScoresPublished: 'newScoresPublished',
   newSegmentTeamState: 'newSegmentTeamState',
   newWinner: 'newWinner',
-  newTeam: 'newTeam'
+  newTeam: 'newTeam',
+  deletedTeam: 'deletedTeam'
 } as const;
 
 export const makePublishMessage =

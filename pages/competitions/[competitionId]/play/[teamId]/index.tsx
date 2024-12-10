@@ -22,6 +22,7 @@ import { CompetitionWithSegmentCount } from 'types/types';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 import { ablyEvents } from 'services/ably/ably';
 import {
+  PublishDeletedTeamSchema,
   PublishNewSegmentTeamStateSchema,
   PublishNewStageSchema
 } from 'services/ably/client';
@@ -236,6 +237,22 @@ const CompetitionPlayPage: NextPage<Props> = ({
             parsedMessage.success &&
             parsedMessage.data.stage === competition.currentStage
           ) {
+            return;
+          }
+        }
+
+        // Ignore team events for other teams, redirect to home if current team deleted
+        if (message.name === ablyEvents.deletedTeam) {
+          const parsedMessage = PublishDeletedTeamSchema.safeParse(
+            message.data
+          );
+          if (
+            parsedMessage.success &&
+            parsedMessage.data.teamId !== teamState?.teamId
+          ) {
+            return;
+          } else if (parsedMessage.success) {
+            router.replace('/');
             return;
           }
         }

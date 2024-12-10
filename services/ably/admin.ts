@@ -15,7 +15,14 @@ export const publishNewSegmentTeamState = async (
 };
 
 export const publishNewTeam = async (competitionId: string, team: Team) => {
-  return publishMessage(ablyEvents.newSegmentTeamState, competitionId, team);
+  return publishMessage(ablyEvents.newTeam, competitionId, team);
+};
+
+export const publishDeletedTeam = async (
+  competitionId: string,
+  teamId: string
+) => {
+  return publishMessage(ablyEvents.deletedTeam, competitionId, { teamId });
 };
 
 export const publishNewStage = async (

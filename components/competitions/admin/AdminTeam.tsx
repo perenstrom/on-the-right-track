@@ -6,7 +6,7 @@ import { ScoreButton } from './ScoreButton';
 import { patchTeamSegmentState } from 'services/local';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { MouseEventHandler } from 'react';
 
 interface WrapperProps {
@@ -234,7 +234,7 @@ export const AdminTeam: React.FC<{
               onClick={() => handleEditTeam(team.id)}
               disabled={connectionState !== 'connected'}
             >
-              <FontAwesomeIcon icon={faEdit} />
+              <FontAwesomeIcon icon={faTrash} />
             </EditButton>
           )}
         </Score>

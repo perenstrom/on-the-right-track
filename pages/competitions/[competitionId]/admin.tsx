@@ -19,8 +19,11 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useCallback, useState } from 'react';
+import { ablyEvents } from 'services/ably/ably';
+import { PublishDeletedTeamSchema } from 'services/ably/client';
 import {
   createTeam,
+  deleteTeam,
   setCompetitionWinner,
   setCurrentLevel,
   setCurrentStage,
@@ -128,15 +131,28 @@ const calculateScore = (team: FullTeam, segments: Segment[]) =>
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
 
+  const [editingTeam, setEditingTeam] = useState<string | null>(null);
+
   const { connectionState } = useAblyAdminChannel(
     competition.id,
     useCallback(
-      (msg) => {
+      (message) => {
+        if (message.name === ablyEvents.deletedTeam) {
+          const parsedMessage = PublishDeletedTeamSchema.safeParse(
+            message.data
+          );
+          if (
+            parsedMessage.success &&
+            parsedMessage.data.teamId === editingTeam
+          ) {
+            setEditingTeam(null);
+          }
+        }
         console.log('message received');
-        console.log(JSON.stringify(msg, null, 2));
+        console.log(JSON.stringify(message, null, 2));
         return router.replace(router.asPath);
       },
-      [router]
+      [editingTeam, router]
     )
   );
 
@@ -164,7 +180,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       : 'connected';
 
   const [addingTeam, setAddingTeam] = useState(false);
-  const [editingTeam, setEditingTeam] = useState<string | null>(null);
   const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
   const [members, setMembers] = useState('');
   const [displayAnswers, setDisplayAnswers] = useState(false);
@@ -200,9 +215,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       return;
     }
 
-    // await deleteTeam(editingTeam);
-    setEditingTeam(null);
-    router.replace(router.asPath);
+    await deleteTeam(editingTeam);
   };
 
   const [segmentIsLoading, setSegmentIsLoading] = useState(false);
