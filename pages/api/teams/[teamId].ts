@@ -13,30 +13,32 @@ import {
 
 const teams = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'PATCH') {
-    return new Promise((resolve) => {
-      const parsedBody = PatchTeamSchema.safeParse(req.body);
-      const parsedQuery = PatchTeamQuerySchema.safeParse(req.query);
+    const parsedBody = PatchTeamSchema.safeParse(req.body);
+    const parsedQuery = PatchTeamQuerySchema.safeParse(req.query);
 
-      if (!parsedBody.success || !parsedQuery.success) {
-        console.log(parsedBody);
-        console.log(parsedQuery);
-        res.status(400).end('Action data malformed');
-        resolve('');
-      } else {
-        updateTeam(prismaContext, parsedQuery.data.teamId, parsedBody.data)
-          .then(async (team) => {
-            await publishNewTeamClient(parsedBody.data.competitionId, team);
-            await publishNewTeamAdmin(parsedBody.data.competitionId, team);
-            res.status(200).json(team);
-            resolve('');
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).end('Unexpected internal server error');
-            resolve('');
-          });
+    if (!parsedBody.success || !parsedQuery.success) {
+      console.log(parsedBody);
+      console.log(parsedQuery);
+      res.status(400).end('Action data malformed');
+      return;
+    } else {
+      try {
+        const team = await updateTeam(
+          prismaContext,
+          parsedQuery.data.teamId,
+          parsedBody.data
+        );
+
+        await publishNewTeamClient(parsedBody.data.competitionId, team);
+        await publishNewTeamAdmin(parsedBody.data.competitionId, team);
+        res.status(200).json(team);
+        return;
+      } catch (error) {
+        console.log(error);
+        res.status(500).end('Unexpected internal server error');
+        return;
       }
-    });
+    }
   } else if (req.method === 'DELETE') {
     return new Promise(async (resolve) => {
       const parsedQuery = PatchTeamQuerySchema.safeParse(req.query);
