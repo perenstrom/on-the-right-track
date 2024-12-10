@@ -13,7 +13,17 @@ export const publishNewLevel = async (
 };
 
 export const publishNewTeam = async (competitionId: string, team: Team) => {
-  return publishMessage(ablyEvents.newSegmentTeamState, competitionId, team);
+  return publishMessage(ablyEvents.newTeam, competitionId, team);
+};
+
+export const PublishDeletedTeamSchema = z.object({
+  teamId: z.string()
+});
+export const publishDeletedTeam = async (
+  competitionId: string,
+  teamId: string
+) => {
+  return publishMessage(ablyEvents.deletedTeam, competitionId, { teamId });
 };
 
 export const PublishNewStageSchema = z.object({

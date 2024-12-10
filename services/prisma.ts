@@ -227,6 +227,14 @@ export const setScorePublished = async (
   return result;
 };
 
+export const createTeam = async (ctx: Context, team: UncreatedTeam) => {
+  const result = await ctx.prisma.team.create({
+    data: team
+  });
+
+  return result;
+};
+
 export const getTeam = async (ctx: Context, id: string) => {
   const result = await ctx.prisma.team.findUnique({
     where: {
@@ -256,9 +264,11 @@ export const updateTeam = async (
   return result;
 };
 
-export const createTeam = async (ctx: Context, team: UncreatedTeam) => {
-  const result = await ctx.prisma.team.create({
-    data: team
+export const deleteTeam = async (ctx: Context, teamId: string) => {
+  const result = await ctx.prisma.team.delete({
+    where: {
+      id: teamId
+    }
   });
 
   return result;

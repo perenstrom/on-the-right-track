@@ -1,7 +1,12 @@
 import { Segment } from '@prisma/client';
 import { Button } from 'components/Button';
 import { ConnectionStatus } from 'components/ConnectionStatus';
-import { Label, Input, SubmitButton } from 'components/FormControls';
+import {
+  Label,
+  Input,
+  SubmitButton,
+  CancelButton
+} from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { BreadCrumb } from 'components/competitions/admin/BreadCrumb';
@@ -14,8 +19,11 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useCallback, useState } from 'react';
+import { ablyEvents } from 'services/ably/ably';
+import { PublishDeletedTeamSchema } from 'services/ably/client';
 import {
   createTeam,
+  deleteTeam,
   setCompetitionWinner,
   setCurrentLevel,
   setCurrentStage,
@@ -91,6 +99,7 @@ const PublishWrapper = styled.div`
 const ModalContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 `;
 
 const ModalContent = styled.div`
@@ -122,15 +131,28 @@ const calculateScore = (team: FullTeam, segments: Segment[]) =>
 const AdminPage: NextPage<Props> = ({ competition }) => {
   const router = useRouter();
 
+  const [editingTeam, setEditingTeam] = useState<string | null>(null);
+
   const { connectionState } = useAblyAdminChannel(
     competition.id,
     useCallback(
-      (msg) => {
+      (message) => {
+        if (message.name === ablyEvents.deletedTeam) {
+          const parsedMessage = PublishDeletedTeamSchema.safeParse(
+            message.data
+          );
+          if (
+            parsedMessage.success &&
+            parsedMessage.data.teamId === editingTeam
+          ) {
+            setEditingTeam(null);
+          }
+        }
         console.log('message received');
-        console.log(JSON.stringify(msg, null, 2));
+        console.log(JSON.stringify(message, null, 2));
         return router.replace(router.asPath);
       },
-      [router]
+      [editingTeam, router]
     )
   );
 
@@ -179,6 +201,21 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     await createTeam(newTeam);
     setAddingTeam(false);
     router.replace(router.asPath);
+  };
+
+  const resetAddTeam = () => {
+    setName(`Lag ${competition.teams.length + 1}`);
+    setMembers('');
+    setAddingTeam(false);
+  };
+
+  const handleDeleteTeam: FormEventHandler = async (event) => {
+    event.preventDefault();
+    if (!editingTeam) {
+      return;
+    }
+
+    await deleteTeam(editingTeam);
   };
 
   const [segmentIsLoading, setSegmentIsLoading] = useState(false);
@@ -306,6 +343,9 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  const getTeamName = (teamId: string) =>
+    competition.teams.find((team) => team.id === teamId)?.name || '';
+
   return (
     <>
       {addingTeam && (
@@ -329,9 +369,28 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 value={members}
                 onChange={(event) => setMembers(event.target.value)}
               />
-              <SubmitButton type="submit">Spara</SubmitButton>
+              <ModalButtonWrapper>
+                <SubmitButton type="submit">Spara</SubmitButton>
+                <Button onClick={() => resetAddTeam()}>Avbryt</Button>
+              </ModalButtonWrapper>
             </form>
           </div>
+        </ModalOverlay>
+      )}
+      {editingTeam && (
+        <ModalOverlay>
+          <ModalContentWrapper>
+            <div>
+              <h2>Ta bort lag</h2>
+              <p>{`Vill du ta bort "${getTeamName(editingTeam)}"?`}</p>
+            </div>
+            <form onSubmit={handleDeleteTeam}>
+              <ModalButtonWrapper>
+                <CancelButton type="submit">Ta bort</CancelButton>
+                <Button onClick={() => setEditingTeam(null)}>Avbryt</Button>
+              </ModalButtonWrapper>
+            </form>
+          </ModalContentWrapper>
         </ModalOverlay>
       )}
       {endGameModalOpen && (
@@ -446,6 +505,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 score={calculateScore(team, competition.segments)}
                 connectionState={connectionStatus}
                 displayAnswers={displayAnswers}
+                handleEditTeam={setEditingTeam}
               />
             ))}
             {!gameIsOver && (

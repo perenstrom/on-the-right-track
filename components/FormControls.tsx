@@ -26,3 +26,12 @@ export const SubmitButton = styled(Button)`
     background-color: hsl(116, 46%, 50%);
   }
 `;
+
+export const CancelButton = styled(Button)`
+  background-color: hsl(12 100% 50%);
+  border: 1px solid hsl(12 100% 40%);
+
+  &:hover {
+    background-color: hsl(12 100% 55%);
+  }
+`;
