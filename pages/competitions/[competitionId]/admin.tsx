@@ -180,7 +180,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       : 'connected';
 
   const [addingTeam, setAddingTeam] = useState(false);
-  const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
+  const [name, setName] = useState('');
   const [members, setMembers] = useState('');
   const [displayAnswers, setDisplayAnswers] = useState(false);
 
@@ -510,7 +510,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             ))}
             {!gameIsOver && (
               <AddTeam
-                triggerAdd={() => setAddingTeam(true)}
+                triggerAdd={() => {
+                  setName(`Lag ${competition.teams.length + 1}`);
+                  setAddingTeam(true);
+                }}
                 connectionState={connectionStatus}
               />
             )}
