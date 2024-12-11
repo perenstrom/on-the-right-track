@@ -40,30 +40,27 @@ const teams = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
   } else if (req.method === 'DELETE') {
-    return new Promise(async (resolve) => {
-      const parsedQuery = PatchTeamQuerySchema.safeParse(req.query);
+    const parsedQuery = PatchTeamQuerySchema.safeParse(req.query);
 
-      if (!parsedQuery.success) {
-        console.log(parsedQuery);
-        res.status(400).end('Action data malformed');
-        resolve('');
-      } else {
-        const fullTeam = await getTeam(prismaContext, parsedQuery.data.teamId);
+    if (!parsedQuery.success) {
+      console.log(parsedQuery);
+      res.status(400).end('Action data malformed');
+      return;
+    } else {
+      const fullTeam = await getTeam(prismaContext, parsedQuery.data.teamId);
+      try {
+        await deleteTeam(prismaContext, parsedQuery.data.teamId);
 
-        deleteTeam(prismaContext, parsedQuery.data.teamId)
-          .then(async () => {
-            await publishDeletedTeamClient(fullTeam.competitionId, fullTeam.id);
-            await publishDeletedTeamAdmin(fullTeam.competitionId, fullTeam.id);
-            res.status(200);
-            resolve('');
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).end('Unexpected internal server error');
-            resolve('');
-          });
+        await publishDeletedTeamClient(fullTeam.competitionId, fullTeam.id);
+        await publishDeletedTeamAdmin(fullTeam.competitionId, fullTeam.id);
+        res.status(200);
+        return;
+      } catch (error) {
+        console.log(error);
+        res.status(500).end('Unexpected internal server error');
+        return;
       }
-    });
+    }
   } else {
     res.status(404).end();
   }

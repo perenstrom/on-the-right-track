@@ -7,35 +7,37 @@ import { publishNewLevel as publishNewLevelAdmin } from 'services/ably/admin';
 
 const setLevel = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    return new Promise((resolve) => {
-      const parsedBody = SetLevelSchema.safeParse(req.body);
-      const parsedQuery = CompetitionIdSchema.safeParse(req.query);
+    const parsedBody = SetLevelSchema.safeParse(req.body);
+    const parsedQuery = CompetitionIdSchema.safeParse(req.query);
 
-      if (!parsedBody.success || !parsedQuery.success) {
-        console.log(parsedBody);
-        console.log(parsedQuery);
-        res.status(400).end('Action data malformed');
-        resolve('');
-      } else {
-        const { level } = parsedBody.data;
-        const { competitionId } = parsedQuery.data;
+    if (!parsedBody.success || !parsedQuery.success) {
+      console.log(parsedBody);
+      console.log(parsedQuery);
+      res.status(400).end('Action data malformed');
+      return;
+    } else {
+      const { level } = parsedBody.data;
+      const { competitionId } = parsedQuery.data;
 
-        setCurrentLevel(prismaContext, competitionId, level)
-          .then(async (competition) => {
-            await Promise.all([
-              publishNewLevelClient(competitionId, level),
-              publishNewLevelAdmin(competitionId, level)
-            ]);
-            res.status(200).json(competition);
-            resolve('');
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).end('Unexpected internal server error');
-            resolve('');
-          });
+      try {
+        const competition = await setCurrentLevel(
+          prismaContext,
+          competitionId,
+          level
+        );
+
+        await Promise.all([
+          publishNewLevelClient(competitionId, level),
+          publishNewLevelAdmin(competitionId, level)
+        ]);
+        res.status(200).json(competition);
+        return;
+      } catch (error) {
+        console.log(error);
+        res.status(500).end('Unexpected internal server error');
+        return;
       }
-    });
+    }
   } else {
     res.status(404).end();
   }

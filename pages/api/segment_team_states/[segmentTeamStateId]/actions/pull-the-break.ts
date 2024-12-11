@@ -21,26 +21,32 @@ const pullTheBreak = async (req: NextApiRequest, res: NextApiResponse) => {
       const { competitionId } = parsedBody.data;
       const { segmentTeamStateId } = parsedQuery.data;
 
-      const competition = await getBaseCompetition(
-        prismaContext,
-        competitionId
-      );
+      try {
+        const competition = await getBaseCompetition(
+          prismaContext,
+          competitionId
+        );
 
-      updateSegmentTeamState(prismaContext, segmentTeamStateId, {
-        state: 'STOPPED',
-        stopLevel: competition.currentLevel
-      })
-        .then(async (segmentTeamState) => {
-          await Promise.all([
-            publishNewSegmentTeamStateAdmin(competitionId, segmentTeamState),
-            publishNewSegmentTeamStateClient(competitionId, segmentTeamState)
-          ]);
-          res.status(200).json(segmentTeamState);
-        })
-        .catch((error) => {
-          console.log(error);
-          res.status(500).end('Unexpected internal server error');
-        });
+        const segmentTeamState = await updateSegmentTeamState(
+          prismaContext,
+          segmentTeamStateId,
+          {
+            state: 'STOPPED',
+            stopLevel: competition.currentLevel
+          }
+        );
+
+        await Promise.all([
+          publishNewSegmentTeamStateAdmin(competitionId, segmentTeamState),
+          publishNewSegmentTeamStateClient(competitionId, segmentTeamState)
+        ]);
+        res.status(200).json(segmentTeamState);
+        return;
+      } catch (error) {
+        console.log(error);
+        res.status(500).end('Unexpected internal server error');
+        return;
+      }
     }
   } else {
     res.status(404).end();

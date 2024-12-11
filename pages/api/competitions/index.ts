@@ -5,17 +5,17 @@ import { CreateCompetitionSchema } from 'schemas/zod/schema';
 
 const competitions = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    return new Promise((resolve) => {
-      const parsedCompetition = CreateCompetitionSchema.safeParse(req.body);
+    const parsedCompetition = CreateCompetitionSchema.safeParse(req.body);
 
-      if (!parsedCompetition.success) {
-        console.log(JSON.stringify(parsedCompetition.error, null, 2));
-        res.status(400).end('Game data malformed');
-        resolve('');
-      } else {
-        const { date, hosts, name } = parsedCompetition.data.competition;
+    if (!parsedCompetition.success) {
+      console.log(JSON.stringify(parsedCompetition.error, null, 2));
+      res.status(400).end('Game data malformed');
+      return;
+    } else {
+      const { date, hosts, name } = parsedCompetition.data.competition;
 
-        createCompetition(
+      try {
+        const competition = await createCompetition(
           prismaContext,
           {
             date,
@@ -26,18 +26,16 @@ const competitions = async (req: NextApiRequest, res: NextApiResponse) => {
             winnerTeamId: null
           },
           parsedCompetition.data.segments
-        )
-          .then((competition) => {
-            res.status(200).json(competition);
-            resolve('');
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).end('Unexpected internal server error');
-            resolve('');
-          });
+        );
+
+        res.status(200).json(competition);
+        return;
+      } catch (error) {
+        console.log(error);
+        res.status(500).end('Unexpected internal server error');
+        return;
       }
-    });
+    }
   } else {
     res.status(404).end();
   }
