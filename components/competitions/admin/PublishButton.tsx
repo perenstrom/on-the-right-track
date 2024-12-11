@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 
 interface PublishButtonProps {
-  readonly variant: 'idle' | 'active';
+  readonly $variant: 'idle' | 'active';
 }
 
 const buttonColors: Record<
-PublishButtonProps['variant'],
+  PublishButtonProps['$variant'],
   { background: string; border: string; hover: string; text: string }
 > = {
   idle: {
@@ -27,12 +27,12 @@ export const PublishButton = styled.button<PublishButtonProps>`
   padding: 0 1rem;
   width: 100%;
 
-  color: ${({ variant }) => buttonColors[variant].text};
+  color: ${({ $variant }) => buttonColors[$variant].text};
 
-  background-color: ${({ variant }) => buttonColors[variant].background};
-  border: 1px solid ${({ variant }) => buttonColors[variant].border};
+  background-color: ${({ $variant }) => buttonColors[$variant].background};
+  border: 1px solid ${({ $variant }) => buttonColors[$variant].border};
 
   &:hover {
-    background-color: ${({ variant }) => buttonColors[variant].hover};
+    background-color: ${({ $variant }) => buttonColors[$variant].hover};
   }
 `;

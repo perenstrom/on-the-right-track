@@ -432,7 +432,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             {currentSegment?.scorePublished && (
               <PublishWrapper>
                 <PublishButton
-                  variant={'active'}
+                  $variant={'active'}
                   onClick={() => setDisplayAnswers(!displayAnswers)}
                   disabled={connectionState !== 'connected'}
                 >
@@ -443,7 +443,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             {someOneAnswered && !gameIsOver && (
               <PublishWrapper>
                 <PublishButton
-                  variant={allAnswered ? 'active' : 'idle'}
+                  $variant={allAnswered ? 'active' : 'idle'}
                   onClick={handlePublish}
                   disabled={connectionState !== 'connected'}
                 >
@@ -454,7 +454,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             {isLastStage && allPublished && (
               <PublishWrapper>
                 <PublishButton
-                  variant={'active'}
+                  $variant={'active'}
                   onClick={() => setEndGameModalOpen(true)}
                   disabled={connectionState !== 'connected'}
                 >

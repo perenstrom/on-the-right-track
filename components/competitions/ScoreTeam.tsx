@@ -7,24 +7,31 @@ import styled from 'styled-components';
 import { ScoreTeam as ScoreTeamType } from 'types/types';
 
 interface WrapperProps {
-  readonly state: TeamState;
-  readonly scoresPublished: boolean;
-  readonly score: number | null;
-  readonly segmentType: SegmentType;
+  readonly $state: TeamState;
+  readonly $scoresPublished: boolean;
+  readonly $score: number | null;
+  readonly $segmentType: SegmentType;
 }
 const Wrapper = styled.div<WrapperProps>`
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  color: ${({ state, scoresPublished }) =>
-    getScoreTeamStateTextColor({ state, scoresPublished })};
-  background: ${({ state, scoresPublished, score, segmentType }) => {
-    const options = scoresPublished
-      ? { scoresPublished, score, segmentType }
+  color: ${({ $state, $scoresPublished }) =>
+    getScoreTeamStateTextColor({
+      state: $state,
+      scoresPublished: $scoresPublished
+    })};
+  background: ${({ $state, $scoresPublished, $score, $segmentType }) => {
+    const options = $scoresPublished
+      ? {
+          scoresPublished: $scoresPublished,
+          score: $score,
+          segmentType: $segmentType
+        }
       : {
-          scoresPublished,
-          state
+          scoresPublished: $scoresPublished,
+          state: $state
         };
     return getScoreTeamStateColor(options);
   }};
@@ -83,10 +90,10 @@ export const ScoreTeam: React.FC<{
 
   return (
     <Wrapper
-      state={currentState}
-      score={currentSegmentTeamState?.score || null}
-      scoresPublished={currentSegment?.scorePublished || false}
-      segmentType={currentSegment?.type || 'QUESTION'}
+      $state={currentState}
+      $score={currentSegmentTeamState?.score || null}
+      $scoresPublished={currentSegment?.scorePublished || false}
+      $segmentType={currentSegment?.type || 'QUESTION'}
     >
       <h2>{team.name}</h2>
       <RelativeFlex>

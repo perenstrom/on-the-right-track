@@ -59,9 +59,9 @@ const FirstSegmentPartSeparator = styled(SegmentPartSeparator)`
 `;
 
 interface SegmentPartProps {
-  readonly current: boolean;
-  readonly scoresPublished: boolean;
-  readonly gameIsOver: boolean;
+  readonly $current: boolean;
+  readonly $scoresPublished: boolean;
+  readonly $gameIsOver: boolean;
 }
 const SegmentPart = styled.div<SegmentPartProps>`
   position: relative;
@@ -70,15 +70,15 @@ const SegmentPart = styled.div<SegmentPartProps>`
   align-items: center;
   justify-content: center;
 
-  cursor: ${({ gameIsOver }) => (gameIsOver ? 'default' : 'pointer')};
+  cursor: ${({ $gameIsOver }) => ($gameIsOver ? 'default' : 'pointer')};
 
   padding: 0 1.5rem 0 2.2rem;
   margin-left: calc((var(--arrow-size) - 3px) * -1);
 
-  background: ${({ current, scoresPublished }) =>
-    current
+  background: ${({ $current, $scoresPublished }) =>
+    $current
       ? 'hsl(216, 100%, 74%)'
-      : scoresPublished
+      : $scoresPublished
       ? 'hsl(87, 70%, 74%)'
       : 'hsl(0, 0%, 75%)'};
   font-size: 0.9rem;
@@ -119,9 +119,9 @@ export const BreadCrumb: React.FC<{
       <SegmentPartWrapper key={'start'}>
         <FirstSegmentPartSeparator />
         <FirstSegmentPart
-          current={currentSegment === 'start'}
-          scoresPublished={true}
-          gameIsOver={gameIsOver}
+          $current={currentSegment === 'start'}
+          $scoresPublished={true}
+          $gameIsOver={gameIsOver}
           onClick={() => !gameIsOver && goToSegment(null)}
         >
           <FontAwesomeIcon icon={faPause} style={{ minWidth: '1.5rem' }} />
@@ -131,9 +131,9 @@ export const BreadCrumb: React.FC<{
         <SegmentPartWrapper key={segment.id}>
           <SegmentPartSeparator />
           <SegmentPart
-            current={currentSegment === segment.id}
-            scoresPublished={segment.scorePublished}
-            gameIsOver={gameIsOver}
+            $current={currentSegment === segment.id}
+            $scoresPublished={segment.scorePublished}
+            $gameIsOver={gameIsOver}
             onClick={() => !gameIsOver && goToSegment(stageIndex + 1)}
           >
             <SegmentIcon type={segment.type} />
@@ -144,9 +144,9 @@ export const BreadCrumb: React.FC<{
       <SegmentPartWrapper key={'end'}>
         <LastSegmentPartSeparator />
         <LastSegmentPart
-          current={currentSegment === 'end'}
-          scoresPublished={false}
-          gameIsOver={gameIsOver}
+          $current={currentSegment === 'end'}
+          $scoresPublished={false}
+          $gameIsOver={gameIsOver}
           onClick={() => !gameIsOver && goToSegment(segments.length + 1)}
         >
           <FontAwesomeIcon

@@ -10,15 +10,15 @@ import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { MouseEventHandler } from 'react';
 
 interface WrapperProps {
-  readonly state: TeamState;
+  readonly $state: TeamState;
 }
 const Wrapper = styled.div<WrapperProps>`
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  color: ${({ state }) => getTeamStateTextColor(state)};
-  background: ${({ state }) => getTeamStateColor(state)};
+  color: ${({ $state }) => getTeamStateTextColor($state)};
+  background: ${({ $state }) => getTeamStateColor($state)};
   border: none;
   border-radius: 10px;
   padding: 0.8rem 1rem 1rem;
@@ -207,7 +207,7 @@ export const AdminTeam: React.FC<{
   };
 
   return (
-    <Wrapper state={currentState}>
+    <Wrapper $state={currentState}>
       <h2>{team.name}</h2>
       <RelativeFlex>
         <span>{team.members}</span>
@@ -261,14 +261,14 @@ export const AdminTeam: React.FC<{
                 {currentSegment?.type === 'TRIP' && (
                   <>
                     <ScoreButton
-                      variant="wrong"
+                      $variant="wrong"
                       onClick={() => handleScoring(0)}
                       disabled={connectionState !== 'connected'}
                     >
                       Fel 0p
                     </ScoreButton>
                     <ScoreButton
-                      variant="correct"
+                      $variant="correct"
                       onClick={() =>
                         handleScoring(currentSegmentTeamState?.stopLevel || 0)
                       }
@@ -283,28 +283,28 @@ export const AdminTeam: React.FC<{
                   currentSegment?.type === 'SPECIAL') && (
                   <>
                     <ScoreButton
-                      variant="wrong"
+                      $variant="wrong"
                       onClick={() => handleScoring(0)}
                       disabled={connectionState !== 'connected'}
                     >
                       0p
                     </ScoreButton>
                     <ScoreButton
-                      variant="correct"
+                      $variant="correct"
                       onClick={() => handleScoring(1)}
                       disabled={connectionState !== 'connected'}
                     >
                       1p
                     </ScoreButton>
                     <ScoreButton
-                      variant="correct"
+                      $variant="correct"
                       onClick={() => handleScoring(2)}
                       disabled={connectionState !== 'connected'}
                     >
                       2p
                     </ScoreButton>
                     <ScoreButton
-                      variant="correct"
+                      $variant="correct"
                       onClick={() => handleScoring(3)}
                       disabled={connectionState !== 'connected'}
                     >

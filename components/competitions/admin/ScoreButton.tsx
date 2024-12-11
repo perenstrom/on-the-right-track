@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 
 interface ScoreButtonProps {
-  readonly variant: 'wrong' | 'correct';
+  readonly $variant: 'wrong' | 'correct';
 }
 
 const buttonColors: Record<
-  ScoreButtonProps['variant'],
+  ScoreButtonProps['$variant'],
   { background: string; border: string; hover: string; text: string }
 > = {
   wrong: {
@@ -27,12 +27,12 @@ export const ScoreButton = styled.button<ScoreButtonProps>`
   padding: 0 1rem;
   flex: 1;
 
-  color: ${({ variant }) => buttonColors[variant].text};
+  color: ${({ $variant }) => buttonColors[$variant].text};
 
-  background-color: ${({ variant }) => buttonColors[variant].background};
-  border: 1px solid ${({ variant }) => buttonColors[variant].border};
+  background-color: ${({ $variant }) => buttonColors[$variant].background};
+  border: 1px solid ${({ $variant }) => buttonColors[$variant].border};
 
   &:hover {
-    background-color: ${({ variant }) => buttonColors[variant].hover};
+    background-color: ${({ $variant }) => buttonColors[$variant].hover};
   }
 `;
