@@ -154,3 +154,53 @@
     }
   }
 }
+
+@utility clip-path-arrow-separator {
+  clip-path: polygon(
+    var(--arrow-size) 50%,
+    0% 0%,
+    calc(100% - var(--arrow-size)) 0%,
+    100% 50%,
+    calc(100% - var(--arrow-size)) 100%,
+    0% 100%
+  );
+}
+
+@utility clip-path-arrow-separator-last {
+  clip-path: polygon(var(--arrow-size) 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+@utility clip-path-arrow-separator-first {
+  clip-path: polygon(
+    0% 0%,
+    calc(100% - var(--arrow-size)) 0%,
+    100% 50%,
+    calc(100% - var(--arrow-size)) 100%,
+    0% 100%
+  );
+}
+
+@utility clip-path-arrow-part {
+  clip-path: polygon(
+    var(--arrow-size) 50%,
+    0% 0%,
+    calc(100% - var(--arrow-size)) 0%,
+    100% 50%,
+    calc(100% - var(--arrow-size)) 100%,
+    0% 100%
+  );
+}
+
+@utility clip-path-arrow-part-last {
+  clip-path: polygon(var(--arrow-size) 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+@utility clip-path-arrow-part-first {
+  clip-path: polygon(
+    0% 0%,
+    calc(100% - var(--arrow-size)) 0%,
+    100% 50%,
+    calc(100% - var(--arrow-size)) 100%,
+    0% 100%
+  );
+}

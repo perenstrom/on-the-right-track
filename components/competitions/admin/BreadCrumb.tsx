@@ -3,110 +3,99 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Segment } from '@prisma/client';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getShortSegmentName } from 'helpers/copy';
+import { cn } from 'helpers/tailwindUtils';
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  position: relative;
-  z-index: 1;
-  background-color: hsl(0, 0%, 85%);
-  flex: 0 0 3rem;
-  border-bottom: 1px solid hsl(0, 0%, 0%);
-  margin-left: -4px;
+const SegmentPartWrapper = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className="relative h-full grow [--arrow-size:20px]" {...props} />
+);
 
-  display: flex;
-  align-items: center;
-`;
+const SegmentPartSeparator = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className="clip-path-arrow-separator absolute top-0 -right-1 bottom-0 left-0 bg-black"
+    {...props}
+  />
+);
 
-const SegmentPartWrapper = styled.div`
-  flex-grow: 1;
-  position: relative;
-  height: 100%;
-  --arrow-size: 20px;
-`;
+const LastSegmentPartSeparator = (
+  props: React.HTMLAttributes<HTMLDivElement>
+) => (
+  <div
+    className="clip-path-arrow-separator-last absolute top-0 right-0 bottom-0 left-0 bg-black"
+    {...props}
+  />
+);
 
-const SegmentPartSeparator = styled.div`
-  position: absolute;
-  top: 0;
-  right: -4px;
-  bottom: 0;
-  left: 0;
+const FirstSegmentPartSeparator = (
+  props: React.HTMLAttributes<HTMLDivElement>
+) => (
+  <div
+    className="clip-path-arrow-separator-first absolute top-0 -right-1 bottom-0 left-0 bg-black"
+    {...props}
+  />
+);
 
-  background: black;
+const segmentPartClassNames =
+  'relative h-full flex items-center justify-center py-0 pr-6 pl-[2.2rem] text-[0.9rem] clip-path-arrow-part ml-[calc((var(--arrow-size)_-_3px)_*_-1)]';
+const segmentBackgroundClassNames = (
+  current: boolean,
+  scoresPublished: boolean
+) => {
+  if (current) return 'bg-[hsl(216,100%,74%)]';
+  if (scoresPublished) return 'bg-[hsl(87,70%,74%)]';
+  return 'bg-[hsl(0,0%,75%)]';
+};
 
-  clip-path: polygon(
-    var(--arrow-size) 50%,
-    0% 0%,
-    calc(100% - var(--arrow-size)) 0%,
-    100% 50%,
-    calc(100% - var(--arrow-size)) 100%,
-    0% 100%
-  );
-`;
+const SegmentPart = (
+  props: React.HTMLAttributes<HTMLDivElement> & {
+    gameIsOver: boolean;
+    current: boolean;
+    scoresPublished: boolean;
+  }
+) => (
+  <div
+    className={cn(
+      segmentPartClassNames,
+      props.gameIsOver ? 'cursor-default' : 'cursor-pointer',
+      segmentBackgroundClassNames(props.current, props.scoresPublished)
+    )}
+    {...props}
+  />
+);
 
-const LastSegmentPartSeparator = styled(SegmentPartSeparator)`
-  clip-path: polygon(var(--arrow-size) 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%);
-  right: 0;
-`;
+const LastSegmentPart = (
+  props: React.HTMLAttributes<HTMLDivElement> & {
+    current: boolean;
+    scoresPublished: boolean;
+    gameIsOver: boolean;
+  }
+) => (
+  <div
+    className={cn(
+      segmentPartClassNames,
+      segmentBackgroundClassNames(props.current, props.scoresPublished),
+      'clip-path-arrow-part-last py-0 pr-4 pl-[1.8rem]'
+    )}
+    {...props}
+  />
+);
 
-const FirstSegmentPartSeparator = styled(SegmentPartSeparator)`
-  clip-path: polygon(
-    0% 0%,
-    calc(100% - var(--arrow-size)) 0%,
-    100% 50%,
-    calc(100% - var(--arrow-size)) 100%,
-    0% 100%
-  );
-`;
-
-interface SegmentPartProps {
-  readonly $current: boolean;
-  readonly $scoresPublished: boolean;
-  readonly $gameIsOver: boolean;
-}
-const SegmentPart = styled.div<SegmentPartProps>`
-  position: relative;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: ${({ $gameIsOver }) => ($gameIsOver ? 'default' : 'pointer')};
-
-  padding: 0 1.5rem 0 2.2rem;
-  margin-left: calc((var(--arrow-size) - 3px) * -1);
-
-  background: ${({ $current, $scoresPublished }) =>
-    $current
-      ? 'hsl(216, 100%, 74%)'
-      : $scoresPublished
-      ? 'hsl(87, 70%, 74%)'
-      : 'hsl(0, 0%, 75%)'};
-  font-size: 0.9rem;
-  clip-path: polygon(
-    var(--arrow-size) 50%,
-    0% 0%,
-    calc(100% - var(--arrow-size)) 0%,
-    100% 50%,
-    calc(100% - var(--arrow-size)) 100%,
-    0% 100%
-  );
-`;
-
-const LastSegmentPart = styled(SegmentPart)`
-  padding: 0 1rem 0 1.8rem;
-  clip-path: polygon(var(--arrow-size) 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%);
-`;
-
-const FirstSegmentPart = styled(SegmentPart)`
-  padding: 0 0.7rem 0 1rem;
-  clip-path: polygon(
-    0% 0%,
-    calc(100% - var(--arrow-size)) 0%,
-    100% 50%,
-    calc(100% - var(--arrow-size)) 100%,
-    0% 100%
-  );
-`;
+const FirstSegmentPart = (
+  props: React.HTMLAttributes<HTMLDivElement> & {
+    current: boolean;
+    scoresPublished: boolean;
+    gameIsOver: boolean;
+  }
+) => (
+  <div
+    className={cn(
+      segmentPartClassNames,
+      segmentBackgroundClassNames(props.current, props.scoresPublished),
+      'clip-path-arrow-part-first py-0 pr-[0.7rem] pl-4'
+    )}
+    {...props}
+  />
+);
 
 export const BreadCrumb: React.FC<{
   segments: Segment[];
@@ -115,13 +104,13 @@ export const BreadCrumb: React.FC<{
   goToSegment: (stage: number | null) => void;
 }> = ({ segments, currentSegment, gameIsOver, goToSegment }) => {
   return (
-    <Wrapper>
+    <div className="relative z-1 -ml-1 flex shrink-0 grow-0 basis-12 border-b border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
       <SegmentPartWrapper key={'start'}>
         <FirstSegmentPartSeparator />
         <FirstSegmentPart
-          $current={currentSegment === 'start'}
-          $scoresPublished={true}
-          $gameIsOver={gameIsOver}
+          current={currentSegment === 'start'}
+          scoresPublished={true}
+          gameIsOver={gameIsOver}
           onClick={() => !gameIsOver && goToSegment(null)}
         >
           <FontAwesomeIcon icon={faPause} style={{ minWidth: '1.5rem' }} />
@@ -131,9 +120,9 @@ export const BreadCrumb: React.FC<{
         <SegmentPartWrapper key={segment.id}>
           <SegmentPartSeparator />
           <SegmentPart
-            $current={currentSegment === segment.id}
-            $scoresPublished={segment.scorePublished}
-            $gameIsOver={gameIsOver}
+            current={currentSegment === segment.id}
+            scoresPublished={segment.scorePublished}
+            gameIsOver={gameIsOver}
             onClick={() => !gameIsOver && goToSegment(stageIndex + 1)}
           >
             <SegmentIcon type={segment.type} />
@@ -144,9 +133,9 @@ export const BreadCrumb: React.FC<{
       <SegmentPartWrapper key={'end'}>
         <LastSegmentPartSeparator />
         <LastSegmentPart
-          $current={currentSegment === 'end'}
-          $scoresPublished={false}
-          $gameIsOver={gameIsOver}
+          current={currentSegment === 'end'}
+          scoresPublished={false}
+          gameIsOver={gameIsOver}
           onClick={() => !gameIsOver && goToSegment(segments.length + 1)}
         >
           <FontAwesomeIcon
@@ -155,6 +144,6 @@ export const BreadCrumb: React.FC<{
           />
         </LastSegmentPart>
       </SegmentPartWrapper>
-    </Wrapper>
+    </div>
   );
 };

@@ -17,6 +17,23 @@ export const getTeamStateColor = (state: TeamState) => {
   }
 };
 
+export const getTeamStateColorTW = (state: TeamState) => {
+  switch (state) {
+    case 'IDLE':
+      return 'bg-[hsl(0,0%,85%)]';
+    case 'STOPPED':
+    case 'STOPPED_ANSWERED':
+      return 'bg-[hsl(18,95%,40%)]';
+    case 'STOPPED_HANDLED':
+      return 'bg-[hsl(11,74%,77%)]';
+    case 'ANSWERED':
+    case 'ANSWERED_HANDLED':
+      return 'bg-[hsl(216,100%,74%)]';
+    default:
+      return 'bg-[hsl(0,0%,85%)]';
+  }
+};
+
 export const getTeamStateTextColor = (state: TeamState) => {
   switch (state) {
     case 'IDLE':
@@ -29,6 +46,21 @@ export const getTeamStateTextColor = (state: TeamState) => {
       return 'hsl(0, 0%, 100%)';
     default:
       return 'hsl(0, 0%, 15%)';
+  }
+};
+
+export const getTeamStateTextColorTW = (state: TeamState) => {
+  switch (state) {
+    case 'IDLE':
+    case 'ANSWERED':
+    case 'ANSWERED_HANDLED':
+    case 'STOPPED_HANDLED':
+      return 'text-[hsl(0,0%,15%)]';
+    case 'STOPPED_ANSWERED':
+    case 'STOPPED':
+      return 'text-[hsl(0,0%,100%)]';
+    default:
+      return 'text-[hsl(0,0%,15%)]';
   }
 };
 
