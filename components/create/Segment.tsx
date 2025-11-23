@@ -8,6 +8,10 @@ import { SegmentIcon } from 'components/SegmentIcon';
 import { getFullSegmentName } from 'helpers/copy';
 import { MouseEventHandler } from 'react';
 import { UncreatedSegment } from 'types/types';
+import { Item, ItemActions, ItemContent, ItemMedia } from '../ui/item';
+import { ArrowDown, ArrowUp, Minus, Plus, Trash2 } from 'lucide-react';
+import { ButtonGroup, ButtonGroupText } from '../ui/button-group';
+import { Button } from '../ui/button';
 
 const OptionsButtonClassNames = 'h-full border-none bg-transparent flex-1';
 
@@ -34,66 +38,73 @@ export const Segment: React.FC<{
   };
 
   return (
-    <div className="flex h-12 w-88 content-start items-center rounded-sm border border-black bg-[#d9d9d9] font-medium">
-      <span className="block grow p-2">
+    <Item variant="outline">
+      <ItemMedia>
         <SegmentIcon type={segment.type} />
+      </ItemMedia>
+      <ItemContent className="text-md">
         {getFullSegmentName(segment)}
-      </span>
-      {(segment.type === 'QUESTION' || segment.type === 'MUSIC') && (
-        <div className="flex h-full flex-col border-l border-black px-2 py-0">
-          <div className="flex flex-[0_0_50%] content-center items-center leading-0">
-            Delsvar
-          </div>
-          <div className="flex flex-[0_0_50%] content-between items-center leading-0">
-            <button
-              className={OptionsButtonClassNames}
-              type="button"
-              onClick={() =>
-                handleOptionsChange((segment.numberOfOptions ?? 0) - 1)
-              }
-            >
-              -
-            </button>
-            <div className="flex h-full flex-1 content-center items-center">
-              {segment.numberOfOptions}
-            </div>
-            <button
-              className={OptionsButtonClassNames}
-              type="button"
-              onClick={() =>
-                handleOptionsChange((segment.numberOfOptions ?? 0) + 1)
-              }
-            >
-              +
-            </button>
-          </div>
-        </div>
-      )}
-      <div className="flex h-full flex-col content-center border-l border-l-black leading-0">
-        <button
-          className={OrderButtonClassNames}
+      </ItemContent>
+      <ItemActions className="flex-wrap">
+        {(segment.type === 'QUESTION' || segment.type === 'MUSIC') && (
+          <>
+            <ButtonGroup>
+              <ButtonGroupText>
+                {segment.numberOfOptions} delfrågor
+              </ButtonGroupText>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() =>
+                  handleOptionsChange((segment.numberOfOptions ?? 0) - 1)
+                }
+                disabled={segment.numberOfOptions === 1}
+              >
+                <Minus />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() =>
+                  handleOptionsChange((segment.numberOfOptions ?? 0) + 1)
+                }
+              >
+                <Plus />
+              </Button>
+            </ButtonGroup>
+          </>
+        )}
+        <ButtonGroup>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={moveUp}
+            disabled={segment.order === 1}
+          >
+            <ArrowUp />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={moveDown}
+            disabled={segment.order === totalSegments}
+          >
+            <ArrowDown />
+          </Button>
+        </ButtonGroup>
+        <Button
           type="button"
-          disabled={segment.order === 1}
-          onClick={moveUp}
+          variant="outline"
+          size="icon"
+          onClick={deleteSegment}
         >
-          <FontAwesomeIcon icon={faArrowUp} />
-        </button>
-        <button
-          className={OrderButtonClassNames}
-          type="button"
-          disabled={segment.order === totalSegments}
-          onClick={moveDown}
-        >
-          <FontAwesomeIcon icon={faArrowDown} />
-        </button>
-      </div>
-      <button
-        className="h-full rounded-r-[3px] border-l border-none border-l-black bg-transparent px-[0.4rem] hover:bg-[#bfbfbf]"
-        type="button"
-        onClick={deleteSegment}
-      >
-        <FontAwesomeIcon icon={faTrashCan} />
-      </button>
-    </div>
+          <Trash2 />
+        </Button>
+      </ItemActions>
+    </Item>
   );
 };

@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -65,7 +65,7 @@
   /* Global Styles */
   body {
     font-family: var(--font-sans);
-    font-weight: 300;
+    font-weight: 500;
     line-height: 1.75;
     color: hsl(0 0% 15%);
     background-color: hsl(60 30% 97%);

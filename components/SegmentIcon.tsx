@@ -1,27 +1,17 @@
-import {
-  faClipboardList,
-  faFeatherPointed,
-  faMusic,
-  faTrain
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegmentType } from '@prisma/client';
-
-const style = {
-  paddingRight: '0.5rem'
-};
+import { Clipboard, Leaf, Music, TrainTrack } from 'lucide-react';
 
 export const SegmentIcon: React.FC<{
   type: SegmentType;
 }> = ({ type }) => {
   switch (type) {
     case 'TRIP':
-      return <FontAwesomeIcon icon={faTrain} style={style} />;
+      return <TrainTrack />;
     case 'QUESTION':
-      return <FontAwesomeIcon icon={faClipboardList} style={style} />;
+      return <Clipboard />;
     case 'MUSIC':
-      return <FontAwesomeIcon icon={faMusic} style={style} />;
+      return <Music />;
     case 'SPECIAL':
-      return <FontAwesomeIcon icon={faFeatherPointed} style={style} />;
+      return <Leaf />;
   }
 };

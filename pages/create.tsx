@@ -1,13 +1,16 @@
 import { NextPage } from 'next';
 import { Wrapper } from 'components/Wrapper';
-import { Button } from 'components/Button';
 import { FormEventHandler, useState } from 'react';
 import { SegmentType } from '@prisma/client';
 import { Segment } from 'components/create/Segment';
 import { UncreatedSegment } from 'types/types';
 import { createCompetition } from 'services/local';
 import { useRouter } from 'next/router';
-import { Label, Input } from 'components/FormControls';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Field, FieldLabel, FieldSet } from '@/components/ui/field';
+import { ItemGroup } from '@/components/ui/item';
 
 const calculateSegmentNumbers = (
   segments: UncreatedSegment[]
@@ -163,33 +166,41 @@ const CreatePage: NextPage<{}> = () => {
     <Wrapper>
       <h1>Skapa tävling</h1>
       <form onSubmit={submit}>
-        <Label htmlFor="name">Namn</Label>
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-        <Label htmlFor="hosts">Värdar</Label>
-        <Input
-          type="text"
-          id="hosts"
-          name="hosts"
-          value={hosts}
-          onChange={(event) => setHosts(event.target.value)}
-        />
-        <Label htmlFor="date">Datum</Label>
-        <Input
-          type="date"
-          id="date"
-          name="date"
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-        />
+        <FieldSet>
+          <Field>
+            <FieldLabel htmlFor="name">Namn</FieldLabel>
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="hosts">Värdar</FieldLabel>
+            <Input
+              type="text"
+              id="hosts"
+              name="hosts"
+              value={hosts}
+              onChange={(event) => setHosts(event.target.value)}
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="date">Datum</FieldLabel>
+            <Input
+              type="date"
+              id="date"
+              name="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+            />
+          </Field>
+        </FieldSet>
         <h2>Moment</h2>
         {segments.length > 0 ? (
-          <div className="mb-4 flex flex-col gap-2">
+          <ItemGroup className="mb-4 gap-4">
             {segments.map((segment) => (
               <Segment
                 key={
@@ -205,29 +216,43 @@ const CreatePage: NextPage<{}> = () => {
                 changeOptionsCount={changeOptionsCount}
               />
             ))}
-          </div>
+          </ItemGroup>
         ) : (
           <p>
             <i>Inga moment har lagts till</i>
           </p>
         )}
         <div className="mb-4 flex gap-4">
-          <Button type="button" onClick={() => addSegment('TRIP')}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => addSegment('TRIP')}
+          >
             + Resa
           </Button>
-          <Button type="button" onClick={() => addSegment('QUESTION')}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => addSegment('QUESTION')}
+          >
             + Fråga
           </Button>
-          <Button type="button" onClick={() => addSegment('MUSIC')}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => addSegment('MUSIC')}
+          >
             + Musikfråga
           </Button>
-          <Button type="button" onClick={() => addSegment('SPECIAL')}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => addSegment('SPECIAL')}
+          >
             + Specialfråga
           </Button>
         </div>
-
         <hr className="mb-4 border-b border-none border-b-[#999999]" />
-
         <Button className="mb-16 border border-[hsl(116,46%,30%)] bg-[hsl(116,46%,55%)] hover:bg-[hsl(116,46%,50%)]">
           Spara
         </Button>
