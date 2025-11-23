@@ -6,7 +6,7 @@ export default class MyDocument extends Document {
       <Html>
         <Head>
           <link
-            href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Mulish:ital,wght@0,300;0,500;1,300;1,500&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
             rel="stylesheet"
           />
         </Head>

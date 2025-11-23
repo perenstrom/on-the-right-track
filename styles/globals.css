@@ -1,5 +1,10 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-heading: 'Roboto', sans-serif;
+  --font-sans: 'Open Sans', sans-serif;
+}
+
 @layer base {
   /* CSS Reset */
   *,
@@ -56,7 +61,7 @@
 
   /* Global Styles */
   body {
-    font-family: 'Mulish', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 300;
     line-height: 1.75;
     color: hsl(0 0% 15%);
@@ -70,7 +75,7 @@
   h5,
   h6 {
     margin: 3rem 0 1.38rem -0.4rem;
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-heading);
     font-weight: 700;
     line-height: 1.3;
   }
