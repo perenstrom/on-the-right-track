@@ -4,7 +4,6 @@ import { Segment } from '@prisma/client';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getShortSegmentName } from 'helpers/copy';
 import { cn } from 'helpers/tailwindUtils';
-import styled from 'styled-components';
 
 const SegmentPartWrapper = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div className="relative h-full grow [--arrow-size:20px]" {...props} />
@@ -46,52 +45,67 @@ const segmentBackgroundClassNames = (
   return 'bg-[hsl(0,0%,75%)]';
 };
 
-const SegmentPart = (
-  props: React.HTMLAttributes<HTMLDivElement> & {
-    gameIsOver: boolean;
-    current: boolean;
-    scoresPublished: boolean;
-  }
-) => (
+const SegmentPart = ({
+  className,
+  gameIsOver,
+  current,
+  scoresPublished,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  gameIsOver: boolean;
+  current: boolean;
+  scoresPublished: boolean;
+}) => (
   <div
     className={cn(
       segmentPartClassNames,
-      props.gameIsOver ? 'cursor-default' : 'cursor-pointer',
-      segmentBackgroundClassNames(props.current, props.scoresPublished)
+      gameIsOver ? 'cursor-default' : 'cursor-pointer',
+      segmentBackgroundClassNames(current, scoresPublished),
+      className
     )}
     {...props}
   />
 );
 
-const LastSegmentPart = (
-  props: React.HTMLAttributes<HTMLDivElement> & {
-    current: boolean;
-    scoresPublished: boolean;
-    gameIsOver: boolean;
-  }
-) => (
+const LastSegmentPart = ({
+  className,
+  current,
+  scoresPublished,
+  gameIsOver,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  current: boolean;
+  scoresPublished: boolean;
+  gameIsOver: boolean;
+}) => (
   <div
     className={cn(
       segmentPartClassNames,
-      segmentBackgroundClassNames(props.current, props.scoresPublished),
-      'clip-path-arrow-part-last py-0 pr-4 pl-[1.8rem]'
+      segmentBackgroundClassNames(current, scoresPublished),
+      'clip-path-arrow-part-last py-0 pr-4 pl-[1.8rem]',
+      className
     )}
     {...props}
   />
 );
 
-const FirstSegmentPart = (
-  props: React.HTMLAttributes<HTMLDivElement> & {
-    current: boolean;
-    scoresPublished: boolean;
-    gameIsOver: boolean;
-  }
-) => (
+const FirstSegmentPart = ({
+  className,
+  current,
+  scoresPublished,
+  gameIsOver,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & {
+  current: boolean;
+  scoresPublished: boolean;
+  gameIsOver: boolean;
+}) => (
   <div
     className={cn(
       segmentPartClassNames,
-      segmentBackgroundClassNames(props.current, props.scoresPublished),
-      'clip-path-arrow-part-first py-0 pr-[0.7rem] pl-4'
+      segmentBackgroundClassNames(current, scoresPublished),
+      'clip-path-arrow-part-first py-0 pr-[0.7rem] pl-4',
+      className
     )}
     {...props}
   />

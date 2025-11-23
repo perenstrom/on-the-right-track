@@ -17,7 +17,6 @@ import {
   upsertAnswer,
   upsertSegmentTeamState
 } from 'services/prisma';
-import styled from 'styled-components';
 import { CompetitionWithSegmentCount } from 'types/types';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 import { ablyEvents } from 'services/ably/ably';
@@ -28,165 +27,41 @@ import {
 } from 'services/ably/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
 import { pullTheBreak as pullTheBreakService } from 'services/local';
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-`;
-
-const SegmentHeading = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-  width: 100%;
-
-  font-size: 2rem;
-  font-weight: bold;
-  height: 4rem;
-  background-color: hsl(0, 0%, 90%);
-`;
-
-const BreakButton = styled.button`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: transparent;
-  border: none;
-`;
-
-const BreakImage = styled.img`
-  margin-top: -13rem;
-`;
+import { cn } from 'helpers/tailwindUtils';
 
 interface TripHeadingProps {
   variant: 'stopped' | 'answered';
 }
-const TripHeading = styled.div<TripHeadingProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+const TripHeading = ({
+  variant,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & TripHeadingProps) => (
+  <div
+    className={cn(
+      'flex h-28 w-full items-center justify-center text-[5rem] leading-none font-bold text-white',
+      variant === 'stopped' ? 'bg-[hsl(18,95%,40%)]' : 'bg-[hsl(11,74%,77%)]',
+      className
+    )}
+  />
+);
 
-  font-size: 5rem;
-  line-height: 1;
-  font-weight: bold;
-  color: hsl(0, 0%, 100%);
-  height: 7rem;
-  background-color: ${({ variant }) =>
-    variant === 'stopped' ? 'hsl(18, 95%, 40%)' : 'hsl(11, 74%, 77%)'};
-`;
+const WaitingForSegment = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn('mx-auto mt-10 mb-0 text-[1.6rem]', className)}
+    {...props}
+  />
+);
 
-const TripLevel = styled.div`
-  flex: 1;
-
-  margin-top: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 13rem;
-  font-weight: bold;
-  line-height: 1;
-`;
-
-const WaitingForSegment = styled.div`
-  margin: 10rem auto 0;
-  font-size: 1.6rem;
-`;
-
-const AnswerForm = styled.form`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-const AnswerWrapper = styled.div`
-  width: 100%;
-  flex: 1;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-`;
-
-const AnswerLabel = styled(Label)`
-  font-size: 2rem;
-`;
-
-const AnswerInput = styled(TextArea)`
-  font-size: 1.5rem;
-  line-height: 1.2;
-  flex: 1;
-`;
-
-const SubmitButton = styled(Button)`
-  background-color: hsl(116, 46%, 55%);
-  border: 1px solid hsl(116, 46%, 30%);
-  width: 100%;
-  font-size: 1.5rem;
-`;
-
-const AnsweredWrapper = styled.div`
-  width: 100%;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
-const AnsweredLabel = styled.p`
-  font-size: 2rem;
-  display: block;
-  font-weight: 500;
-`;
-
-const AnswerText = styled.p`
-  font-size: 1.5rem;
-  line-height: 1.2;
-
-  width: 100%;
-  margin-bottom: 1rem;
-
-  flex: 1;
-`;
-
-const AnsweredList = styled.ol`
-  flex: 1;
-  padding-left: 1rem;
-`;
-
-const AnsweredCheck = styled.p`
-  color: hsl(203, 54%, 50%);
-  font-size: 1.5rem;
-  text-align: center;
-`;
-
-const SpecialWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 1rem;
-`;
-
-const TextWrapper = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  text-align: center;
-  line-height: 1.4rem;
-  font-size: 1.2rem;
-`;
-
-const SpecialText = styled.div`
-  max-width: 18rem;
-`;
+const AnswerForm = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLFormElement>) => (
+  <form className={cn('flex h-full w-full flex-col', className)} {...props} />
+);
 
 interface Props {
   competition: CompetitionWithSegmentCount;
@@ -370,14 +245,14 @@ const CompetitionPlayPage: NextPage<Props> = ({
   const winnerIsDeclared = !!competition.winnerTeamId;
 
   return (
-    <Wrapper>
-      <SegmentHeading>
+    <div className="flex h-full flex-col items-center">
+      <div className="z-1 flex h-16 w-full content-center items-center bg-[hsl(0,0%,90%)] text-[2rem] font-bold">
         {ablyHasFailed
           ? 'offline'
           : segment
-          ? getFullSegmentName(segment)
-          : '. . .'}
-      </SegmentHeading>
+            ? getFullSegmentName(segment)
+            : '. . .'}
+      </div>
       <ConnectionStatus state={connectionStatus} />
       {ablyHasFailed ? (
         <WaitingForSegment>
@@ -403,14 +278,22 @@ const CompetitionPlayPage: NextPage<Props> = ({
           )}
           {isTraveling && (
             <>
-              <BreakButton
+              <button
+                className="flex w-full items-center justify-center border-none bg-transparent"
                 type="button"
                 onClick={() => pullTheBreak()}
                 disabled={connectionState !== 'connected'}
               >
-                <BreakImage src="/break.svg" alt="Break" width="80%" />
-              </BreakButton>
-              <TripLevel>{competition.currentLevel}</TripLevel>
+                <img
+                  className="-mt-52"
+                  src="/break.svg"
+                  alt="Break"
+                  width="80%"
+                />
+              </button>
+              <div className="mt-8 flex flex-1 content-center items-center text-[13rem] leading-none font-bold">
+                {competition.currentLevel}
+              </div>
             </>
           )}
           {isAnswering && (
@@ -420,13 +303,14 @@ const CompetitionPlayPage: NextPage<Props> = ({
                   {teamState.stopLevel}
                 </TripHeading>
               )}
-              <AnswerWrapper>
+              <div className="flex w-full flex-1 flex-col p-4">
                 {answers.map((answer) => (
                   <React.Fragment key={answer.id}>
-                    <AnswerLabel htmlFor={answer.id}>
+                    <Label className="text-[2rem]" htmlFor={answer.id}>
                       {`Svar ${answer.questionNumber}`}
-                    </AnswerLabel>
-                    <AnswerInput
+                    </Label>
+                    <TextArea
+                      className="flex-1 text-2xl leading-[1.2]"
                       id={answer.id}
                       value={answer.answer}
                       onChange={(event) =>
@@ -435,42 +319,44 @@ const CompetitionPlayPage: NextPage<Props> = ({
                     />
                   </React.Fragment>
                 ))}
-                <SubmitButton
+                <Button
+                  className="w-full border border-[hsl(116,46%,30%)] bg-[hsl(116,46%,55%)] text-2xl"
                   type="submit"
                   disabled={connectionState !== 'connected'}
                 >
                   Svara
-                </SubmitButton>
-              </AnswerWrapper>
+                </Button>
+              </div>
             </AnswerForm>
           )}
           {isSpecial && (
             <AnswerForm onSubmit={handleSubmitSpecial}>
-              <SpecialWrapper>
-                <TextWrapper>
-                  <SpecialText>
+              <div className="flex flex-1 flex-col p-4">
+                <div className="flex flex-1 flex-col content-center items-center gap-4 text-center text-[1.2rem] leading-[1.4rem]">
+                  <div className="max-w-72">
                     Specialfråga. Följ instruktioner från spelledningen.
-                  </SpecialText>
+                  </div>
 
-                  <SpecialText>
+                  <div className="max-w-72">
                     {isIdle
                       ? 'Tryck på Svarat när ni är klara.'
                       : 'Ni har svarat.'}
-                  </SpecialText>
-                </TextWrapper>
+                  </div>
+                </div>
                 {isIdle ? (
-                  <SubmitButton
+                  <Button
+                    className="w-full border border-[hsl(116,46%,30%)] bg-[hsl(116,46%,55%)] text-2xl"
                     type="submit"
                     disabled={connectionState !== 'connected'}
                   >
                     Svarat
-                  </SubmitButton>
+                  </Button>
                 ) : (
-                  <AnsweredCheck>
+                  <p className="text-center text-2xl text-[hsl(203,54%,50%)]">
                     <FontAwesomeIcon icon={faCheck} /> Svarat
-                  </AnsweredCheck>
+                  </p>
                 )}
-              </SpecialWrapper>
+              </div>
             </AnswerForm>
           )}
           {hasAnswered && (
@@ -480,24 +366,24 @@ const CompetitionPlayPage: NextPage<Props> = ({
                   {teamState.stopLevel}
                 </TripHeading>
               )}
-              <AnsweredWrapper>
-                <AnsweredLabel>Ert svar:</AnsweredLabel>
-                <AnsweredList>
+              <div className="flex w-full flex-1 flex-col p-4">
+                <p className="block text-[2rem] font-medium">Ert svar:</p>
+                <ol className="flex-1 pl-4">
                   {answers.map((answer) => (
                     <li key={answer.id}>
-                      <AnswerText>{`${answer.answer}`}</AnswerText>
+                      <p className="mb-4 w-full flex-1 text-2xl leading-[1.2]">{`${answer.answer}`}</p>
                     </li>
                   ))}
-                </AnsweredList>
-                <AnsweredCheck>
+                </ol>
+                <p className="text-center text-2xl text-[hsl(203,54%,50%)]">
                   <FontAwesomeIcon icon={faCheck} /> Svarat
-                </AnsweredCheck>
-              </AnsweredWrapper>
+                </p>
+              </div>
             </>
           )}
         </>
       )}
-    </Wrapper>
+    </div>
   );
 };
 

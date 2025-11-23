@@ -1,6 +1,5 @@
 import { NextPage } from 'next';
 import { Wrapper } from 'components/Wrapper';
-import styled from 'styled-components';
 import { Button } from 'components/Button';
 import { FormEventHandler, useState } from 'react';
 import { SegmentType } from '@prisma/client';
@@ -9,35 +8,6 @@ import { UncreatedSegment } from 'types/types';
 import { createCompetition } from 'services/local';
 import { useRouter } from 'next/router';
 import { Label, Input } from 'components/FormControls';
-
-const SegmentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const SubmitButton = styled(Button)`
-  margin-bottom: 4rem;
-  background-color: hsl(116, 46%, 55%);
-  border: 1px solid hsl(116, 46%, 30%);
-
-  &:hover {
-    background-color: hsl(116, 46%, 50%);
-  }
-`;
-
-const Divider = styled.hr`
-  margin-bottom: 1rem;
-  border: none;
-  border-bottom: 1px solid #999999;
-`;
 
 const calculateSegmentNumbers = (
   segments: UncreatedSegment[]
@@ -219,7 +189,7 @@ const CreatePage: NextPage<{}> = () => {
         />
         <h2>Moment</h2>
         {segments.length > 0 ? (
-          <SegmentWrapper>
+          <div className="mb-4 flex flex-col gap-2">
             {segments.map((segment) => (
               <Segment
                 key={
@@ -235,13 +205,13 @@ const CreatePage: NextPage<{}> = () => {
                 changeOptionsCount={changeOptionsCount}
               />
             ))}
-          </SegmentWrapper>
+          </div>
         ) : (
           <p>
             <i>Inga moment har lagts till</i>
           </p>
         )}
-        <ButtonWrapper>
+        <div className="mb-4 flex gap-4">
           <Button type="button" onClick={() => addSegment('TRIP')}>
             + Resa
           </Button>
@@ -254,11 +224,13 @@ const CreatePage: NextPage<{}> = () => {
           <Button type="button" onClick={() => addSegment('SPECIAL')}>
             + Specialfråga
           </Button>
-        </ButtonWrapper>
+        </div>
 
-        <Divider />
+        <hr className="mb-4 border-b border-none border-b-[#999999]" />
 
-        <SubmitButton>Spara</SubmitButton>
+        <Button className="mb-16 border border-[hsl(116,46%,30%)] bg-[hsl(116,46%,55%)] hover:bg-[hsl(116,46%,50%)]">
+          Spara
+        </Button>
       </form>
     </Wrapper>
   );

@@ -1,18 +1,5 @@
 import { faCircle, faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import styled from 'styled-components';
-
-const Wrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 1.2rem;
-  height: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
-`;
 
 const colorMap = {
   connected: 'hsl(116, 46%, 55%)',
@@ -24,7 +11,7 @@ export const ConnectionStatus: React.FC<{
   state: 'connected' | 'connecting' | 'disconnected';
 }> = ({ state }) => {
   return (
-    <Wrapper>
+    <div className="absolute top-0 right-0 z-5 flex h-[1.2rem] w-[1.2rem] items-center justify-center">
       <span className="fa-layers fa-fw fa-lg">
         {state === 'connecting' && (
           <FontAwesomeIcon
@@ -41,6 +28,6 @@ export const ConnectionStatus: React.FC<{
           color={colorMap[state]}
         />
       </span>
-    </Wrapper>
+    </div>
   );
 };

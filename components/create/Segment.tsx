@@ -7,119 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getFullSegmentName } from 'helpers/copy';
 import { MouseEventHandler } from 'react';
-import styled from 'styled-components';
 import { UncreatedSegment } from 'types/types';
 
-const Wrapper = styled.div`
-  width: 22rem;
-  height: 3rem;
-  border: 1px solid black;
-  border-radius: 4px;
-  background-color: #d9d9d9;
-  font-weight: 500;
+const OptionsButtonClassNames = 'h-full border-none bg-transparent flex-1';
 
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
-const QuestionName = styled.span`
-  padding: 0.5rem;
-  display: block;
-  flex-grow: 1;
-`;
-
-const OptionsWrapper = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 0 0.5rem;
-  border-left: 1px solid black;
-`;
-
-const OptionsHeading = styled.div`
-  line-height: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  flex: 0 0 50%;
-`;
-
-const OptionsControls = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  line-height: 0;
-
-  flex: 0 0 50%;
-
-  button {
-    height: 100%;
-    border: 0;
-    background-color: transparent;
-
-    flex: 1;
-  }
-
-  div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    flex: 1;
-  }
-`;
-
-const OrderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  line-height: 0;
-  height: 100%;
-
-  border-left: 1px solid black;
-
-  button {
-    border: 0;
-    background-color: transparent;
-    flex-grow: 1;
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
-  }
-
-  button:first-child {
-    border-bottom: 1px solid black;
-  }
-
-  button:hover {
-    background-color: #bfbfbf;
-  }
-
-  button:disabled {
-    color: #999999;
-  }
-
-  button:disabled:hover {
-    background-color: transparent;
-  }
-`;
-
-const DeleteButton = styled.button`
-  border: 0;
-  background-color: transparent;
-  height: 100%;
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
-
-  border-left: 1px solid black;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-
-  &:hover {
-    background-color: #bfbfbf;
-  }
-`;
+const OrderButtonClassNames =
+  'border-none bg-transparent grow px-[0.4rem] first:border-b first:border-black disabled:text-[#999999] disabled:hover:bg-transparent hover:bg-[#bfbfbf]';
 
 export const Segment: React.FC<{
   segment: UncreatedSegment;
@@ -141,16 +34,19 @@ export const Segment: React.FC<{
   };
 
   return (
-    <Wrapper>
-      <QuestionName>
+    <div className="flex h-12 w-88 content-start items-center rounded-sm border border-black bg-[#d9d9d9] font-medium">
+      <span className="block grow p-2">
         <SegmentIcon type={segment.type} />
         {getFullSegmentName(segment)}
-      </QuestionName>
+      </span>
       {(segment.type === 'QUESTION' || segment.type === 'MUSIC') && (
-        <OptionsWrapper>
-          <OptionsHeading>Delsvar</OptionsHeading>
-          <OptionsControls>
+        <div className="flex h-full flex-col border-l border-black px-2 py-0">
+          <div className="flex flex-[0_0_50%] content-center items-center leading-0">
+            Delsvar
+          </div>
+          <div className="flex flex-[0_0_50%] content-between items-center leading-0">
             <button
+              className={OptionsButtonClassNames}
               type="button"
               onClick={() =>
                 handleOptionsChange((segment.numberOfOptions ?? 0) - 1)
@@ -158,8 +54,11 @@ export const Segment: React.FC<{
             >
               -
             </button>
-            <div>{segment.numberOfOptions}</div>
+            <div className="flex h-full flex-1 content-center items-center">
+              {segment.numberOfOptions}
+            </div>
             <button
+              className={OptionsButtonClassNames}
               type="button"
               onClick={() =>
                 handleOptionsChange((segment.numberOfOptions ?? 0) + 1)
@@ -167,24 +66,34 @@ export const Segment: React.FC<{
             >
               +
             </button>
-          </OptionsControls>
-        </OptionsWrapper>
+          </div>
+        </div>
       )}
-      <OrderWrapper>
-        <button type="button" disabled={segment.order === 1} onClick={moveUp}>
+      <div className="flex h-full flex-col content-center border-l border-l-black leading-0">
+        <button
+          className={OrderButtonClassNames}
+          type="button"
+          disabled={segment.order === 1}
+          onClick={moveUp}
+        >
           <FontAwesomeIcon icon={faArrowUp} />
         </button>
         <button
+          className={OrderButtonClassNames}
           type="button"
           disabled={segment.order === totalSegments}
           onClick={moveDown}
         >
           <FontAwesomeIcon icon={faArrowDown} />
         </button>
-      </OrderWrapper>
-      <DeleteButton type="button" onClick={deleteSegment}>
+      </div>
+      <button
+        className="h-full rounded-r-[3px] border-l border-none border-l-black bg-transparent px-[0.4rem] hover:bg-[#bfbfbf]"
+        type="button"
+        onClick={deleteSegment}
+      >
         <FontAwesomeIcon icon={faTrashCan} />
-      </DeleteButton>
-    </Wrapper>
+      </button>
+    </div>
   );
 };

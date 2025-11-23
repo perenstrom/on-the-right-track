@@ -1,37 +1,48 @@
-import styled from 'styled-components';
-import { Button } from './Button';
+import { cn } from 'helpers/tailwindUtils';
 
-export const Label = styled.label`
-  display: block;
-  font-weight: 500;
-`;
+export const Label = ({
+  className,
+  ...props
+}: React.LabelHTMLAttributes<HTMLLabelElement>) => (
+  <label className={cn('block font-medium', className)} {...props} />
+);
 
-export const Input = styled.input`
-  width: 100%;
-  max-width: 25rem;
-  margin-bottom: 1rem;
-`;
+export const Input = ({
+  className,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) => (
+  <input className={cn('mb-1 w-full max-w-100', className)} {...props} />
+);
 
-export const TextArea = styled.textarea`
-  width: 100%;
-  max-width: 25rem;
-  margin-bottom: 1rem;
-`;
+export const TextArea = ({
+  className,
+  ...props
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
+  <textarea className={cn('mb-1 w-full max-w-100', className)} {...props} />
+);
 
-export const SubmitButton = styled(Button)`
-  background-color: hsl(116, 46%, 55%);
-  border: 1px solid hsl(116, 46%, 30%);
+export const SubmitButton = ({
+  className,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  <button
+    className={cn(
+      'border border-[hsl(116,46%,30%)] bg-[hsl(116,46%,55%)] hover:bg-[hsl(116,46%,50%)]',
+      className
+    )}
+    {...props}
+  />
+);
 
-  &:hover {
-    background-color: hsl(116, 46%, 50%);
-  }
-`;
-
-export const CancelButton = styled(Button)`
-  background-color: hsl(12 100% 50%);
-  border: 1px solid hsl(12 100% 40%);
-
-  &:hover {
-    background-color: hsl(12 100% 55%);
-  }
-`;
+export const CancelButton = ({
+  className,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  <button
+    className={cn(
+      'border border-[hsl(12,100%,40%)] bg-[hsl(12,100%,50%)] hover:bg-[hsl(12,100%,55%)]',
+      className
+    )}
+    {...props}
+  />
+);

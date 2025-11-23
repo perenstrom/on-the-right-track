@@ -5,24 +5,7 @@ import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import { getCompetition } from 'services/prisma';
-import styled from 'styled-components';
 import { FullCompetition } from 'types/types';
-
-const Wrapper = styled.div`
-  width: 100%;
-  padding: 1rem;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-`;
-
-const HeaderCell = styled.th`
-  white-space: nowrap;
-  min-width: 5rem;
-`;
 
 interface Props {
   competition: FullCompetition;
@@ -33,16 +16,16 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
   const table = formatCompetitionEndTable(competition);
 
   return competitionHasEnded ? (
-    <Wrapper>
-      <Table>
+    <div className="w-full p-4">
+      <table className="w-full border-collapse text-center">
         <thead>
           <tr>
             <th>Lag</th>
             {competition.segments.map((segment) => (
-              <HeaderCell key={segment.id}>
+              <th className="min-w-20 whitespace-nowrap" key={segment.id}>
                 <SegmentIcon type={segment.type} />
                 {getShortSegmentName(segment)}
-              </HeaderCell>
+              </th>
             ))}
             <th>Totalt</th>
           </tr>
@@ -56,8 +39,8 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             <td>{row.totalScore}</td>
           </tr>
         ))}
-      </Table>
-    </Wrapper>
+      </table>
+    </div>
   ) : (
     <p>Spelet pågår ännu</p>
   );
