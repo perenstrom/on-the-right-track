@@ -5,6 +5,7 @@ import { Label, SubmitButton, CancelButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { BreadCrumb } from 'components/competitions/admin/BreadCrumb';
+import { EndGameDialog } from 'components/competitions/admin/EndGameDialog';
 import { PublishButton } from 'components/competitions/admin/PublishButton';
 import { StageController } from 'components/competitions/admin/StageController';
 import { getShortSegmentName } from 'helpers/copy';
@@ -259,7 +260,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
-  const [endGameModalOpen, setEndGameModalOpen] = useState(false);
   const handleEndGame = async () => {
     if (!gameIsOver) {
       const winnerTeamId = competition.teams.reduce(
@@ -271,12 +271,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       ).id;
 
       await setCompetitionWinner(competition.id, winnerTeamId);
-      setEndGameModalOpen(false);
     } else {
       await setCompetitionWinner(competition.id, null);
     }
 
-    setEndGameModalOpen(false);
     router.replace(router.asPath);
   };
 
@@ -298,26 +296,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 <Button onClick={() => setEditingTeam(null)}>Avbryt</Button>
               </ModalButtonWrapper>
             </form>
-          </ModalContentWrapper>
-        </ModalOverlay>
-      )}
-      {endGameModalOpen && (
-        <ModalOverlay>
-          <ModalContentWrapper>
-            <ModalHeading>{gameIsOver ? 'Öppna' : 'Avsluta'}</ModalHeading>
-            <div className="grow">
-              {gameIsOver
-                ? 'Är du säker på att du vill återöppna spelet och ta bort vinnare?'
-                : 'Är du säker på att du vill avsluta spelet och utse vinnare?'}
-            </div>
-            <ModalButtonWrapper>
-              <Button onClick={() => setEndGameModalOpen(false)}>
-                Nej, avbryt
-              </Button>
-              <SubmitButton onClick={handleEndGame}>
-                {gameIsOver ? 'Ja, öppna' : 'Ja, avsluta'}
-              </SubmitButton>
-            </ModalButtonWrapper>
           </ModalContentWrapper>
         </ModalOverlay>
       )}
@@ -360,15 +338,11 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               </PublishWrapper>
             )}
             {isLastStage && allPublished && (
-              <PublishWrapper>
-                <PublishButton
-                  variant={'active'}
-                  onClick={() => setEndGameModalOpen(true)}
-                  disabled={connectionState !== 'connected'}
-                >
-                  {gameIsOver ? 'Öppna' : 'Avsluta'}
-                </PublishButton>
-              </PublishWrapper>
+              <EndGameDialog
+                gameIsOver={gameIsOver}
+                connectionState={connectionState}
+                onEndGame={handleEndGame}
+              />
             )}
             {currentSegment?.type === 'TRIP' && !gameIsOver && (
               <StageController
