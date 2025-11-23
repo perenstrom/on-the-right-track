@@ -1,12 +1,7 @@
+import { Button } from '@/components/ui/button';
 import { Segment } from '@prisma/client';
-import { Button } from 'components/Button';
 import { ConnectionStatus } from 'components/ConnectionStatus';
-import {
-  Label,
-  Input,
-  SubmitButton,
-  CancelButton
-} from 'components/FormControls';
+import { Label, SubmitButton, CancelButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { BreadCrumb } from 'components/competitions/admin/BreadCrumb';
@@ -23,7 +18,6 @@ import { FormEventHandler, useCallback, useState } from 'react';
 import { ablyEvents } from 'services/ably/ably';
 import { PublishDeletedTeamSchema } from 'services/ably/client';
 import {
-  createTeam,
   deleteTeam,
   setCompetitionWinner,
   setCurrentLevel,
@@ -31,7 +25,7 @@ import {
   setScorePublished
 } from 'services/local';
 import { getCompetition } from 'services/prisma';
-import { FullCompetition, FullTeam, UncreatedTeam } from 'types/types';
+import { FullCompetition, FullTeam } from 'types/types';
 
 const ModalOverlay = ({
   className,
@@ -142,9 +136,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         : 'connecting'
       : 'connected';
 
-  const [addingTeam, setAddingTeam] = useState(false);
-  const [name, setName] = useState('');
-  const [members, setMembers] = useState('');
   const [displayAnswers, setDisplayAnswers] = useState(false);
 
   const currentSegment =
@@ -152,25 +143,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     competition.currentStage !== competition.segments.length + 1
       ? competition.segments[competition.currentStage - 1]
       : null;
-
-  const handleAddTeam: FormEventHandler = async (event) => {
-    event.preventDefault();
-    const newTeam: UncreatedTeam = {
-      name,
-      members,
-      competitionId: competition.id
-    };
-
-    await createTeam(newTeam);
-    setAddingTeam(false);
-    router.replace(router.asPath);
-  };
-
-  const resetAddTeam = () => {
-    setName(`Lag ${competition.teams.length + 1}`);
-    setMembers('');
-    setAddingTeam(false);
-  };
 
   const handleDeleteTeam: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -313,35 +285,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   return (
     <>
-      {addingTeam && (
-        <ModalOverlay>
-          <div className="h-100 w-120 rounded-lg bg-white px-12 py-8">
-            <ModalHeading>Lägg till lag</ModalHeading>
-            <form onSubmit={handleAddTeam}>
-              <Label htmlFor="name">Namn</Label>
-              <Input
-                type="text"
-                id="name"
-                name="name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-              <Label htmlFor="members">Medlemmar (ej obligatoriskt)</Label>
-              <Input
-                type="text"
-                id="members"
-                name="members"
-                value={members}
-                onChange={(event) => setMembers(event.target.value)}
-              />
-              <ModalButtonWrapper>
-                <SubmitButton type="submit">Spara</SubmitButton>
-                <Button onClick={() => resetAddTeam()}>Avbryt</Button>
-              </ModalButtonWrapper>
-            </form>
-          </div>
-        </ModalOverlay>
-      )}
       {editingTeam && (
         <ModalOverlay>
           <ModalContentWrapper>
@@ -475,10 +418,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             ))}
             {!gameIsOver && (
               <AddTeam
-                triggerAdd={() => {
-                  setName(`Lag ${competition.teams.length + 1}`);
-                  setAddingTeam(true);
-                }}
+                competitionId={competition.id}
                 connectionState={connectionStatus}
               />
             )}
