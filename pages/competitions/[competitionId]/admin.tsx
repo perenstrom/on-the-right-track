@@ -1,7 +1,5 @@
-import { Button } from '@/components/ui/button';
 import { Segment } from '@prisma/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
-import { Label, SubmitButton, CancelButton } from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { BreadCrumb } from 'components/competitions/admin/BreadCrumb';
@@ -15,11 +13,10 @@ import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { FormEventHandler, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ablyEvents } from 'services/ably/ably';
 import { PublishDeletedTeamSchema } from 'services/ably/client';
 import {
-  deleteTeam,
   setCompetitionWinner,
   setCurrentLevel,
   setCurrentStage,
@@ -28,45 +25,11 @@ import {
 import { getCompetition } from 'services/prisma';
 import { FullCompetition, FullTeam } from 'types/types';
 
-const ModalOverlay = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      'fixed top-0 left-0 z-100 flex h-full w-full content-center items-center bg-[hsla(0,0%,90%,70%)]',
-      className
-    )}
-    {...props}
-  />
-);
-
-const ModalHeading = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLHeadingElement>) => (
-  <h2 className={cn('mt-0', className)} {...props} />
-);
-
 const PublishWrapper = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('w-full p-4', className)} {...props} />
-);
-
-const ModalContentWrapper = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col justify-between', className)} {...props} />
-);
-
-const ModalButtonWrapper = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex gap-4', className)} {...props} />
 );
 
 interface Props {
@@ -144,15 +107,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     competition.currentStage !== competition.segments.length + 1
       ? competition.segments[competition.currentStage - 1]
       : null;
-
-  const handleDeleteTeam: FormEventHandler = async (event) => {
-    event.preventDefault();
-    if (!editingTeam) {
-      return;
-    }
-
-    await deleteTeam(editingTeam);
-  };
 
   const [segmentIsLoading, setSegmentIsLoading] = useState(false);
   const handleChangeState = async (direction: 'next' | 'prev') => {
@@ -278,27 +232,8 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
-  const getTeamName = (teamId: string) =>
-    competition.teams.find((team) => team.id === teamId)?.name || '';
-
   return (
     <>
-      {editingTeam && (
-        <ModalOverlay>
-          <ModalContentWrapper>
-            <div>
-              <ModalHeading>Ta bort lag</ModalHeading>
-              <p>{`Vill du ta bort "${getTeamName(editingTeam)}"?`}</p>
-            </div>
-            <form onSubmit={handleDeleteTeam}>
-              <ModalButtonWrapper>
-                <CancelButton type="submit">Ta bort</CancelButton>
-                <Button onClick={() => setEditingTeam(null)}>Avbryt</Button>
-              </ModalButtonWrapper>
-            </form>
-          </ModalContentWrapper>
-        </ModalOverlay>
-      )}
       <div className="flex h-full flex-col">
         <ConnectionStatus state={connectionStatus} />
         <BreadCrumb

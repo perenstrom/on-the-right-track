@@ -25,7 +25,7 @@ const buttonColors: Record<
 export const ScoreButton = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLButtonElement> & ScoreButtonProps) => (
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & ScoreButtonProps) => (
   <button
     className={cn(
       'flex-1 rounded-sm border border-solid px-4 py-0',

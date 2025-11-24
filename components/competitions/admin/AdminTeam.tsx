@@ -2,12 +2,24 @@ import { Segment, TeamState } from '@prisma/client';
 import { getTeamStateColorTW, getTeamStateTextColorTW } from 'helpers/styling';
 import { FullTeam } from 'types/types';
 import { ScoreButton } from './ScoreButton';
-import { patchTeamSegmentState } from 'services/local';
+import { deleteTeam, patchTeamSegmentState } from 'services/local';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { MouseEventHandler } from 'react';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { FormEventHandler, MouseEventHandler } from 'react';
 import { cn } from 'helpers/tailwindUtils';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 const EditButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
@@ -31,6 +43,11 @@ export const AdminTeam: React.FC<{
   displayAnswers,
   handleEditTeam
 }) => {
+  const handleDeleteTeam: FormEventHandler = async (event) => {
+    event.preventDefault();
+
+    await deleteTeam(team.id);
+  };
   const currentSegmentTeamState = team.segmentTeamStates.find(
     (segmentTeamState) => segmentTeamState.segmentId === currentSegment?.id
   );
@@ -113,12 +130,29 @@ export const AdminTeam: React.FC<{
               </EditButton>
             )}
           {!currentSegment && team.segmentTeamStates.length === 0 && (
-            <EditButton
-              onClick={() => handleEditTeam(team.id)}
-              disabled={connectionState !== 'connected'}
-            >
-              <FontAwesomeIcon icon={faTrash} />
-            </EditButton>
+            <Dialog>
+              <DialogTrigger asChild>
+                <EditButton disabled={connectionState !== 'connected'}>
+                  <Trash2 />
+                </EditButton>
+              </DialogTrigger>
+              <DialogContent>
+                <form onSubmit={handleDeleteTeam} className="contents">
+                  <DialogHeader>
+                    <DialogTitle className="m-0">Ta bort lag</DialogTitle>
+                    <DialogDescription>
+                      {`Vill du ta bort "${team.name}"?`}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Avbryt</Button>
+                    </DialogClose>
+                    <Button type="submit">Ta bort</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
         {currentState === 'STOPPED' && !displayAnswers && (
