@@ -1,6 +1,12 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPause } from '@fortawesome/free-solid-svg-icons';
 import { cn } from 'helpers/tailwindUtils';
+import { ButtonGroup } from '@/components/ui/button-group';
+import { Button } from '@/components/ui/button';
+import {
+  ArrowLeft,
+  ArrowRight,
+  FlagTriangleRight,
+  PauseIcon
+} from 'lucide-react';
 
 const buttonClasses = cn(
   'border-t-solid flex-1 border-t border-black bg-transparent text-2xl',
@@ -30,47 +36,63 @@ export const StageController: React.FC<{
 }) => {
   const prevContent =
     previousStage === 'start' ? (
-      <FontAwesomeIcon icon={faPause} />
+      <>
+        <ArrowLeft /> <PauseIcon />
+      </>
     ) : !previousStage ? (
-      '< '
+      <ArrowLeft />
     ) : (
-      `< ${previousStage}`
+      <>
+        <ArrowLeft />
+        {previousStage}
+      </>
     );
 
   const nextContent =
     nextStage === 'end' ? (
-      <FontAwesomeIcon icon={faPause} />
+      <>
+        <FlagTriangleRight /> <ArrowRight />
+      </>
     ) : !nextStage ? (
-      '> '
+      <ArrowRight />
     ) : (
-      `${nextStage} >`
+      <>
+        {nextStage}
+        <ArrowRight />
+      </>
     );
 
   return (
-    <div className="border-y-solid mb-4 flex w-full flex-col items-center border-y-2 border-y-black bg-white">
+    <div className="mb-2 flex w-full flex-col items-center rounded-none border-y border-black bg-white">
       <h3 className="m-0 pt-2 text-2xl">{heading}</h3>
       <span className="mb-2 text-[4rem] leading-none font-medium">
         {currentStage}
       </span>
       <div className="flex w-full content-between">
-        <button
-          className={buttonClasses}
-          type="button"
-          onClick={() => previous()}
-          disabled={
-            !previousStage || connectionState !== 'connected' || isLoading
-          }
-        >
-          {prevContent}
-        </button>
-        <button
-          className={buttonClasses}
-          type="button"
-          onClick={() => next()}
-          disabled={!nextStage || connectionState !== 'connected' || isLoading}
-        >
-          {nextContent}
-        </button>
+        <ButtonGroup className="w-full justify-center p-1">
+          <Button
+            variant="outline"
+            className="flex-1 grow border-zinc-900 text-lg"
+            onClick={() => previous()}
+            size="lg"
+            disabled={
+              !previousStage || connectionState !== 'connected' || isLoading
+            }
+          >
+            {prevContent}
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 grow border-zinc-900 text-lg"
+            onClick={() => next()}
+            size="lg"
+            disabled={
+              !nextStage || connectionState !== 'connected' || isLoading
+            }
+          >
+            {nextContent}
+          </Button>
+        </ButtonGroup>
       </div>
     </div>
   );

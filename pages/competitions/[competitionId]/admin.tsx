@@ -174,7 +174,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   const previousLevel =
     competition.currentLevel === 10
-      ? 'N/A'
+      ? 'P'
       : !competition.currentLevel
         ? undefined
         : (competition.currentLevel + 2).toString();
@@ -249,7 +249,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           goToSegment={goToSegment}
         />
         <div className="flex flex-1">
-          <div className="flex flex-[0_0_12rem] flex-col items-center justify-center border-r border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
+          <div className="flex flex-[0_0_12rem] flex-col items-center justify-end border-r border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
             {currentSegment?.scorePublished && (
               <PublishWrapper>
                 <PublishButton
@@ -284,7 +284,7 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 heading="Nivå"
                 previous={() => handleChangeLevel('prev')}
                 next={() => handleChangeLevel('next')}
-                currentStage={competition.currentLevel?.toString() || 'N/A'}
+                currentStage={competition.currentLevel?.toString() || 'P'}
                 previousStage={previousLevel}
                 nextStage={nextLevel}
                 connectionState={connectionStatus}
