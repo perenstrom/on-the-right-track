@@ -1,12 +1,13 @@
 import { Segment } from '@prisma/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
 import { ScoreTeam } from 'components/competitions/ScoreTeam';
+import ConfettiRain from 'components/competitions/ConfettiRain';
 import { useAblyClientChannel } from 'hooks/useAblyClientChannel';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getScoreCompetition } from 'services/prisma';
 import { ScoreCompetition, ScoreTeam as ScoreTeamType } from 'types/types';
 
@@ -62,20 +63,40 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     ? competition.segments[competition.currentStage - 1]
     : null;
 
+  const winnerTeamId = competition.winnerTeamId;
+  const winnerCardRef = useRef<HTMLDivElement>(null);
+  const [winnerElement, setWinnerElement] = useState<HTMLElement | null>(null);
+
+  // Update winner element reference when winner changes
+  useEffect(() => {
+    if (winnerCardRef.current) {
+      setWinnerElement(winnerCardRef.current);
+    }
+  }, [winnerTeamId]);
+
   return (
     <>
       <div className="flex h-full flex-col">
         <ConnectionStatus state={connectionStatus} />
-        <div className="flex flex-1">
-          <div className="grid flex-1 grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] gap-4 p-4">
-            {competition.teams.map((team) => (
-              <ScoreTeam
-                key={team.id}
-                team={team}
-                currentSegment={currentSegment}
-                score={calculateScore(team, competition.segments)}
-              />
-            ))}
+        <div className="relative flex flex-1">
+          <ConfettiRain
+            isActive={!!winnerTeamId}
+            sourceElement={winnerElement}
+          />
+          <div className="relative z-10 grid flex-1 grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] gap-4 p-4">
+            {competition.teams.map((team) => {
+              const isWinner = competition.winnerTeamId === team.id;
+              return (
+                <ScoreTeam
+                  key={team.id}
+                  ref={isWinner ? winnerCardRef : null}
+                  team={team}
+                  currentSegment={currentSegment}
+                  score={calculateScore(team, competition.segments)}
+                  isWinner={isWinner}
+                />
+              );
+            })}
           </div>
         </div>
       </div>

@@ -14,6 +14,9 @@ import { Optional, WithRequired } from 'types/utils';
 
 export const getCompetitions = async (ctx: Context): Promise<Competition[]> => {
   const result = await ctx.prisma.competition.findMany({
+    include: {
+      winnerTeam: true
+    },
     orderBy: [
       {
         date: 'desc'

@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prismaContext } from 'lib/prisma';
 import { createTeam } from 'services/prisma';
 import { CreateTeamSchema } from 'schemas/zod/schema';
+import { publishNewTeam as publishNewTeamClient } from 'services/ably/client';
+import { publishNewTeam as publishNewTeamAdmin } from 'services/ably/admin';
 
 const teams = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -14,6 +16,12 @@ const teams = async (req: NextApiRequest, res: NextApiResponse) => {
     } else {
       try {
         const team = await createTeam(prismaContext, parsedTeam.data);
+
+        await Promise.all([
+          publishNewTeamClient(parsedTeam.data.competitionId, team),
+          publishNewTeamAdmin(parsedTeam.data.competitionId, team)
+        ]);
+
         res.status(200).json(team);
         return;
       } catch (error) {
