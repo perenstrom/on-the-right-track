@@ -43,6 +43,7 @@ const TripHeading = ({
       variant === 'stopped' ? 'bg-[hsl(18,95%,40%)]' : 'bg-[hsl(11,74%,77%)]',
       className
     )}
+    {...props}
   />
 );
 
