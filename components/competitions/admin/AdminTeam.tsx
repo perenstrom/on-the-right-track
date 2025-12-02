@@ -6,7 +6,12 @@ import { deleteTeam, patchTeamSegmentState } from 'services/local';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import { FormEventHandler, MouseEventHandler } from 'react';
+import {
+  FormEventHandler,
+  MouseEventHandler,
+  useEffect,
+  useState
+} from 'react';
 import { cn } from 'helpers/tailwindUtils';
 import {
   Dialog,
@@ -19,7 +24,14 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { CheckIcon, Trash2, XIcon } from 'lucide-react';
 
 const EditButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
@@ -92,6 +104,41 @@ export const AdminTeam: React.FC<{
     );
 
     router.replace(router.asPath);
+  };
+
+  const [isEditingLevel, setIsEditingLevel] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<string>(
+    currentSegmentTeamState?.stopLevel?.toString() || ''
+  );
+
+  const handleLevelChange = async (level: string) => {
+    if (!currentSegmentTeamState || !currentSegment) return;
+
+    const levelNumber = level === '' ? null : parseInt(level, 10);
+    await patchTeamSegmentState(
+      currentSegment.competitionId,
+      currentSegmentTeamState.id,
+      {
+        stopLevel: levelNumber
+      }
+    );
+
+    setIsEditingLevel(false);
+    router.replace(router.asPath);
+  };
+
+  const handleStartEditLevel = () => {
+    setSelectedLevel(currentSegmentTeamState?.stopLevel?.toString() || '');
+    setIsEditingLevel(true);
+  };
+
+  const handleCancelEditLevel = () => {
+    setIsEditingLevel(false);
+    setSelectedLevel(currentSegmentTeamState?.stopLevel?.toString() || '');
+  };
+
+  const handleConfirmLevelChange = () => {
+    handleLevelChange(selectedLevel);
   };
 
   return (
@@ -181,31 +228,77 @@ export const AdminTeam: React.FC<{
               ))}
             </ol>
             {!displayAnswers && (
-              <div className="flex w-full gap-2">
-                {currentSegment?.type === 'TRIP' && (
-                  <>
-                    <ScoreButton
-                      $variant="wrong"
-                      onClick={() => handleScoring(0)}
-                      disabled={connectionState !== 'connected'}
-                    >
-                      Fel 0p
-                    </ScoreButton>
-                    <ScoreButton
-                      $variant="correct"
-                      onClick={() =>
-                        handleScoring(currentSegmentTeamState?.stopLevel || 0)
-                      }
-                      disabled={connectionState !== 'connected'}
-                    >
-                      {`Rätt ${currentSegmentTeamState?.stopLevel}p`}
-                    </ScoreButton>
-                  </>
-                )}
+              <div className="flex w-full flex-col gap-2">
+                {currentSegment?.type === 'TRIP' &&
+                  (currentState === 'STOPPED_ANSWERED' ||
+                    currentState === 'STOPPED_HANDLED') &&
+                  (isEditingLevel ? (
+                    <div className="flex w-full items-center gap-2">
+                      <Select
+                        value={selectedLevel}
+                        onValueChange={setSelectedLevel}
+                        disabled={connectionState !== 'connected'}
+                      >
+                        <SelectTrigger className="h-9 flex-1 rounded-sm border border-[hsl(0_0%_15%)] bg-[hsl(0_0%_100%)] text-[hsl(0_0%_15%)] hover:bg-[hsl(0_0%_95%)] disabled:cursor-not-allowed disabled:opacity-50">
+                          <SelectValue placeholder="Välj nivå" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="2">Stoppnivå: 2</SelectItem>
+                          <SelectItem value="4">Stoppnivå: 4</SelectItem>
+                          <SelectItem value="6">Stoppnivå: 6</SelectItem>
+                          <SelectItem value="8">Stoppnivå: 8</SelectItem>
+                          <SelectItem value="10">Stoppnivå: 10</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <button
+                        onClick={handleConfirmLevelChange}
+                        disabled={connectionState !== 'connected'}
+                        className="flex h-9 w-9 items-center justify-center rounded-sm border border-[hsl(116_46%_30%)] bg-[hsl(116_46%_55%)] text-[hsl(0_0%_15%)] hover:bg-[hsl(116_46%_50%)] disabled:cursor-not-allowed disabled:opacity-50"
+                        type="button"
+                      >
+                        <CheckIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={handleCancelEditLevel}
+                        disabled={connectionState !== 'connected'}
+                        className="flex h-9 w-9 items-center justify-center rounded-sm border border-[hsl(0_0%_15%)] bg-[hsl(0_0%_100%)] text-[hsl(0_0%_15%)] hover:bg-[hsl(0_0%_95%)] disabled:cursor-not-allowed disabled:opacity-50"
+                        type="button"
+                      >
+                        <XIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex w-full gap-2">
+                      <ScoreButton
+                        $variant="wrong"
+                        onClick={() => handleScoring(0)}
+                        disabled={connectionState !== 'connected'}
+                      >
+                        Fel 0p
+                      </ScoreButton>
+                      <ScoreButton
+                        $variant="correct"
+                        onClick={() =>
+                          handleScoring(currentSegmentTeamState?.stopLevel || 0)
+                        }
+                        disabled={connectionState !== 'connected'}
+                      >
+                        {`Rätt ${currentSegmentTeamState?.stopLevel || 0}p`}
+                      </ScoreButton>
+                      <button
+                        onClick={handleStartEditLevel}
+                        disabled={connectionState !== 'connected'}
+                        className="flex h-9 w-9 items-center justify-center rounded-sm border border-[hsl(0_0%_15%)] bg-[hsl(0_0%_100%)] text-[hsl(0_0%_15%)] hover:bg-[hsl(0_0%_95%)] disabled:cursor-not-allowed disabled:opacity-50"
+                        type="button"
+                      >
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                    </div>
+                  ))}
                 {(currentSegment?.type === 'MUSIC' ||
                   currentSegment?.type === 'QUESTION' ||
                   currentSegment?.type === 'SPECIAL') && (
-                  <>
+                  <div className="flex w-full gap-2">
                     <ScoreButton
                       $variant="wrong"
                       onClick={() => handleScoring(0)}
@@ -234,7 +327,7 @@ export const AdminTeam: React.FC<{
                     >
                       3p
                     </ScoreButton>
-                  </>
+                  </div>
                 )}
               </div>
             )}
