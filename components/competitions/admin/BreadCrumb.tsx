@@ -59,7 +59,7 @@ const SegmentPart = ({
   <div
     className={cn(
       segmentPartClassNames,
-      gameIsOver ? 'cursor-default' : 'cursor-pointer',
+      'cursor-pointer',
       segmentBackgroundClassNames(current, scoresPublished),
       className
     )}
@@ -125,7 +125,7 @@ export const BreadCrumb: React.FC<{
           current={currentSegment === 'start'}
           scoresPublished={true}
           gameIsOver={gameIsOver}
-          onClick={() => !gameIsOver && goToSegment(null)}
+          onClick={() => goToSegment(null)}
         >
           <FontAwesomeIcon icon={faPause} style={{ minWidth: '1.5rem' }} />
         </FirstSegmentPart>
@@ -137,7 +137,7 @@ export const BreadCrumb: React.FC<{
             current={currentSegment === segment.id}
             scoresPublished={segment.scorePublished}
             gameIsOver={gameIsOver}
-            onClick={() => !gameIsOver && goToSegment(stageIndex + 1)}
+            onClick={() => goToSegment(stageIndex + 1)}
           >
             <SegmentIcon type={segment.type} />
             {getShortSegmentName(segment)}
@@ -150,7 +150,7 @@ export const BreadCrumb: React.FC<{
           current={currentSegment === 'end'}
           scoresPublished={false}
           gameIsOver={gameIsOver}
-          onClick={() => !gameIsOver && goToSegment(segments.length + 1)}
+          onClick={() => goToSegment(segments.length + 1)}
         >
           <FontAwesomeIcon
             icon={faFlagCheckered}
