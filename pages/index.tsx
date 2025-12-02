@@ -1,21 +1,9 @@
 import { GetServerSideProps, NextPage } from 'next';
-import styled from 'styled-components';
 import { Wrapper } from 'components/Wrapper';
 import { prismaContext } from 'lib/prisma';
 import { getCompetitions } from 'services/prisma';
 import { Competition } from 'types/types';
 import Link from 'next/link';
-
-const Quote = styled.blockquote`
-  text-align: right;
-  font-style: italic;
-  font-size: 0.75rem;
-  color: hsl(0 0% 50%);
-`;
-
-const Add = styled.p`
-  margin-top: 1rem;
-`;
 
 interface Props {
   competitions: Competition[];
@@ -34,7 +22,9 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
         Det är en hedersbetygelse som de flesta deltagare strävar efter och som
         bevisar att de är bland de mest kunniga och skickliga i världen.
       </p>
-      <Quote>– ChatGPT, 2023</Quote>
+      <blockquote className="font-italic text-right text-xs text-[hsl(0,0%,50%)]">
+        – ChatGPT, 2023
+      </blockquote>
 
       <h2>Tävlingar</h2>
       {competitions.length > 0 ? (
@@ -52,9 +42,9 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
           <i>Det finns inga tävlingar just nu.</i>
         </p>
       )}
-      <Add>
+      <p className="mt-4">
         <Link href="/create">Skapa tävling</Link>
-      </Add>
+      </p>
     </Wrapper>
   );
 };

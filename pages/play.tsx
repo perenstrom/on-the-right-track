@@ -3,14 +3,6 @@ import { Wrapper } from 'components/Wrapper';
 import { prismaContext } from 'lib/prisma';
 import { getCompetitions } from 'services/prisma';
 import { Competition } from 'types/types';
-import styled from 'styled-components';
-
-const Quote = styled.blockquote`
-  text-align: right;
-  font-style: italic;
-  font-size: 0.75rem;
-  color: hsl(0 0% 50%);
-`;
 
 interface Props {
   competitions: Competition[];
@@ -30,7 +22,9 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
         Det är en hedersbetygelse som de flesta deltagare strävar efter och som
         bevisar att de är bland de mest kunniga och skickliga i världen.
       </p>
-      <Quote>– ChatGPT, 2023</Quote>
+      <blockquote className="font-italic text-right text-xs text-[hsl(0,0%,50%)]">
+        – ChatGPT, 2023
+      </blockquote>
       {competitions.length > 0 ? (
         <ul>
           {competitions.map((competition) => (

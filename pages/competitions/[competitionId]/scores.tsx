@@ -8,29 +8,7 @@ import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { useCallback, useState } from 'react';
 import { getScoreCompetition } from 'services/prisma';
-import styled from 'styled-components';
 import { ScoreCompetition, ScoreTeam as ScoreTeamType } from 'types/types';
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`;
-
-const Bottom = styled.div`
-  flex: 1;
-  display: flex;
-`;
-
-const Main = styled.div`
-  flex: 1;
-
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 1rem;
-  padding: 1rem;
-`;
 
 interface Props {
   competition: ScoreCompetition;
@@ -86,10 +64,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   return (
     <>
-      <Wrapper>
+      <div className="flex h-full flex-col">
         <ConnectionStatus state={connectionStatus} />
-        <Bottom>
-          <Main>
+        <div className="flex flex-1">
+          <div className="grid flex-1 grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] gap-4 p-4">
             {competition.teams.map((team) => (
               <ScoreTeam
                 key={team.id}
@@ -98,9 +76,9 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 score={calculateScore(team, competition.segments)}
               />
             ))}
-          </Main>
-        </Bottom>
-      </Wrapper>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

@@ -7,119 +7,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getFullSegmentName } from 'helpers/copy';
 import { MouseEventHandler } from 'react';
-import styled from 'styled-components';
 import { UncreatedSegment } from 'types/types';
+import { Item, ItemActions, ItemContent, ItemMedia } from '../ui/item';
+import { ArrowDown, ArrowUp, Minus, Plus, Trash2 } from 'lucide-react';
+import { ButtonGroup, ButtonGroupText } from '../ui/button-group';
+import { Button } from '../ui/button';
 
-const Wrapper = styled.div`
-  width: 22rem;
-  height: 3rem;
-  border: 1px solid black;
-  border-radius: 4px;
-  background-color: #d9d9d9;
-  font-weight: 500;
+const OptionsButtonClassNames = 'h-full border-none bg-transparent flex-1';
 
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
-const QuestionName = styled.span`
-  padding: 0.5rem;
-  display: block;
-  flex-grow: 1;
-`;
-
-const OptionsWrapper = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 0 0.5rem;
-  border-left: 1px solid black;
-`;
-
-const OptionsHeading = styled.div`
-  line-height: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  flex: 0 0 50%;
-`;
-
-const OptionsControls = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  line-height: 0;
-
-  flex: 0 0 50%;
-
-  button {
-    height: 100%;
-    border: 0;
-    background-color: transparent;
-
-    flex: 1;
-  }
-
-  div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    flex: 1;
-  }
-`;
-
-const OrderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  line-height: 0;
-  height: 100%;
-
-  border-left: 1px solid black;
-
-  button {
-    border: 0;
-    background-color: transparent;
-    flex-grow: 1;
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
-  }
-
-  button:first-child {
-    border-bottom: 1px solid black;
-  }
-
-  button:hover {
-    background-color: #bfbfbf;
-  }
-
-  button:disabled {
-    color: #999999;
-  }
-
-  button:disabled:hover {
-    background-color: transparent;
-  }
-`;
-
-const DeleteButton = styled.button`
-  border: 0;
-  background-color: transparent;
-  height: 100%;
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
-
-  border-left: 1px solid black;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-
-  &:hover {
-    background-color: #bfbfbf;
-  }
-`;
+const OrderButtonClassNames =
+  'border-none bg-transparent grow px-[0.4rem] first:border-b first:border-black disabled:text-[#999999] disabled:hover:bg-transparent hover:bg-[#bfbfbf]';
 
 export const Segment: React.FC<{
   segment: UncreatedSegment;
@@ -141,50 +38,73 @@ export const Segment: React.FC<{
   };
 
   return (
-    <Wrapper>
-      <QuestionName>
+    <Item variant="outline">
+      <ItemMedia>
         <SegmentIcon type={segment.type} />
+      </ItemMedia>
+      <ItemContent className="text-md">
         {getFullSegmentName(segment)}
-      </QuestionName>
-      {(segment.type === 'QUESTION' || segment.type === 'MUSIC') && (
-        <OptionsWrapper>
-          <OptionsHeading>Delsvar</OptionsHeading>
-          <OptionsControls>
-            <button
-              type="button"
-              onClick={() =>
-                handleOptionsChange((segment.numberOfOptions ?? 0) - 1)
-              }
-            >
-              -
-            </button>
-            <div>{segment.numberOfOptions}</div>
-            <button
-              type="button"
-              onClick={() =>
-                handleOptionsChange((segment.numberOfOptions ?? 0) + 1)
-              }
-            >
-              +
-            </button>
-          </OptionsControls>
-        </OptionsWrapper>
-      )}
-      <OrderWrapper>
-        <button type="button" disabled={segment.order === 1} onClick={moveUp}>
-          <FontAwesomeIcon icon={faArrowUp} />
-        </button>
-        <button
+      </ItemContent>
+      <ItemActions className="flex-wrap">
+        {(segment.type === 'QUESTION' || segment.type === 'MUSIC') && (
+          <>
+            <ButtonGroup>
+              <ButtonGroupText>
+                {segment.numberOfOptions} delfrågor
+              </ButtonGroupText>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() =>
+                  handleOptionsChange((segment.numberOfOptions ?? 0) - 1)
+                }
+                disabled={segment.numberOfOptions === 1}
+              >
+                <Minus />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() =>
+                  handleOptionsChange((segment.numberOfOptions ?? 0) + 1)
+                }
+              >
+                <Plus />
+              </Button>
+            </ButtonGroup>
+          </>
+        )}
+        <ButtonGroup>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={moveUp}
+            disabled={segment.order === 1}
+          >
+            <ArrowUp />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={moveDown}
+            disabled={segment.order === totalSegments}
+          >
+            <ArrowDown />
+          </Button>
+        </ButtonGroup>
+        <Button
           type="button"
-          disabled={segment.order === totalSegments}
-          onClick={moveDown}
+          variant="outline"
+          size="icon"
+          onClick={deleteSegment}
         >
-          <FontAwesomeIcon icon={faArrowDown} />
-        </button>
-      </OrderWrapper>
-      <DeleteButton type="button" onClick={deleteSegment}>
-        <FontAwesomeIcon icon={faTrashCan} />
-      </DeleteButton>
-    </Wrapper>
+          <Trash2 />
+        </Button>
+      </ItemActions>
+    </Item>
   );
 };

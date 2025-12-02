@@ -6,32 +6,34 @@ import { publishNewWinner } from 'services/ably/client';
 
 const setWinner = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    return new Promise((resolve) => {
-      const parsedBody = SetWinnerSchema.safeParse(req.body);
-      const parsedQuery = CompetitionIdSchema.safeParse(req.query);
+    const parsedBody = SetWinnerSchema.safeParse(req.body);
+    const parsedQuery = CompetitionIdSchema.safeParse(req.query);
 
-      if (!parsedBody.success || !parsedQuery.success) {
-        console.log(parsedBody);
-        console.log(parsedQuery);
-        res.status(400).end('Action data malformed');
-        resolve('');
-      } else {
-        const { winner } = parsedBody.data;
-        const { competitionId } = parsedQuery.data;
+    if (!parsedBody.success || !parsedQuery.success) {
+      console.log(parsedBody);
+      console.log(parsedQuery);
+      res.status(400).end('Action data malformed');
+      return;
+    } else {
+      const { winner } = parsedBody.data;
+      const { competitionId } = parsedQuery.data;
 
-        setCompetitionWinner(prismaContext, competitionId, winner)
-          .then(async (competition) => {
-            await publishNewWinner(competitionId, winner);
-            res.status(200).json(competition);
-            resolve('');
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).end('Unexpected internal server error');
-            resolve('');
-          });
+      try {
+        const competition = await setCompetitionWinner(
+          prismaContext,
+          competitionId,
+          winner
+        );
+
+        await publishNewWinner(competitionId, winner);
+        res.status(200).json(competition);
+        return;
+      } catch (error) {
+        console.log(error);
+        res.status(500).end('Unexpected internal server error');
+        return;
       }
-    });
+    }
   } else {
     res.status(404).end();
   }

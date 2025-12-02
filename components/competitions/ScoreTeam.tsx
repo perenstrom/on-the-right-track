@@ -1,72 +1,33 @@
 import { Segment, SegmentType, TeamState } from '@prisma/client';
 import {
-  getScoreTeamStateColor,
-  getScoreTeamStateTextColor
+  getScoreTeamStateColorTW,
+  getScoreTeamStateTextColorTW
 } from 'helpers/styling';
-import styled from 'styled-components';
+import { cn } from 'helpers/tailwindUtils';
 import { ScoreTeam as ScoreTeamType } from 'types/types';
 
-interface WrapperProps {
-  readonly state: TeamState;
-  readonly scoresPublished: boolean;
-  readonly score: number | null;
-  readonly segmentType: SegmentType;
-}
-const Wrapper = styled.div<WrapperProps>`
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  color: ${({ state, scoresPublished }) =>
-    getScoreTeamStateTextColor({ state, scoresPublished })};
-  background: ${({ state, scoresPublished, score, segmentType }) => {
-    const options = scoresPublished
-      ? { scoresPublished, score, segmentType }
-      : {
-          scoresPublished,
-          state
-        };
-    return getScoreTeamStateColor(options);
-  }};
-  border: none;
-  border-radius: 10px;
-  padding: 0.8rem 1rem 1rem;
-  min-width: 0;
+const commonClasses =
+  'm-0 block max-w-full overflow-hidden text-center leading-normal text-ellipsis whitespace-nowrap';
 
-  > h2,
-  > div > span {
-    line-height: normal;
-    display: block;
-    margin: 0;
-    text-align: center;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+const getWrapperBgClassName = (
+  state: TeamState,
+  scoresPublished: boolean,
+  score: number | null,
+  segmentType: SegmentType
+) => {
+  const options = scoresPublished
+    ? {
+        scoresPublished,
+        score,
+        segmentType
+      }
+    : {
+        scoresPublished,
+        state
+      };
 
-  > h2 {
-    font-size: 1.5rem;
-  }
-`;
-
-const Score = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 6rem;
-  line-height: 0;
-  font-weight: 500;
-`;
-
-const RelativeFlex = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-`;
+  return getScoreTeamStateColorTW(options);
+};
 
 export const ScoreTeam: React.FC<{
   team: ScoreTeamType;
@@ -82,19 +43,28 @@ export const ScoreTeam: React.FC<{
     : 'IDLE';
 
   return (
-    <Wrapper
-      state={currentState}
-      score={currentSegmentTeamState?.score || null}
-      scoresPublished={currentSegment?.scorePublished || false}
-      segmentType={currentSegment?.type || 'QUESTION'}
+    <div
+      className={cn(
+        'relative flex min-w-0 flex-col overflow-hidden rounded-lg border-none p-4 pt-[0.8rem]',
+        getScoreTeamStateTextColorTW({
+          state: currentState,
+          scoresPublished: currentSegment?.scorePublished || false
+        }),
+        getWrapperBgClassName(
+          currentState,
+          currentSegment?.scorePublished || false,
+          currentSegmentTeamState?.score || null,
+          currentSegment?.type || 'QUESTION'
+        )
+      )}
     >
-      <h2>{team.name}</h2>
-      <RelativeFlex>
-        <span>{team.members}</span>
-        <Score>
+      <h2 className={cn(commonClasses, 'text-2xl')}>{team.name}</h2>
+      <div className="relative flex flex-1 flex-col items-center">
+        <span className={commonClasses}>{team.members}</span>
+        <div className="flex flex-1 content-center items-center text-8xl leading-none font-medium">
           <>{score}</>
-        </Score>
-      </RelativeFlex>
-    </Wrapper>
+        </div>
+      </div>
+    </div>
   );
 };

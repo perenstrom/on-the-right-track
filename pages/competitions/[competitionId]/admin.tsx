@@ -1,115 +1,36 @@
 import { Segment } from '@prisma/client';
-import { Button } from 'components/Button';
 import { ConnectionStatus } from 'components/ConnectionStatus';
-import {
-  Label,
-  Input,
-  SubmitButton,
-  CancelButton
-} from 'components/FormControls';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
 import { AdminTeam } from 'components/competitions/admin/AdminTeam';
 import { BreadCrumb } from 'components/competitions/admin/BreadCrumb';
+import { EndGameDialog } from 'components/competitions/admin/EndGameDialog';
 import { PublishButton } from 'components/competitions/admin/PublishButton';
 import { StageController } from 'components/competitions/admin/StageController';
 import { getShortSegmentName } from 'helpers/copy';
+import { cn } from 'helpers/tailwindUtils';
 import { useAblyAdminChannel } from 'hooks/useAblyAdminChannel';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import { FormEventHandler, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ablyEvents } from 'services/ably/ably';
 import { PublishDeletedTeamSchema } from 'services/ably/client';
 import {
-  createTeam,
-  deleteTeam,
   setCompetitionWinner,
   setCurrentLevel,
   setCurrentStage,
   setScorePublished
 } from 'services/local';
 import { getCompetition } from 'services/prisma';
-import styled from 'styled-components';
-import { FullCompetition, FullTeam, UncreatedTeam } from 'types/types';
+import { FullCompetition, FullTeam } from 'types/types';
 
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: hsla(0, 0%, 90%, 70%);
-  z-index: 100;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  > div {
-    background-color: white;
-    padding: 2rem 3rem;
-    border-radius: 10px;
-    width: 30rem;
-    height: 25rem;
-
-    h2 {
-      margin-top: 0;
-    }
-  }
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`;
-
-const Bottom = styled.div`
-  flex: 1;
-  display: flex;
-`;
-
-const Main = styled.div`
-  flex: 1;
-
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 1rem;
-  padding: 1rem;
-`;
-
-const ControlBar = styled.div`
-  background-color: hsl(0, 0%, 85%);
-  border-right: 1px solid hsl(0, 0%, 0%);
-  flex: 0 0 12rem;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-`;
-
-const PublishWrapper = styled.div`
-  width: 100%;
-  padding: 1rem;
-`;
-
-const ModalContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-
-const ModalContent = styled.div`
-  flex-grow: 1;
-`;
-
-const ModalButtonWrapper = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
+const PublishWrapper = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn('w-full p-4', className)} {...props} />
+);
 
 interface Props {
   competition: FullCompetition;
@@ -179,9 +100,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         : 'connecting'
       : 'connected';
 
-  const [addingTeam, setAddingTeam] = useState(false);
-  const [name, setName] = useState(`Lag ${competition.teams.length + 1}`);
-  const [members, setMembers] = useState('');
   const [displayAnswers, setDisplayAnswers] = useState(false);
 
   const currentSegment =
@@ -189,34 +107,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     competition.currentStage !== competition.segments.length + 1
       ? competition.segments[competition.currentStage - 1]
       : null;
-
-  const handleAddTeam: FormEventHandler = async (event) => {
-    event.preventDefault();
-    const newTeam: UncreatedTeam = {
-      name,
-      members,
-      competitionId: competition.id
-    };
-
-    await createTeam(newTeam);
-    setAddingTeam(false);
-    router.replace(router.asPath);
-  };
-
-  const resetAddTeam = () => {
-    setName(`Lag ${competition.teams.length + 1}`);
-    setMembers('');
-    setAddingTeam(false);
-  };
-
-  const handleDeleteTeam: FormEventHandler = async (event) => {
-    event.preventDefault();
-    if (!editingTeam) {
-      return;
-    }
-
-    await deleteTeam(editingTeam);
-  };
 
   const [segmentIsLoading, setSegmentIsLoading] = useState(false);
   const handleChangeState = async (direction: 'next' | 'prev') => {
@@ -249,16 +139,18 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     competition.currentStage === 1
       ? 'start'
       : competition.currentStage && competition.currentStage > 1
-      ? getShortSegmentName(competition.segments[competition.currentStage - 2])
-      : undefined;
+        ? getShortSegmentName(
+            competition.segments[competition.currentStage - 2]
+          )
+        : undefined;
 
   const nextStage = !competition.currentStage
     ? getShortSegmentName(competition.segments[0])
     : competition.currentStage < competition.segments.length
-    ? getShortSegmentName(competition.segments[competition.currentStage])
-    : competition.currentStage === competition.segments.length
-    ? 'end'
-    : undefined;
+      ? getShortSegmentName(competition.segments[competition.currentStage])
+      : competition.currentStage === competition.segments.length
+        ? 'end'
+        : undefined;
 
   const [levelIsLoading, setLevelIsLoading] = useState(false);
   const handleChangeLevel = async (direction: 'next' | 'prev') => {
@@ -282,17 +174,17 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   const previousLevel =
     competition.currentLevel === 10
-      ? 'N/A'
+      ? 'P'
       : !competition.currentLevel
-      ? undefined
-      : (competition.currentLevel + 2).toString();
+        ? undefined
+        : (competition.currentLevel + 2).toString();
 
   const nextLevel =
     competition.currentLevel === 2
       ? undefined
       : !competition.currentLevel
-      ? '10'
-      : (competition.currentLevel - 2).toString();
+        ? '10'
+        : (competition.currentLevel - 2).toString();
 
   const isHandled = (team: FullTeam) => {
     const segmentTeamState = team.segmentTeamStates.find(
@@ -322,7 +214,6 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
-  const [endGameModalOpen, setEndGameModalOpen] = useState(false);
   const handleEndGame = async () => {
     if (!gameIsOver) {
       const winnerTeamId = competition.teams.reduce(
@@ -334,86 +225,16 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
       ).id;
 
       await setCompetitionWinner(competition.id, winnerTeamId);
-      setEndGameModalOpen(false);
     } else {
       await setCompetitionWinner(competition.id, null);
     }
 
-    setEndGameModalOpen(false);
     router.replace(router.asPath);
   };
 
-  const getTeamName = (teamId: string) =>
-    competition.teams.find((team) => team.id === teamId)?.name || '';
-
   return (
     <>
-      {addingTeam && (
-        <ModalOverlay>
-          <div>
-            <h2>Lägg till lag</h2>
-            <form onSubmit={handleAddTeam}>
-              <Label htmlFor="name">Namn</Label>
-              <Input
-                type="text"
-                id="name"
-                name="name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-              <Label htmlFor="members">Medlemmar (ej obligatoriskt)</Label>
-              <Input
-                type="text"
-                id="members"
-                name="members"
-                value={members}
-                onChange={(event) => setMembers(event.target.value)}
-              />
-              <ModalButtonWrapper>
-                <SubmitButton type="submit">Spara</SubmitButton>
-                <Button onClick={() => resetAddTeam()}>Avbryt</Button>
-              </ModalButtonWrapper>
-            </form>
-          </div>
-        </ModalOverlay>
-      )}
-      {editingTeam && (
-        <ModalOverlay>
-          <ModalContentWrapper>
-            <div>
-              <h2>Ta bort lag</h2>
-              <p>{`Vill du ta bort "${getTeamName(editingTeam)}"?`}</p>
-            </div>
-            <form onSubmit={handleDeleteTeam}>
-              <ModalButtonWrapper>
-                <CancelButton type="submit">Ta bort</CancelButton>
-                <Button onClick={() => setEditingTeam(null)}>Avbryt</Button>
-              </ModalButtonWrapper>
-            </form>
-          </ModalContentWrapper>
-        </ModalOverlay>
-      )}
-      {endGameModalOpen && (
-        <ModalOverlay>
-          <ModalContentWrapper>
-            <h2>{gameIsOver ? 'Öppna' : 'Avsluta'}</h2>
-            <ModalContent>
-              {gameIsOver
-                ? 'Är du säker på att du vill återöppna spelet och ta bort vinnare?'
-                : 'Är du säker på att du vill avsluta spelet och utse vinnare?'}
-            </ModalContent>
-            <ModalButtonWrapper>
-              <Button onClick={() => setEndGameModalOpen(false)}>
-                Nej, avbryt
-              </Button>
-              <SubmitButton onClick={handleEndGame}>
-                {gameIsOver ? 'Ja, öppna' : 'Ja, avsluta'}
-              </SubmitButton>
-            </ModalButtonWrapper>
-          </ModalContentWrapper>
-        </ModalOverlay>
-      )}
-      <Wrapper>
+      <div className="flex h-full flex-col">
         <ConnectionStatus state={connectionStatus} />
         <BreadCrumb
           segments={competition.segments}
@@ -421,14 +242,14 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             competition.currentStage === competition.segments.length + 1
               ? 'end'
               : competition.currentStage
-              ? currentSegment?.id || ''
-              : 'start'
+                ? currentSegment?.id || ''
+                : 'start'
           }
           gameIsOver={gameIsOver}
           goToSegment={goToSegment}
         />
-        <Bottom>
-          <ControlBar>
+        <div className="flex flex-1">
+          <div className="flex flex-[0_0_12rem] flex-col items-center justify-end border-r border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
             {currentSegment?.scorePublished && (
               <PublishWrapper>
                 <PublishButton
@@ -452,22 +273,18 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
               </PublishWrapper>
             )}
             {isLastStage && allPublished && (
-              <PublishWrapper>
-                <PublishButton
-                  variant={'active'}
-                  onClick={() => setEndGameModalOpen(true)}
-                  disabled={connectionState !== 'connected'}
-                >
-                  {gameIsOver ? 'Öppna' : 'Avsluta'}
-                </PublishButton>
-              </PublishWrapper>
+              <EndGameDialog
+                gameIsOver={gameIsOver}
+                connectionState={connectionState}
+                onEndGame={handleEndGame}
+              />
             )}
             {currentSegment?.type === 'TRIP' && !gameIsOver && (
               <StageController
                 heading="Nivå"
                 previous={() => handleChangeLevel('prev')}
                 next={() => handleChangeLevel('next')}
-                currentStage={competition.currentLevel?.toString() || 'N/A'}
+                currentStage={competition.currentLevel?.toString() || 'P'}
                 previousStage={previousLevel}
                 nextStage={nextLevel}
                 connectionState={connectionStatus}
@@ -484,10 +301,10 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                   competition.currentStage === competition.segments.length + 1
                     ? 'Slut'
                     : !competition.currentStage
-                    ? 'Start'
-                    : getShortSegmentName(
-                        competition.segments[competition.currentStage - 1]
-                      )
+                      ? 'Start'
+                      : getShortSegmentName(
+                          competition.segments[competition.currentStage - 1]
+                        )
                 }
                 previousStage={previousStage}
                 nextStage={nextStage}
@@ -495,8 +312,8 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
                 isLoading={segmentIsLoading}
               />
             )}
-          </ControlBar>
-          <Main>
+          </div>
+          <div className="grid flex-1 grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] gap-4 p-4">
             {competition.teams.map((team) => (
               <AdminTeam
                 key={team.id}
@@ -510,13 +327,13 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
             ))}
             {!gameIsOver && (
               <AddTeam
-                triggerAdd={() => setAddingTeam(true)}
+                competitionId={competition.id}
                 connectionState={connectionStatus}
               />
             )}
-          </Main>
-        </Bottom>
-      </Wrapper>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

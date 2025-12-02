@@ -21,18 +21,24 @@ export default async function handler(
       const { stage } = parsedBody.data;
       const { competitionId } = parsedQuery.data;
 
-      setCurrentStage(prismaContext, competitionId, stage)
-        .then(async (competition) => {
-          await Promise.all([
-            publishNewStageClient(competitionId, stage),
-            publishNewStageAdmin(competitionId, stage)
-          ]);
-          res.status(200).json(competition);
-        })
-        .catch((error) => {
-          console.log(error);
-          res.status(500).end('Unexpected internal server error');
-        });
+      try {
+        const competition = await setCurrentStage(
+          prismaContext,
+          competitionId,
+          stage
+        );
+
+        await Promise.all([
+          publishNewStageClient(competitionId, stage),
+          publishNewStageAdmin(competitionId, stage)
+        ]);
+        res.status(200).json(competition);
+        return;
+      } catch (error) {
+        console.log(error);
+        res.status(500).end('Unexpected internal server error');
+        return;
+      }
     }
   } else {
     res.status(404).end();

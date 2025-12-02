@@ -1,13 +1,14 @@
-import styled from 'styled-components';
+import { cn } from 'helpers/tailwindUtils';
 
-export const Button = styled.button`
-  background-color: hsl(0, 0%, 85%);
-  border: 1px solid #999999;
-  border-radius: 4px;
-  min-width: 10rem;
-  padding: 0.2rem 1rem;
-
-  &:hover {
-    background-color: hsl(0, 0%, 75%);
-  }
-`;
+export const Button = ({
+  className,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  <button
+    className={cn(
+      'min-w-40 rounded-sm border border-[#999999] bg-[hsl(0,0%,85%)] px-4 py-[0.2rem] hover:bg-[hsl(0,0%,75%)]',
+      className
+    )}
+    {...props}
+  />
+);

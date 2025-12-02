@@ -1,56 +1,19 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPause } from '@fortawesome/free-solid-svg-icons';
-import styled from 'styled-components';
+import { cn } from 'helpers/tailwindUtils';
+import { ButtonGroup } from '@/components/ui/button-group';
+import { Button } from '@/components/ui/button';
+import {
+  ArrowLeft,
+  ArrowRight,
+  FlagTriangleRight,
+  PauseIcon
+} from 'lucide-react';
 
-const Wrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  border-top: 2px solid hsl(0, 0%, 0%);
-  border-bottom: 2px solid hsl(0, 0%, 0%);
-  background: white;
-  margin-bottom: 1rem;
-  align-items: center;
-
-  h3 {
-    font-size: 1.5rem;
-    margin: 0;
-    padding-top: 0.5rem;
-  }
-
-  span {
-    font-size: 4rem;
-    font-weight: 500;
-    line-height: 1;
-    margin-bottom: 0.5rem;
-  }
-`;
-
-const ButtonWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-
-  button {
-    font-size: 1.5rem;
-    flex: 1;
-    border: none;
-    border-top: 1px solid hsl(0, 0%, 0%);
-    background: transparent;
-  }
-
-  button:last-child {
-    border-left: 1px solid hsl(0, 0%, 0%);
-  }
-
-  button:hover {
-    background-color: #bfbfbf;
-  }
-
-  button:disabled:hover {
-    background-color: transparent;
-  }
-`;
+const buttonClasses = cn(
+  'border-t-solid flex-1 border-t border-black bg-transparent text-2xl',
+  'last:border-l-solid last:border-l',
+  'hover:bg-[#bfbfbf]',
+  'disabled:hover:bg-transparent'
+);
 
 export const StageController: React.FC<{
   next: () => void;
@@ -73,44 +36,64 @@ export const StageController: React.FC<{
 }) => {
   const prevContent =
     previousStage === 'start' ? (
-      <FontAwesomeIcon icon={faPause} />
+      <>
+        <ArrowLeft /> <PauseIcon />
+      </>
     ) : !previousStage ? (
-      '< '
+      <ArrowLeft />
     ) : (
-      `< ${previousStage}`
+      <>
+        <ArrowLeft />
+        {previousStage}
+      </>
     );
 
   const nextContent =
     nextStage === 'end' ? (
-      <FontAwesomeIcon icon={faPause} />
+      <>
+        <FlagTriangleRight /> <ArrowRight />
+      </>
     ) : !nextStage ? (
-      '> '
+      <ArrowRight />
     ) : (
-      `${nextStage} >`
+      <>
+        {nextStage}
+        <ArrowRight />
+      </>
     );
 
   return (
-    <Wrapper>
-      <h3>{heading}</h3>
-      <span>{currentStage}</span>
-      <ButtonWrapper>
-        <button
-          type="button"
-          onClick={() => previous()}
-          disabled={
-            !previousStage || connectionState !== 'connected' || isLoading
-          }
-        >
-          {prevContent}
-        </button>
-        <button
-          type="button"
-          onClick={() => next()}
-          disabled={!nextStage || connectionState !== 'connected' || isLoading}
-        >
-          {nextContent}
-        </button>
-      </ButtonWrapper>
-    </Wrapper>
+    <div className="mb-2 flex w-full flex-col items-center rounded-none border-y border-black bg-white">
+      <h3 className="m-0 pt-2 text-2xl">{heading}</h3>
+      <span className="mb-2 text-[4rem] leading-none font-medium">
+        {currentStage}
+      </span>
+      <div className="flex w-full content-between">
+        <ButtonGroup className="w-full justify-center p-1">
+          <Button
+            variant="outline"
+            className="flex-1 grow border-zinc-900 text-lg"
+            onClick={() => previous()}
+            size="lg"
+            disabled={
+              !previousStage || connectionState !== 'connected' || isLoading
+            }
+          >
+            {prevContent}
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 grow border-zinc-900 text-lg"
+            onClick={() => next()}
+            size="lg"
+            disabled={
+              !nextStage || connectionState !== 'connected' || isLoading
+            }
+          >
+            {nextContent}
+          </Button>
+        </ButtonGroup>
+      </div>
+    </div>
   );
 };

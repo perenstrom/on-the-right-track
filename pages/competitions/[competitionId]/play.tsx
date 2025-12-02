@@ -3,37 +3,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
 import { ParsedUrlQuery } from 'querystring';
 import { getCompetition } from 'services/prisma';
-import styled from 'styled-components';
 import { FullCompetition } from 'types/types';
-
-const Wrapper = styled.div`
-  padding: 1rem;
-`;
-
-const Heading = styled.h1`
-  text-align: center;
-`;
-
-const TeamWrapper = styled(Link)`
-  display: block;
-  background-color: hsl(0, 0%, 90%);
-  border: 1px solid hsl(0, 0%, 10%);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  cursor: pointer;
-  text-decoration: none;
-`;
-
-const TeamName = styled.h2`
-  margin-left: -0.2rem;
-  margin-bottom: 0;
-  margin-top: 0;
-`;
-
-const TeamMembers = styled.p`
-  margin: 0;
-`;
 
 interface Props {
   competition: FullCompetition;
@@ -41,15 +11,19 @@ interface Props {
 
 const CompetitionPlayChooseTeamPage: NextPage<Props> = ({ competition }) => {
   return (
-    <Wrapper>
-      <Heading>Välj lag</Heading>
+    <div className="p-4">
+      <h1 className="text-center">Välj lag</h1>
       {competition.teams.map((team) => (
-        <TeamWrapper key={team.id} href={`/competitions/${competition.id}/play/${team.id}/settings`}>
-          <TeamName>{team.name}</TeamName>
-          <TeamMembers>{team.members}</TeamMembers>
-        </TeamWrapper>
+        <Link
+          className="mb-4 block cursor-pointer rounded-lg border border-[hsl(0,0%,10%)] bg-[hsl(0,0%,90%)] p-4 no-underline"
+          key={team.id}
+          href={`/competitions/${competition.id}/play/${team.id}/settings`}
+        >
+          <h2 className="mt-0 mb-0 -ml-[0.2rem]">{team.name}</h2>
+          <p className="m-0">{team.members}</p>
+        </Link>
       ))}
-    </Wrapper>
+    </div>
   );
 };
 

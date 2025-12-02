@@ -1,38 +1,41 @@
-import styled from 'styled-components';
+import { cn } from 'helpers/tailwindUtils';
 
 interface PublishButtonProps {
   readonly variant: 'idle' | 'active';
 }
 
 const buttonColors: Record<
-PublishButtonProps['variant'],
+  PublishButtonProps['variant'],
   { background: string; border: string; hover: string; text: string }
 > = {
   idle: {
-    background: 'hsl(0, 0%, 85%)',
-    border: 'hsl(0, 0%, 60%)',
-    hover: 'hsl(0, 0%, 75%)',
-    text: 'hsl(0, 0%, 15%)'
+    background: 'bg-[hsl(0,0%,85%)]',
+    border: 'border-[hsl(0,0%,60%)]',
+    hover: 'hover:bg-[hsl(0,0%,75%)]',
+    text: 'text-[hsl(0,0%,15%)]'
   },
   active: {
-    background: 'hsl(116, 46%, 55%)',
-    border: 'hsl(116, 46%, 30%)',
-    hover: 'hsl(116, 46%, 50%)',
-    text: 'hsl(0, 0%, 15%)'
+    background: 'bg-[hsl(116,46%,55%)]',
+    border: 'border-[hsl(116,46%,30%)]',
+    hover: 'hover:bg-[hsl(116,46%,50%)]',
+    text: 'text-[hsl(0,0%,15%)]'
   }
 };
 
-export const PublishButton = styled.button<PublishButtonProps>`
-  border-radius: 4px;
-  padding: 0 1rem;
-  width: 100%;
-
-  color: ${({ variant }) => buttonColors[variant].text};
-
-  background-color: ${({ variant }) => buttonColors[variant].background};
-  border: 1px solid ${({ variant }) => buttonColors[variant].border};
-
-  &:hover {
-    background-color: ${({ variant }) => buttonColors[variant].hover};
-  }
-`;
+export const PublishButton = ({
+  className,
+  variant,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & PublishButtonProps) => (
+  <button
+    className={cn(
+      'w-full rounded-sm border border-solid px-4 py-0',
+      buttonColors[variant].background,
+      buttonColors[variant].border,
+      buttonColors[variant].hover,
+      buttonColors[variant].text,
+      className
+    )}
+    {...props}
+  />
+);

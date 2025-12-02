@@ -8,21 +8,7 @@ import { ParsedUrlQuery } from 'querystring';
 import { useState } from 'react';
 import { updateTeam } from 'services/local';
 import { getTeam } from 'services/prisma';
-import styled from 'styled-components';
 import { z } from 'zod';
-
-const Wrapper = styled.form`
-  padding: 1rem;
-`;
-
-const Heading = styled.h1`
-  text-align: center;
-`;
-
-const SubmitButton = styled(Button)`
-  background-color: hsl(116, 46%, 55%);
-  border: 1px solid hsl(116, 46%, 30%);
-`;
 
 interface Props {
   team: Team;
@@ -59,8 +45,8 @@ const CompetitionPlaySetTeamSettingsPage: NextPage<Props> = ({ team }) => {
   };
 
   return (
-    <Wrapper onSubmit={handleSubmit}>
-      <Heading>Ändra inställningar</Heading>
+    <form className="p-4" onSubmit={handleSubmit}>
+      <h1 className="text-center">Ändra inställningar</h1>
       <Label htmlFor="name">Lagnamn</Label>
       <Input
         type="text"
@@ -77,10 +63,14 @@ const CompetitionPlaySetTeamSettingsPage: NextPage<Props> = ({ team }) => {
         value={members}
         onChange={(event) => setMembers(event.target.value)}
       />
-      <SubmitButton type="submit" disabled={loading}>
+      <Button
+        className="border border-[hsl(116,46%,30%)] bg-[hsl(116,46%,55%)]"
+        type="submit"
+        disabled={loading}
+      >
         Börja spela
-      </SubmitButton>
-    </Wrapper>
+      </Button>
+    </form>
   );
 };
 
