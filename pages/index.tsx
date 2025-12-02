@@ -33,6 +33,15 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
             <li key={competition.id}>
               <Link href={`/competitions/${competition.id}/admin`}>
                 {competition.name} - {competition.hosts}
+                {competition.winnerTeam && (
+                  <>
+                    {' '}
+                    <span className="text-sm">
+                      (Vinnare: {competition.winnerTeam.name} -{' '}
+                      {competition.winnerTeam.members})
+                    </span>
+                  </>
+                )}
               </Link>
             </li>
           ))}

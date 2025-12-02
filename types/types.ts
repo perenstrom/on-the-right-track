@@ -5,7 +5,14 @@ import {
   Team
 } from '@prisma/client';
 
-export type Competition = Omit<PrismaCompetition, 'date'> & {
+export type Competition = Omit<
+  Prisma.CompetitionGetPayload<{
+    include: {
+      winnerTeam: true;
+    };
+  }>,
+  'date'
+> & {
   date: string;
 };
 export type CompetitionWithSegmentCount = Omit<PrismaCompetition, 'date'> & {
