@@ -1,16 +1,15 @@
-import { NextPage } from 'next';
-import { Wrapper } from 'components/Wrapper';
-import { FormEventHandler, useState } from 'react';
-import { SegmentType } from '@prisma/client';
-import { Segment } from 'components/create/Segment';
-import { UncreatedSegment } from 'types/types';
-import { createCompetition } from 'services/local';
-import { useRouter } from 'next/router';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel, FieldSet } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { ItemGroup } from '@/components/ui/item';
+import { SegmentType } from '@prisma/client';
+import { Segment } from 'components/create/Segment';
+import { Wrapper } from 'components/Wrapper';
+import { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import { FormEventHandler, useState } from 'react';
+import { createCompetition } from 'services/local';
+import { UncreatedSegment } from 'types/types';
 
 const calculateSegmentNumbers = (
   segments: UncreatedSegment[]
