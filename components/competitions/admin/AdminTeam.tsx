@@ -1,18 +1,4 @@
-import { Segment, TeamState } from '@prisma/client';
-import { getTeamStateColorTW, getTeamStateTextColorTW } from 'helpers/styling';
-import { FullTeam } from 'types/types';
-import { ScoreButton } from './ScoreButton';
-import { deleteTeam, patchTeamSegmentState } from 'services/local';
-import { useRouter } from 'next/router';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import {
-  FormEventHandler,
-  MouseEventHandler,
-  useEffect,
-  useState
-} from 'react';
-import { cn } from 'helpers/tailwindUtils';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -23,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -31,7 +16,17 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Segment, TeamState } from '@prisma/client';
+import { getTeamStateColorTW, getTeamStateTextColorTW } from 'helpers/styling';
+import { cn } from 'helpers/tailwindUtils';
 import { CheckIcon, Trash2, XIcon } from 'lucide-react';
+import { useRouter } from 'next/router';
+import { FormEventHandler, MouseEventHandler, useState } from 'react';
+import { deleteTeam, patchTeamSegmentState } from 'services/local';
+import { FullTeam } from 'types/types';
+import { ScoreButton } from './ScoreButton';
 
 const EditButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
@@ -47,14 +42,7 @@ export const AdminTeam: React.FC<{
   connectionState: 'connected' | 'connecting' | 'disconnected';
   displayAnswers: boolean;
   handleEditTeam: (teamId: string) => void;
-}> = ({
-  team,
-  score,
-  currentSegment,
-  connectionState,
-  displayAnswers,
-  handleEditTeam
-}) => {
+}> = ({ team, score, currentSegment, connectionState, displayAnswers }) => {
   const handleDeleteTeam: FormEventHandler = async (event) => {
     event.preventDefault();
 

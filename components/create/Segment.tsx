@@ -1,22 +1,11 @@
-import {
-  faArrowDown,
-  faArrowUp,
-  faTrashCan
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegmentIcon } from 'components/SegmentIcon';
 import { getFullSegmentName } from 'helpers/copy';
+import { ArrowDown, ArrowUp, Minus, Plus, Trash2 } from 'lucide-react';
 import { MouseEventHandler } from 'react';
 import { UncreatedSegment } from 'types/types';
-import { Item, ItemActions, ItemContent, ItemMedia } from '../ui/item';
-import { ArrowDown, ArrowUp, Minus, Plus, Trash2 } from 'lucide-react';
-import { ButtonGroup, ButtonGroupText } from '../ui/button-group';
 import { Button } from '../ui/button';
-
-const OptionsButtonClassNames = 'h-full border-none bg-transparent flex-1';
-
-const OrderButtonClassNames =
-  'border-none bg-transparent grow px-[0.4rem] first:border-b first:border-black disabled:text-[#999999] disabled:hover:bg-transparent hover:bg-[#bfbfbf]';
+import { ButtonGroup, ButtonGroupText } from '../ui/button-group';
+import { Item, ItemActions, ItemContent, ItemMedia } from '../ui/item';
 
 export const Segment: React.FC<{
   segment: UncreatedSegment;

@@ -1,19 +1,11 @@
-import { cn } from 'helpers/tailwindUtils';
-import { ButtonGroup } from '@/components/ui/button-group';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import {
   ArrowLeft,
   ArrowRight,
   FlagTriangleRight,
   PauseIcon
 } from 'lucide-react';
-
-const buttonClasses = cn(
-  'border-t-solid flex-1 border-t border-black bg-transparent text-2xl',
-  'last:border-l-solid last:border-l',
-  'hover:bg-[#bfbfbf]',
-  'disabled:hover:bg-transparent'
-);
 
 export const StageController: React.FC<{
   next: () => void;
