@@ -1,26 +1,5 @@
 import { cn } from 'helpers/tailwindUtils';
 
-export const Label = ({
-  className,
-  ...props
-}: React.LabelHTMLAttributes<HTMLLabelElement>) => (
-  <label className={cn('block font-medium', className)} {...props} />
-);
-
-export const Input = ({
-  className,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input className={cn('mb-1 w-full max-w-100', className)} {...props} />
-);
-
-export const TextArea = ({
-  className,
-  ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-  <textarea className={cn('mb-1 w-full max-w-100', className)} {...props} />
-);
-
 export const SubmitButton = ({
   className,
   ...props

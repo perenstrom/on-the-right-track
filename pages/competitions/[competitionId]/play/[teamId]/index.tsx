@@ -2,7 +2,6 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Answer, Segment, SegmentTeamState, TeamState } from '@prisma/client';
 import { Button } from 'components/Button';
-import { Label, TextArea } from 'components/FormControls';
 import { getFullSegmentName } from 'helpers/copy';
 import { prismaContext } from 'lib/prisma';
 import { GetServerSideProps, NextPage } from 'next';
@@ -28,6 +27,8 @@ import {
 import { ConnectionStatus } from 'components/ConnectionStatus';
 import { pullTheBreak as pullTheBreakService } from 'services/local';
 import { cn } from 'helpers/tailwindUtils';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Textarea } from '@/components/ui/textarea';
 
 interface TripHeadingProps {
   variant: 'stopped' | 'answered';
@@ -304,21 +305,21 @@ const CompetitionPlayPage: NextPage<Props> = ({
                   {teamState.stopLevel}
                 </TripHeading>
               )}
-              <div className="flex w-full flex-1 flex-col p-4">
+              <div className="flex w-full flex-1 flex-col gap-4 p-4">
                 {answers.map((answer) => (
-                  <React.Fragment key={answer.id}>
-                    <Label className="text-[2rem]" htmlFor={answer.id}>
+                  <Field className="flex-1 gap-0" key={answer.id}>
+                    <FieldLabel className="text-[2rem]" htmlFor={answer.id}>
                       {`Svar ${answer.questionNumber}`}
-                    </Label>
-                    <TextArea
-                      className="flex-1 text-2xl leading-[1.2]"
+                    </FieldLabel>
+                    <Textarea
+                      className="h-full text-2xl leading-[1.2]"
                       id={answer.id}
                       value={answer.answer}
                       onChange={(event) =>
                         handleAnswersChange(event, answer.questionNumber - 1)
                       }
                     />
-                  </React.Fragment>
+                  </Field>
                 ))}
                 <Button
                   className="w-full border border-[hsl(116,46%,30%)] bg-[hsl(116,46%,55%)] text-2xl"
