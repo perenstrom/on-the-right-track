@@ -1,12 +1,4 @@
 import { CompetitionLinks } from '@/components/competitions/admin/CompetitionLinks';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
 import { Segment } from '@prisma/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
