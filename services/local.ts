@@ -67,6 +67,18 @@ export const deleteTeam = async (teamId: string) => {
   return result;
 };
 
+export const deleteCompetition = async (competitionId: string) => {
+  const url = `/api/competitions/${competitionId}`;
+  const options: RequestInit = {
+    method: 'DELETE',
+    headers: defaultHeaders
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
 export const setCurrentStage = async (
   competitionId: string,
   stage: number | null

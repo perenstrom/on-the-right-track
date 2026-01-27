@@ -100,3 +100,12 @@ export const PatchAnswerSchema = z.object({
 export const PatchAnswerQuerySchema = z.object({
   answerId: z.string()
 });
+
+export const DeleteCompetitionQuerySchema = z.object({
+  competitionId: z.string()
+});
+
+export type DeleteCompetitionQuery = z.infer<
+  typeof DeleteCompetitionQuerySchema
+>;
+

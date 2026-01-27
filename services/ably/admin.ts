@@ -38,3 +38,9 @@ export const publishNewLevel = async (
 ) => {
   return publishMessage(ablyEvents.newLevel, competitionId, { level });
 };
+
+export const publishDeletedCompetitionAdmin = async (competitionId: string) => {
+  return publishMessage(ablyEvents.deletedCompetition, competitionId, {
+    competitionId
+  });
+};

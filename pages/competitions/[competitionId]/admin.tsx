@@ -1,4 +1,5 @@
 import { CompetitionLinks } from '@/components/competitions/admin/CompetitionLinks';
+import { DeleteCompetitionDialog } from '@/components/competitions/admin/DeleteCompetitionDialog';
 import { Segment } from '@prisma/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
@@ -69,6 +70,11 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           ) {
             setEditingTeam(null);
           }
+        }
+        if (message.name === ablyEvents.deletedCompetition) {
+          // Competition was deleted, redirect to home
+          router.push('/');
+          return;
         }
         console.log('message received');
         console.log(JSON.stringify(message, null, 2));
@@ -256,7 +262,15 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
         />
         <div className="flex flex-1">
           <div className="flex flex-[0_0_12rem] flex-col items-center justify-between border-r border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
-            <CompetitionLinks competitionId={competition.id} />
+            <div className="flex w-full flex-col gap-4 p-4">
+              <CompetitionLinks competitionId={competition.id} />
+              {competition.currentStage === null && (
+                <DeleteCompetitionDialog
+                  competitionId={competition.id}
+                  competitionName={competition.name}
+                />
+              )}
+            </div>
             <div className="flex w-full flex-col gap-4">
               {currentSegment?.scorePublished && (
                 <PublishWrapper>
@@ -359,16 +373,26 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
     throw new Error('No competition ID in params');
   }
 
-  const competition = await getCompetition(
-    prismaContext,
-    context?.params?.competitionId
-  );
+  try {
+    const competition = await getCompetition(
+      prismaContext,
+      context?.params?.competitionId
+    );
 
-  return {
-    props: {
-      competition
-    }
-  };
+    return {
+      props: {
+        competition
+      }
+    };
+  } catch (error) {
+    // Competition was deleted or not found
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    };
+  }
 };
 
 export default AdminPage;

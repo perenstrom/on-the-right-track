@@ -14,6 +14,9 @@ import { Optional, WithRequired } from 'types/utils';
 
 export const getCompetitions = async (ctx: Context): Promise<Competition[]> => {
   const result = await ctx.prisma.competition.findMany({
+    where: {
+      deleted: false
+    },
     include: {
       winnerTeam: true
     },
@@ -67,6 +70,10 @@ export const getCompetition = async (
     throw new Error('Competition not found');
   }
 
+  if (result.deleted) {
+    throw new Error('Competition has been deleted');
+  }
+
   return {
     ...result,
     date: result.date.toISOString()
@@ -102,6 +109,10 @@ export const getScoreCompetition = async (
     throw new Error('Competition not found');
   }
 
+  if (result.deleted) {
+    throw new Error('Competition has been deleted');
+  }
+
   return {
     ...result,
     date: result.date.toISOString()
@@ -127,6 +138,10 @@ export const getBaseCompetition = async (
 
   if (!result) {
     throw new Error('Competition not found');
+  }
+
+  if (result.deleted) {
+    throw new Error('Competition has been deleted');
   }
 
   const segmentCount = result.segments.length;
@@ -207,6 +222,22 @@ export const setCompetitionWinner = async (
     },
     data: {
       winnerTeamId: winnerTeamId
+    }
+  });
+
+  return result;
+};
+
+export const softDeleteCompetition = async (
+  ctx: Context,
+  competitionId: string
+) => {
+  const result = await ctx.prisma.competition.update({
+    where: {
+      id: competitionId
+    },
+    data: {
+      deleted: true
     }
   });
 

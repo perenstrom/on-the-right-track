@@ -10,6 +10,7 @@ import { ParsedUrlQuery } from 'querystring';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getScoreCompetition } from 'services/prisma';
 import { ScoreCompetition, ScoreTeam as ScoreTeamType } from 'types/types';
+import { ablyEvents } from 'services/ably/ably';
 
 interface Props {
   competition: ScoreCompetition;
@@ -33,7 +34,18 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
 
   const { connectionState } = useAblyClientChannel(
     competition.id,
-    useCallback(() => router.replace(router.asPath), [router])
+    useCallback(
+      (message) => {
+        // Competition was deleted, redirect to home
+        if (message.name === ablyEvents.deletedCompetition) {
+          router.push('/');
+          return;
+        }
+
+        router.replace(router.asPath);
+      },
+      [router]
+    )
   );
 
   const [ablyHasDisconnected, setAblyHasDisconnected] = useState(false);
@@ -114,16 +126,26 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
     throw new Error('No competition ID in params');
   }
 
-  const competition = await getScoreCompetition(
-    prismaContext,
-    context?.params?.competitionId
-  );
+  try {
+    const competition = await getScoreCompetition(
+      prismaContext,
+      context?.params?.competitionId
+    );
 
-  return {
-    props: {
-      competition
-    }
-  };
+    return {
+      props: {
+        competition
+      }
+    };
+  } catch (error) {
+    // Competition was deleted or not found
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    };
+  }
 };
 
 export default AdminPage;

@@ -70,3 +70,12 @@ export const publishNewSegmentTeamState = async (
     segmentTeamState
   );
 };
+
+export const PublishDeletedCompetitionSchema = z.object({
+  competitionId: z.string()
+});
+export const publishDeletedCompetition = async (competitionId: string) => {
+  return publishMessage(ablyEvents.deletedCompetition, competitionId, {
+    competitionId
+  });
+};

@@ -12,6 +12,7 @@
     "lint": "next lint",
     "prisma:generate": "dotenv -e .env.local -- npx prisma generate --schema=./schemas/prisma/schema.prisma",
     "prisma:push:local": "dotenv -e .env.local -- npx prisma db push --schema=./schemas/prisma/schema.prisma",
+    "prisma:migrate:dev": "dotenv -e .env.local -- npx prisma migrate dev",
     "postinstall": "prisma generate --schema=./schemas/prisma/schema.prisma"
   },
   "dependencies": {

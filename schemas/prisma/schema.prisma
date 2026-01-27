@@ -15,6 +15,7 @@ model Competition {
   currentStage Int?     @map("current_stage")
   currentLevel Int?     @map("current_level")
   winnerTeamId String?  @unique @map("winner_team_id")
+  deleted      Boolean  @default(false)
 
   winnerTeam Team?     @relation("winner_team", fields: [winnerTeamId], references: [id])
   teams      Team[]    @relation("playing_teams")
