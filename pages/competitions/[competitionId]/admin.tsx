@@ -1,3 +1,12 @@
+import { CompetitionLinks } from '@/components/competitions/admin/CompetitionLinks';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
 import { Segment } from '@prisma/client';
 import { ConnectionStatus } from 'components/ConnectionStatus';
 import { AddTeam } from 'components/competitions/admin/AddTeam';
@@ -214,6 +223,11 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
     router.replace(router.asPath);
   };
 
+  /*   const [showLinks, setShowLinks] = useState(false);
+  const handleShowLinks = () => {
+    setShowLinks(!showLinks);
+  }; */
+
   const handleEndGame = async () => {
     if (!gameIsOver) {
       const winnerTeamId = competition.teams.reduce(
@@ -249,69 +263,74 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           goToSegment={goToSegment}
         />
         <div className="flex flex-1">
-          <div className="flex flex-[0_0_12rem] flex-col items-center justify-end border-r border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
-            {currentSegment?.scorePublished && (
-              <PublishWrapper>
-                <PublishButton
-                  variant={'active'}
-                  onClick={() => setDisplayAnswers(!displayAnswers)}
-                  disabled={connectionState !== 'connected'}
-                >
-                  {displayAnswers ? 'Dölj svar' : 'Visa svar'}
-                </PublishButton>
-              </PublishWrapper>
-            )}
-            {someOneAnswered && !gameIsOver && (
-              <PublishWrapper>
-                <PublishButton
-                  variant={allAnswered ? 'active' : 'idle'}
-                  onClick={handlePublish}
-                  disabled={connectionState !== 'connected'}
-                >
-                  {currentSegment?.scorePublished ? 'Avpublicera' : 'Publicera'}
-                </PublishButton>
-              </PublishWrapper>
-            )}
-            {isLastStage && allPublished && (
-              <EndGameDialog
-                gameIsOver={gameIsOver}
-                connectionState={connectionState}
-                onEndGame={handleEndGame}
-              />
-            )}
-            {currentSegment?.type === 'TRIP' && !gameIsOver && (
-              <StageController
-                heading="Nivå"
-                previous={() => handleChangeLevel('prev')}
-                next={() => handleChangeLevel('next')}
-                currentStage={competition.currentLevel?.toString() || 'P'}
-                previousStage={previousLevel}
-                nextStage={nextLevel}
-                connectionState={connectionStatus}
-                isLoading={levelIsLoading}
-              />
-            )}
-            {!gameIsOver && (
-              <StageController
-                heading="Moment"
-                previous={() => handleChangeState('prev')}
-                next={() => handleChangeState('next')}
-                currentStage={
-                  competition.currentStage &&
-                  competition.currentStage === competition.segments.length + 1
-                    ? 'Slut'
-                    : !competition.currentStage
-                      ? 'Start'
-                      : getShortSegmentName(
-                          competition.segments[competition.currentStage - 1]
-                        )
-                }
-                previousStage={previousStage}
-                nextStage={nextStage}
-                connectionState={connectionStatus}
-                isLoading={segmentIsLoading}
-              />
-            )}
+          <div className="flex flex-[0_0_12rem] flex-col items-center justify-between border-r border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
+            <CompetitionLinks competitionId={competition.id} />
+            <div className="flex w-full flex-col gap-4">
+              {currentSegment?.scorePublished && (
+                <PublishWrapper>
+                  <PublishButton
+                    variant={'active'}
+                    onClick={() => setDisplayAnswers(!displayAnswers)}
+                    disabled={connectionState !== 'connected'}
+                  >
+                    {displayAnswers ? 'Dölj svar' : 'Visa svar'}
+                  </PublishButton>
+                </PublishWrapper>
+              )}
+              {someOneAnswered && !gameIsOver && (
+                <PublishWrapper>
+                  <PublishButton
+                    variant={allAnswered ? 'active' : 'idle'}
+                    onClick={handlePublish}
+                    disabled={connectionState !== 'connected'}
+                  >
+                    {currentSegment?.scorePublished
+                      ? 'Avpublicera'
+                      : 'Publicera'}
+                  </PublishButton>
+                </PublishWrapper>
+              )}
+              {isLastStage && allPublished && (
+                <EndGameDialog
+                  gameIsOver={gameIsOver}
+                  connectionState={connectionState}
+                  onEndGame={handleEndGame}
+                />
+              )}
+              {currentSegment?.type === 'TRIP' && !gameIsOver && (
+                <StageController
+                  heading="Nivå"
+                  previous={() => handleChangeLevel('prev')}
+                  next={() => handleChangeLevel('next')}
+                  currentStage={competition.currentLevel?.toString() || 'P'}
+                  previousStage={previousLevel}
+                  nextStage={nextLevel}
+                  connectionState={connectionStatus}
+                  isLoading={levelIsLoading}
+                />
+              )}
+              {!gameIsOver && (
+                <StageController
+                  heading="Moment"
+                  previous={() => handleChangeState('prev')}
+                  next={() => handleChangeState('next')}
+                  currentStage={
+                    competition.currentStage &&
+                    competition.currentStage === competition.segments.length + 1
+                      ? 'Slut'
+                      : !competition.currentStage
+                        ? 'Start'
+                        : getShortSegmentName(
+                            competition.segments[competition.currentStage - 1]
+                          )
+                  }
+                  previousStage={previousStage}
+                  nextStage={nextStage}
+                  connectionState={connectionStatus}
+                  isLoading={segmentIsLoading}
+                />
+              )}
+            </div>
           </div>
           <div className="grid flex-1 grid-cols-[repeat(3,1fr)] grid-rows-[repeat(3,1fr)] gap-4 p-4">
             {competition.teams.map((team) => (
