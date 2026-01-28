@@ -20,7 +20,7 @@ export const CompetitionLinks = ({
       : '';
 
   return (
-    <div className="w-full p-4">
+    <div className="w-full">
       <Dialog>
         <DialogTrigger asChild>
           <PublishButton variant="idle">Länkar</PublishButton>

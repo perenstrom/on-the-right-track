@@ -150,7 +150,8 @@ const CreatePage: NextPage<{}> = () => {
           date,
           currentLevel: null,
           currentStage: null,
-          winnerTeamId: null
+          winnerTeamId: null,
+          deleted: false
         },
         segments
       });

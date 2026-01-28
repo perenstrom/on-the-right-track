@@ -134,6 +134,12 @@ const CompetitionPlayPage: NextPage<Props> = ({
           }
         }
 
+        // Competition was deleted, redirect to home
+        if (message.name === ablyEvents.deletedCompetition) {
+          router.push('/');
+          return;
+        }
+
         router.replace(router.asPath);
         return;
       },
@@ -400,57 +406,67 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async (
     throw new Error('No competition ID or team ID in params');
   }
 
-  const [competition, team] = await Promise.all([
-    getBaseCompetition(prismaContext, context?.params?.competitionId),
-    getTeam(prismaContext, context?.params?.teamId)
-  ]);
+  try {
+    const [competition, team] = await Promise.all([
+      getBaseCompetition(prismaContext, context?.params?.competitionId),
+      getTeam(prismaContext, context?.params?.teamId)
+    ]);
 
-  const segment =
-    competition.currentStage &&
-    competition.currentStage <= competition.segmentCount
-      ? await getSegment(
-          prismaContext,
-          competition.id,
-          competition.currentStage
-        )
+    const segment =
+      competition.currentStage &&
+      competition.currentStage <= competition.segmentCount
+        ? await getSegment(
+            prismaContext,
+            competition.id,
+            competition.currentStage
+          )
+        : null;
+
+    const teamState = segment
+      ? await upsertSegmentTeamState(prismaContext, {
+          selector: {
+            segmentId: segment.id,
+            teamId: team.id
+          },
+          data: {}
+        })
       : null;
 
-  const teamState = segment
-    ? await upsertSegmentTeamState(prismaContext, {
-        selector: {
-          segmentId: segment.id,
-          teamId: team.id
-        },
-        data: {}
-      })
-    : null;
+    const numberOfOptions = segment
+      ? segment.type === 'TRIP'
+        ? 1
+        : segment.numberOfOptions || 0
+      : 0;
 
-  const numberOfOptions = segment
-    ? segment.type === 'TRIP'
-      ? 1
-      : segment.numberOfOptions || 0
-    : 0;
-
-  let answers: Answer[] = [];
-  if (segment && teamState && numberOfOptions > 0) {
-    const numberArray = new Array(numberOfOptions).fill(0);
-    const promises = numberArray.map((_, i) =>
-      upsertAnswer(prismaContext, {
-        stateId: teamState.id,
-        questionNumber: i + 1
-      })
-    );
-    answers = await Promise.all(promises);
-  }
-
-  return {
-    props: {
-      competition,
-      segment,
-      teamState,
-      answers: answers.sort((a, b) => a.questionNumber - b.questionNumber)
+    let answers: Answer[] = [];
+    if (segment && teamState && numberOfOptions > 0) {
+      const numberArray = new Array(numberOfOptions).fill(0);
+      const promises = numberArray.map((_, i) =>
+        upsertAnswer(prismaContext, {
+          stateId: teamState.id,
+          questionNumber: i + 1
+        })
+      );
+      answers = await Promise.all(promises);
     }
-  };
+
+    return {
+      props: {
+        competition,
+        segment,
+        teamState,
+        answers: answers.sort((a, b) => a.questionNumber - b.questionNumber)
+      }
+    };
+  } catch (error) {
+    // Competition was deleted or not found
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    };
+  }
 };
 
 export default CompetitionPlayPage;

@@ -12,6 +12,7 @@
     "lint": "next lint",
     "prisma:generate": "dotenv -e .env.local -- npx prisma generate --schema=./schemas/prisma/schema.prisma",
     "prisma:push:local": "dotenv -e .env.local -- npx prisma db push --schema=./schemas/prisma/schema.prisma",
+    "prisma:migrate:dev": "dotenv -e .env.local -- npx prisma migrate dev",
     "postinstall": "prisma generate --schema=./schemas/prisma/schema.prisma"
   },
   "dependencies": {
@@ -42,6 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "autoprefixer": "^10.4.22",
+    "baseline-browser-mapping": "^2.9.19",
     "dotenv-cli": "^7.1.0",
     "eslint": "^8.23.1",
     "eslint-config-next": "^13.1.6",
