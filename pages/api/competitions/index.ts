@@ -23,7 +23,8 @@ const competitions = async (req: NextApiRequest, res: NextApiResponse) => {
             name,
             currentLevel: null,
             currentStage: null,
-            winnerTeamId: null
+            winnerTeamId: null,
+            deleted: false
           },
           parsedCompetition.data.segments
         );
