@@ -188,3 +188,49 @@ export const patchAnswer = async (answerId: string, answer: string) => {
 
   return result;
 };
+
+export const updateCompetition = async (
+  competitionId: string,
+  data: { name?: string; hosts?: string; date?: string }
+) => {
+  const url = `/api/competitions/${competitionId}`;
+  const options: RequestInit = {
+    method: 'PATCH',
+    headers: defaultHeaders,
+    body: JSON.stringify(data)
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};
+
+export const canEditStages = async (
+  competitionId: string
+): Promise<boolean> => {
+  const url = `/api/competitions/${competitionId}/can-edit-stages`;
+  const options: RequestInit = {
+    method: 'GET',
+    headers: defaultHeaders
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result.canEdit;
+};
+
+export const updateSegments = async (
+  competitionId: string,
+  segments: UncreatedSegment[]
+) => {
+  const url = `/api/competitions/${competitionId}/segments`;
+  const options: RequestInit = {
+    method: 'PUT',
+    headers: defaultHeaders,
+    body: JSON.stringify({ segments })
+  };
+
+  const result = await fetch(url, options).then((r) => r.json());
+
+  return result;
+};

@@ -14,13 +14,15 @@ export const Segment: React.FC<{
   moveDown: MouseEventHandler;
   deleteSegment: MouseEventHandler;
   changeOptionsCount: (position: number, count: number) => void;
+  disabled?: boolean;
 }> = ({
   segment,
   totalSegments,
   moveUp,
   moveDown,
   deleteSegment,
-  changeOptionsCount
+  changeOptionsCount,
+  disabled = false
 }) => {
   const handleOptionsChange = (number: number) => {
     changeOptionsCount(segment.order, number < 1 ? 1 : number);
@@ -48,7 +50,7 @@ export const Segment: React.FC<{
                 onClick={() =>
                   handleOptionsChange((segment.numberOfOptions ?? 0) - 1)
                 }
-                disabled={segment.numberOfOptions === 1}
+                disabled={disabled || segment.numberOfOptions === 1}
               >
                 <Minus />
               </Button>
@@ -59,6 +61,7 @@ export const Segment: React.FC<{
                 onClick={() =>
                   handleOptionsChange((segment.numberOfOptions ?? 0) + 1)
                 }
+                disabled={disabled}
               >
                 <Plus />
               </Button>
@@ -71,7 +74,7 @@ export const Segment: React.FC<{
             variant="outline"
             size="icon"
             onClick={moveUp}
-            disabled={segment.order === 1}
+            disabled={disabled || segment.order === 1}
           >
             <ArrowUp />
           </Button>
@@ -80,7 +83,7 @@ export const Segment: React.FC<{
             variant="outline"
             size="icon"
             onClick={moveDown}
-            disabled={segment.order === totalSegments}
+            disabled={disabled || segment.order === totalSegments}
           >
             <ArrowDown />
           </Button>
@@ -90,6 +93,7 @@ export const Segment: React.FC<{
           variant="outline"
           size="icon"
           onClick={deleteSegment}
+          disabled={disabled}
         >
           <Trash2 />
         </Button>
