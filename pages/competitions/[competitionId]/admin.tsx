@@ -26,6 +26,7 @@ import {
 } from 'services/local';
 import { getCompetition } from 'services/prisma';
 import { FullCompetition, FullTeam } from 'types/types';
+import Link from 'next/link';
 
 const PublishWrapper = ({
   className,
@@ -264,6 +265,9 @@ const AdminPage: NextPage<Props> = ({ competition }) => {
           <div className="flex flex-[0_0_12rem] flex-col items-center justify-between border-r border-[hsl(0,0%,0%)] bg-[hsl(0,0%,85%)]">
             <div className="flex w-full flex-col gap-4 p-4">
               <CompetitionLinks competitionId={competition.id} />
+              <Link href={`/competitions/${competition.id}/edit`}>
+                <PublishButton variant="idle">Redigera tävling</PublishButton>
+              </Link>
               {competition.currentStage === null && (
                 <DeleteCompetitionDialog
                   competitionId={competition.id}

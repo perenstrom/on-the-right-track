@@ -44,3 +44,15 @@ export const publishDeletedCompetitionAdmin = async (competitionId: string) => {
     competitionId
   });
 };
+
+export const publishUpdatedCompetition = async (competitionId: string) => {
+  return publishMessage(ablyEvents.updatedCompetition, competitionId, {
+    competitionId
+  });
+};
+
+export const publishUpdatedSegments = async (competitionId: string) => {
+  return publishMessage(ablyEvents.updatedSegments, competitionId, {
+    competitionId
+  });
+};

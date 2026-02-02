@@ -8,7 +8,9 @@ export const ablyEvents = {
   newWinner: 'newWinner',
   newTeam: 'newTeam',
   deletedTeam: 'deletedTeam',
-  deletedCompetition: 'deletedCompetition'
+  deletedCompetition: 'deletedCompetition',
+  updatedCompetition: 'updatedCompetition',
+  updatedSegments: 'updatedSegments'
 } as const;
 
 export const makePublishMessage =

@@ -420,3 +420,87 @@ export const updateAnswer = async (
 
   return result;
 };
+
+export const updateCompetition = async (
+  ctx: Context,
+  competitionId: string,
+  competition: Partial<UncreatedCompetition>
+) => {
+  const result = await ctx.prisma.competition.update({
+    where: {
+      id: competitionId
+    },
+    data: {
+      ...competition,
+      date: competition.date ? new Date(competition.date) : undefined
+    }
+  });
+
+  return result;
+};
+
+export const canEditStages = async (
+  ctx: Context,
+  competitionId: string
+): Promise<boolean> => {
+  // Check if any team has a non-IDLE state
+  const nonIdleStates = await ctx.prisma.segmentTeamState.count({
+    where: {
+      segment: { competitionId },
+      state: { not: 'IDLE' }
+    }
+  });
+
+  if (nonIdleStates > 0) return false;
+
+  // Check if any answers exist
+  const answers = await ctx.prisma.answer.count({
+    where: {
+      state: {
+        segment: { competitionId }
+      }
+    }
+  });
+
+  return answers === 0;
+};
+
+export const deleteSegment = async (ctx: Context, segmentId: string) => {
+  const result = await ctx.prisma.segment.delete({
+    where: {
+      id: segmentId
+    }
+  });
+
+  return result;
+};
+
+export const createSegment = async (
+  ctx: Context,
+  competitionId: string,
+  segment: UncreatedSegment
+) => {
+  const result = await ctx.prisma.segment.create({
+    data: {
+      ...segment,
+      competitionId
+    }
+  });
+
+  return result;
+};
+
+export const updateSegment = async (
+  ctx: Context,
+  segmentId: string,
+  data: Partial<Omit<UncreatedSegment, 'competitionId'>>
+) => {
+  const result = await ctx.prisma.segment.update({
+    where: {
+      id: segmentId
+    },
+    data
+  });
+
+  return result;
+};

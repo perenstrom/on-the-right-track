@@ -13,7 +13,8 @@
     "prisma:generate": "dotenv -e .env.local -- npx prisma generate --schema=./schemas/prisma/schema.prisma",
     "prisma:push:local": "dotenv -e .env.local -- npx prisma db push --schema=./schemas/prisma/schema.prisma",
     "prisma:migrate:dev": "dotenv -e .env.local -- npx prisma migrate dev",
-    "postinstall": "prisma generate --schema=./schemas/prisma/schema.prisma"
+    "postinstall": "prisma generate --schema=./schemas/prisma/schema.prisma",
+    "prettier": "prettier ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -51,6 +52,7 @@
     "jest": "^29.0.3",
     "jest-environment-jsdom": "^29.0.3",
     "postcss": "^8.5.6",
+    "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "prisma": "^5.17.0",
     "tailwindcss": "^4.1.17",

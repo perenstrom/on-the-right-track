@@ -109,3 +109,21 @@ export type DeleteCompetitionQuery = z.infer<
   typeof DeleteCompetitionQuerySchema
 >;
 
+export const UpdateCompetitionSchema = z.object({
+  name: z.string().min(1).optional(),
+  hosts: z.string().min(1).optional(),
+  date: z.string().optional()
+});
+
+export const UpdateSegmentSchema = z.object({
+  id: z.string().uuid().optional(),
+  type: SegmentType,
+  order: z.number().int().min(1),
+  numberOfOptions: z.number().int().min(2).optional().nullable(),
+  orderOfType: z.number().int(),
+  nearestTrip: z.number().int().nullable()
+});
+
+export const UpdateSegmentsSchema = z.object({
+  segments: z.array(UpdateSegmentSchema)
+});

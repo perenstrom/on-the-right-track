@@ -52,7 +52,12 @@ export type FullCompetition = Omit<
   date: string;
 };
 
-export type UncreatedCompetition = Omit<Competition, 'id' | 'winnerTeam'>;
+export type UncreatedCompetition = Omit<
+  Competition,
+  'id' | 'winnerTeam' | 'deleted'
+> & {
+  deleted?: boolean;
+};
 
 export type UncreatedSegment = Omit<Segment, 'id' | 'competitionId'>;
 
