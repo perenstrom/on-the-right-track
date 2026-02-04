@@ -4,6 +4,7 @@ import { prismaContext } from 'lib/prisma';
 import { getCompetitions } from 'services/prisma';
 import { Competition } from 'types/types';
 import Link from 'next/link';
+import { Copy } from 'lucide-react';
 
 interface Props {
   competitions: Competition[];
@@ -30,7 +31,7 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
       {competitions.length > 0 ? (
         <ul>
           {competitions.map((competition) => (
-            <li key={competition.id}>
+            <li key={competition.id} className="flex items-center gap-2">
               <Link href={`/competitions/${competition.id}/admin`}>
                 {competition.name} - {competition.hosts}
                 {competition.winnerTeam && (
@@ -42,6 +43,13 @@ const IndexPage: NextPage<Props> = ({ competitions }) => {
                     </span>
                   </>
                 )}
+              </Link>
+              <Link
+                href={`/create?clone=${competition.id}`}
+                className="inline-flex items-center text-gray-500 transition-colors hover:text-gray-700"
+                title="Kopiera tävling"
+              >
+                <Copy size={16} />
               </Link>
             </li>
           ))}
